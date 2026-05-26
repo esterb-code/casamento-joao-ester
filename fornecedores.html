@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fornecedores · João & Ester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <style>
+    :root {
+      --rosa: #C2516A; --rosa-claro: #F4AABB; --rosa-escuro: #8B2240;
+      --verde: #2C6E3A; --verde-m: #5FA870; --verde-menta: #C8E8CE;
+      --laranja: #E8760A; --laranja-s: #F4A860; --pessego: #FDE8CC;
+      --creme: #FDF5EC; --taupe: #9A7060; --branco: #FDFAF7;
+      --sidebar-w: 220px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; background: var(--creme); color: #3E3530; display: flex; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar-w); background: var(--rosa-escuro); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow-y: auto; }
+    .sidebar-logo { padding: 24px 20px 20px; border-bottom: 0.5px solid rgba(194,81,106,0.5); margin-bottom: 8px; }
+    .sidebar-logo .initials { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.15em; color: var(--pessego); margin-bottom: 4px; }
+    .sidebar-logo .names { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #fff; line-height: 1.2; }
+    .sidebar-logo .date { font-size: 11px; color: var(--rosa-claro); margin-top: 3px; font-weight: 300; }
+    .nav-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.12em; color: rgba(244,170,187,0.5); padding: 8px 20px 4px; text-transform: uppercase; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: rgba(253,221,230,0.8); cursor: pointer; transition: all 0.15s; text-decoration: none; border-left: 2px solid transparent; }
+    .nav-item:hover { background: rgba(194,81,106,0.2); color: #fff; }
+    .nav-item.active { background: rgba(194,81,106,0.25); color: #fff; border-left-color: var(--rosa-claro); font-weight: 600; }
+    .nav-item i { font-size: 16px; opacity: 0.8; }
+    .nav-section { padding: 8px 0; }
+
+    /* MAIN */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* TOPBAR */
+    .topbar { padding: 20px 36px; background: var(--branco); border-bottom: 0.5px solid #EED8C8; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar-left h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--rosa-escuro); }
+    .topbar-left p { font-size: 12px; color: var(--taupe); margin-top: 2px; }
+    .topbar-right { display: flex; gap: 10px; align-items: center; }
+    .search-wrap { position: relative; }
+    .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--taupe); font-size: 15px; }
+    .search-input { border: 0.5px solid #EED8C8; border-radius: 10px; padding: 8px 12px 8px 32px; font-size: 12px; background: var(--creme); color: #3E3530; width: 200px; font-family: 'Nunito', sans-serif; outline: none; }
+    .search-input:focus { border-color: var(--rosa-claro); }
+    .btn-add { background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 9px 16px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Nunito', sans-serif; transition: background 0.15s; }
+    .btn-add:hover { background: var(--rosa-escuro); }
+
+    /* CONTENT */
+    .content { padding: 24px 36px; }
+
+    /* STATUS FILTERS */
+    .filters { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filter-pill { font-size: 11px; font-weight: 600; padding: 6px 14px; border-radius: 99px; cursor: pointer; border: 0.5px solid transparent; font-family: 'Cinzel', serif; letter-spacing: 0.05em; transition: all 0.15s; }
+    .filter-pill.active, .filter-pill:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .f-todos { background: var(--rosa-escuro); color: white; }
+    .f-orcado { background: var(--branco); color: var(--taupe); border-color: #EED8C8; }
+    .f-negociacao { background: var(--pessego); color: #8B4000; border-color: var(--laranja-s); }
+    .f-contratado { background: var(--verde-menta); color: var(--verde); border-color: var(--verde-m); }
+    .f-pago { background: #E6F1FB; color: #185FA5; border-color: #378ADD; }
+    .f-cancelado { background: #FCEBEB; color: #A32D2D; border-color: #E24B4A; }
+
+    /* RESUMO FINANCEIRO */
+    .resumo-bar { display: flex; gap: 12px; margin-bottom: 28px; }
+    .resumo-item { flex: 1; background: var(--branco); border-radius: 14px; border: 0.5px solid #EED8C8; padding: 14px 18px; }
+    .resumo-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.1em; color: var(--taupe); text-transform: uppercase; margin-bottom: 6px; }
+    .resumo-value { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 500; color: var(--rosa-escuro); }
+    .resumo-sub { font-size: 10px; color: var(--verde-m); margin-top: 2px; }
+
+    /* CATEGORIAS */
+    .categoria-section { margin-bottom: 28px; }
+    .categoria-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 0.5px solid #EED8C8; }
+    .categoria-icon { font-size: 18px; color: var(--rosa); }
+    .categoria-nome { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 0.08em; color: var(--rosa-escuro); text-transform: uppercase; }
+    .categoria-count { font-size: 11px; color: var(--taupe); background: #FAE8EC; padding: 2px 10px; border-radius: 99px; }
+    .categoria-total { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--rosa-escuro); }
+
+    /* CARDS GRID */
+    .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+    /* FORNECEDOR CARD */
+    .vendor-card { background: var(--branco); border-radius: 16px; border: 0.5px solid #EED8C8; padding: 16px; cursor: pointer; transition: all 0.15s; }
+    .vendor-card:hover { border-color: var(--rosa-claro); box-shadow: 0 4px 20px rgba(194,81,106,0.1); transform: translateY(-2px); }
+    .vendor-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+    .vendor-nome { font-size: 14px; font-weight: 600; color: #3E3530; }
+    .vendor-contato { font-size: 11px; color: var(--taupe); margin-top: 2px; }
+    .status-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
+    .s-orcado { background: var(--branco); color: var(--taupe); border: 0.5px solid #EED8C8; }
+    .s-negociacao { background: var(--pessego); color: #8B4000; border: 0.5px solid var(--laranja-s); }
+    .s-contratado { background: var(--verde-menta); color: var(--verde); border: 0.5px solid var(--verde-m); }
+    .s-pago { background: #E6F1FB; color: #185FA5; border: 0.5px solid #378ADD; }
+    .s-cancelado { background: #FCEBEB; color: #A32D2D; border: 0.5px solid #E24B4A; }
+    .vendor-valor { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 500; color: var(--rosa-escuro); margin-bottom: 10px; }
+    .vendor-parcelas { display: flex; align-items: center; gap: 8px; }
+    .parcelas-text { font-size: 10px; color: var(--taupe); white-space: nowrap; }
+    .parcela-bar { flex: 1; height: 4px; background: #FAE8EC; border-radius: 99px; overflow: hidden; }
+    .parcela-fill { height: 100%; background: var(--rosa); border-radius: 99px; transition: width 0.3s; }
+
+    /* ADD CARD */
+    .add-card { background: var(--creme); border: 0.5px dashed var(--rosa-claro); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; min-height: 130px; transition: all 0.15s; color: var(--rosa); font-size: 12px; font-weight: 600; }
+    .add-card:hover { background: #FAE8EC; border-color: var(--rosa); }
+    .add-card i { font-size: 24px; }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(139,34,64,0.3); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--branco); border-radius: 20px; border: 0.5px solid #EED8C8; padding: 28px; width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(139,34,64,0.2); }
+    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--rosa-escuro); margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.1em; color: var(--taupe); text-transform: uppercase; margin-bottom: 5px; display: block; }
+    .form-input, .form-select { width: 100%; border: 0.5px solid #EED8C8; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-family: 'Nunito', sans-serif; background: var(--creme); color: #3E3530; outline: none; transition: border-color 0.15s; }
+    .form-input:focus, .form-select:focus { border-color: var(--rosa-claro); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-salvar { flex: 1; background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 11px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; transition: background 0.15s; }
+    .btn-salvar:hover { background: var(--rosa-escuro); }
+    .btn-cancelar { padding: 11px 20px; background: var(--creme); color: var(--taupe); border: 0.5px solid #EED8C8; border-radius: 10px; font-size: 13px; cursor: pointer; font-family: 'Nunito', sans-serif; }
+
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .categoria-section { animation: fadeInUp 0.3s ease both; }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="initials">💍 J & E</div>
+      <div class="names">João & Ester</div>
+      <div class="date">20 de junho de 2027</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="fornecedores.html" class="nav-item active"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="#" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
+      <a href="#" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
+      <a href="#" class="nav-item"><i class="ti ti-music"></i> Músicas</a>
+      <a href="#" class="nav-item"><i class="ti ti-file-text"></i> Papelaria</a>
+      <a href="#" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
+      <a href="#" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
+      <a href="#" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
+      <a href="#" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto;">
+      <a href="#" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Fornecedores</h1>
+        <p>Gerencie todos os fornecedores do casamento</p>
+      </div>
+      <div class="topbar-right">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input class="search-input" placeholder="Buscar fornecedor..." oninput="filtrarBusca(this.value)" />
+        </div>
+        <button class="btn-add" onclick="abrirModal()"><i class="ti ti-plus"></i> Novo fornecedor</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- FILTROS -->
+      <div class="filters">
+        <span class="filter-pill f-todos" onclick="filtrarStatus('todos', this)">Todos</span>
+        <span class="filter-pill f-orcado" onclick="filtrarStatus('orcado', this)">Orçado</span>
+        <span class="filter-pill f-negociacao" onclick="filtrarStatus('negociacao', this)">Em negociação</span>
+        <span class="filter-pill f-contratado" onclick="filtrarStatus('contratado', this)">Contratado</span>
+        <span class="filter-pill f-pago" onclick="filtrarStatus('pago', this)">Pago</span>
+        <span class="filter-pill f-cancelado" onclick="filtrarStatus('cancelado', this)">Cancelado</span>
+      </div>
+
+      <!-- RESUMO -->
+      <div class="resumo-bar">
+        <div class="resumo-item">
+          <div class="resumo-label">Investimento Total</div>
+          <div class="resumo-value" id="total-geral">R$ 0</div>
+          <div class="resumo-sub">orçado</div>
+        </div>
+        <div class="resumo-item">
+          <div class="resumo-label">Valor Pago</div>
+          <div class="resumo-value" id="total-pago">R$ 0</div>
+          <div class="resumo-sub">quitado</div>
+        </div>
+        <div class="resumo-item">
+          <div class="resumo-label">Saldo Pendente</div>
+          <div class="resumo-value" id="total-pendente">R$ 0</div>
+          <div class="resumo-sub">a pagar</div>
+        </div>
+        <div class="resumo-item">
+          <div class="resumo-label">Fornecedores</div>
+          <div class="resumo-value" id="total-fornecedores">0</div>
+          <div class="resumo-sub">cadastrados</div>
+        </div>
+      </div>
+
+      <!-- CATEGORIAS -->
+      <div id="categorias-container"></div>
+
+    </div>
+  </main>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title">Novo Fornecedor</div>
+      <div class="form-group">
+        <label class="form-label">Categoria</label>
+        <select class="form-select" id="f-categoria">
+          <option value="Igreja">Igreja</option>
+          <option value="Local da recepção">Local da recepção</option>
+          <option value="Buffet">Buffet</option>
+          <option value="Decoração">Decoração</option>
+          <option value="Fotografia">Fotografia</option>
+          <option value="Vídeo">Vídeo</option>
+          <option value="Banda da Igreja">Banda da Igreja</option>
+          <option value="Banda da recepção">Banda da recepção</option>
+          <option value="DJ">DJ</option>
+          <option value="Cerimônia (Padre)">Cerimônia (Padre)</option>
+          <option value="Papelaria">Papelaria</option>
+          <option value="Noiva">Noiva</option>
+          <option value="Noivo">Noivo</option>
+          <option value="Outros">Outros</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nome do fornecedor</label>
+        <input class="form-input" id="f-nome" placeholder="Ex: Buffet Requinte" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">WhatsApp</label>
+          <input class="form-input" id="f-whatsapp" placeholder="+55 61 9 XXXX-XXXX" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="f-status">
+            <option value="orcado">Orçado</option>
+            <option value="negociacao">Em negociação</option>
+            <option value="contratado">Contratado</option>
+            <option value="pago">Pago</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor total (R$)</label>
+          <input class="form-input" id="f-valor" type="number" placeholder="0,00" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Valor pago (R$)</label>
+          <input class="form-input" id="f-pago" type="number" placeholder="0,00" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações</label>
+        <input class="form-input" id="f-obs" placeholder="Anotações importantes..." />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-salvar" onclick="salvarFornecedor()">Salvar fornecedor</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CATEGORIAS = [
+      { nome: 'Igreja', icon: 'ti-building-church' },
+      { nome: 'Local da recepção', icon: 'ti-building' },
+      { nome: 'Buffet', icon: 'ti-tools-kitchen-2' },
+      { nome: 'Decoração', icon: 'ti-flower' },
+      { nome: 'Fotografia', icon: 'ti-camera' },
+      { nome: 'Vídeo', icon: 'ti-video' },
+      { nome: 'Banda da Igreja', icon: 'ti-music' },
+      { nome: 'Banda da recepção', icon: 'ti-guitar-pick' },
+      { nome: 'DJ', icon: 'ti-vinyl' },
+      { nome: 'Cerimônia (Padre)', icon: 'ti-cross' },
+      { nome: 'Papelaria', icon: 'ti-file-text' },
+      { nome: 'Noiva', icon: 'ti-heart' },
+      { nome: 'Noivo', icon: 'ti-tie' },
+      { nome: 'Outros', icon: 'ti-dots' },
+    ];
+
+    const STATUS_LABELS = { orcado: 'Orçado', negociacao: 'Em negociação', contratado: 'Contratado', pago: 'Pago', cancelado: 'Cancelado' };
+    const STATUS_CLASSES = { orcado: 's-orcado', negociacao: 's-negociacao', contratado: 's-contratado', pago: 's-pago', cancelado: 's-cancelado' };
+
+    let fornecedores = JSON.parse(localStorage.getItem('fornecedores') || '[]');
+    let filtroAtivo = 'todos';
+
+    function salvar() { localStorage.setItem('fornecedores', JSON.stringify(fornecedores)); }
+
+    function formatarMoeda(v) {
+      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
+    }
+
+    function abrirModal() { document.getElementById('modal').classList.add('open'); }
+    function fecharModal() {
+      document.getElementById('modal').classList.remove('open');
+      ['f-nome','f-whatsapp','f-valor','f-pago','f-obs'].forEach(id => document.getElementById(id).value = '');
+    }
+
+    function salvarFornecedor() {
+      const nome = document.getElementById('f-nome').value.trim();
+      if (!nome) { alert('Por favor, informe o nome do fornecedor.'); return; }
+      const novo = {
+        id: Date.now(),
+        categoria: document.getElementById('f-categoria').value,
+        nome,
+        whatsapp: document.getElementById('f-whatsapp').value,
+        status: document.getElementById('f-status').value,
+        valor: parseFloat(document.getElementById('f-valor').value) || 0,
+        pago: parseFloat(document.getElementById('f-pago').value) || 0,
+        obs: document.getElementById('f-obs').value,
+      };
+      fornecedores.push(novo);
+      salvar();
+      fecharModal();
+      renderizar();
+    }
+
+    function excluirFornecedor(id) {
+      if (!confirm('Deseja remover este fornecedor?')) return;
+      fornecedores = fornecedores.filter(f => f.id !== id);
+      salvar();
+      renderizar();
+    }
+
+    function filtrarStatus(status, el) {
+      filtroAtivo = status;
+      document.querySelectorAll('.filter-pill').forEach(p => p.style.opacity = '0.6');
+      el.style.opacity = '1';
+      renderizar();
+    }
+
+    function filtrarBusca(q) {
+      renderizar(q.toLowerCase());
+    }
+
+    function renderizar(busca = '') {
+      const container = document.getElementById('categorias-container');
+      container.innerHTML = '';
+
+      let totalGeral = 0, totalPago = 0, totalAtivos = 0;
+
+      CATEGORIAS.forEach(cat => {
+        let lista = fornecedores.filter(f => f.categoria === cat.nome);
+        if (filtroAtivo !== 'todos') lista = lista.filter(f => f.status === filtroAtivo);
+        if (busca) lista = lista.filter(f => f.nome.toLowerCase().includes(busca));
+
+        const totalCat = lista.reduce((s, f) => s + (f.status !== 'cancelado' ? f.valor : 0), 0);
+        totalGeral += totalCat;
+        totalPago += lista.reduce((s, f) => s + f.pago, 0);
+        totalAtivos += lista.length;
+
+        if (lista.length === 0 && filtroAtivo !== 'todos') return;
+
+        const sec = document.createElement('div');
+        sec.className = 'categoria-section';
+        sec.innerHTML = `
+          <div class="categoria-header">
+            <i class="ti ${cat.icon} categoria-icon"></i>
+            <span class="categoria-nome">${cat.nome}</span>
+            <span class="categoria-count">${lista.length} fornecedor${lista.length !== 1 ? 'es' : ''}</span>
+            ${totalCat > 0 ? `<span class="categoria-total">${formatarMoeda(totalCat)}</span>` : ''}
+          </div>
+          <div class="cards-grid" id="grid-${cat.nome.replace(/\s/g,'_')}"></div>
+        `;
+        container.appendChild(sec);
+
+        const grid = sec.querySelector('.cards-grid');
+
+        lista.forEach(f => {
+          const pct = f.valor > 0 ? Math.round((f.pago / f.valor) * 100) : 0;
+          const card = document.createElement('div');
+          card.className = 'vendor-card';
+          card.innerHTML = `
+            <div class="vendor-card-top">
+              <div>
+                <div class="vendor-nome">${f.nome}</div>
+                <div class="vendor-contato">${f.whatsapp || '—'}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+                <span class="status-badge ${STATUS_CLASSES[f.status]}">${STATUS_LABELS[f.status]}</span>
+                <button onclick="excluirFornecedor(${f.id})" style="background:none;border:none;cursor:pointer;color:var(--taupe);font-size:13px;" title="Remover"><i class="ti ti-trash"></i></button>
+              </div>
+            </div>
+            <div class="vendor-valor">${formatarMoeda(f.valor)}</div>
+            <div class="vendor-parcelas">
+              <span class="parcelas-text">${formatarMoeda(f.pago)} pago</span>
+              <div class="parcela-bar"><div class="parcela-fill" style="width:${pct}%"></div></div>
+              <span class="parcelas-text">${pct}%</span>
+            </div>
+            ${f.obs ? `<div style="font-size:11px;color:var(--taupe);margin-top:8px;padding-top:8px;border-top:0.5px solid #F5EDE4;">${f.obs}</div>` : ''}
+          `;
+          grid.appendChild(card);
+        });
+
+        const addCard = document.createElement('div');
+        addCard.className = 'add-card';
+        addCard.innerHTML = '<i class="ti ti-plus"></i> Adicionar';
+        addCard.onclick = () => {
+          document.getElementById('f-categoria').value = cat.nome;
+          abrirModal();
+        };
+        grid.appendChild(addCard);
+      });
+
+      document.getElementById('total-geral').textContent = formatarMoeda(totalGeral);
+      document.getElementById('total-pago').textContent = formatarMoeda(totalPago);
+      document.getElementById('total-pendente').textContent = formatarMoeda(totalGeral - totalPago);
+      document.getElementById('total-fornecedores').textContent = fornecedores.length;
+    }
+
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) fecharModal();
+    });
+
+    renderizar();
+  </script>
+</body>
+</html>
