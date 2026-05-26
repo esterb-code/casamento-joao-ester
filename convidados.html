@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Convidados · João & Ester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <style>
+    :root {
+      --rosa: #C2516A; --rosa-claro: #F4AABB; --rosa-escuro: #8B2240;
+      --verde: #2C6E3A; --verde-m: #5FA870; --verde-menta: #C8E8CE;
+      --laranja: #E8760A; --laranja-s: #F4A860; --pessego: #FDE8CC;
+      --creme: #FDF5EC; --taupe: #9A7060; --branco: #FDFAF7;
+      --sidebar-w: 220px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; background: var(--creme); color: #3E3530; display: flex; min-height: 100vh; }
+
+    .sidebar { width: var(--sidebar-w); background: var(--rosa-escuro); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow-y: auto; }
+    .sidebar-logo { padding: 24px 20px 20px; border-bottom: 0.5px solid rgba(194,81,106,0.5); margin-bottom: 8px; }
+    .sidebar-logo .initials { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.15em; color: var(--pessego); margin-bottom: 4px; }
+    .sidebar-logo .names { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #fff; line-height: 1.2; }
+    .sidebar-logo .date { font-size: 11px; color: var(--rosa-claro); margin-top: 3px; font-weight: 300; }
+    .nav-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.12em; color: rgba(244,170,187,0.5); padding: 8px 20px 4px; text-transform: uppercase; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: rgba(253,221,230,0.8); cursor: pointer; transition: all 0.15s; text-decoration: none; border-left: 2px solid transparent; }
+    .nav-item:hover { background: rgba(194,81,106,0.2); color: #fff; }
+    .nav-item.active { background: rgba(194,81,106,0.25); color: #fff; border-left-color: var(--rosa-claro); font-weight: 600; }
+    .nav-item i { font-size: 16px; opacity: 0.8; }
+    .nav-section { padding: 8px 0; }
+
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    .topbar { padding: 20px 36px; background: var(--branco); border-bottom: 0.5px solid #EED8C8; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar-left h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--rosa-escuro); }
+    .topbar-left p { font-size: 12px; color: var(--taupe); margin-top: 2px; }
+    .topbar-right { display: flex; gap: 10px; align-items: center; }
+    .search-wrap { position: relative; }
+    .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--taupe); font-size: 15px; }
+    .search-input { border: 0.5px solid #EED8C8; border-radius: 10px; padding: 8px 12px 8px 32px; font-size: 12px; background: var(--creme); color: #3E3530; width: 200px; font-family: 'Nunito', sans-serif; outline: none; }
+    .search-input:focus { border-color: var(--rosa-claro); }
+    .btn-add { background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 9px 16px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Nunito', sans-serif; transition: background 0.15s; }
+    .btn-add:hover { background: var(--rosa-escuro); }
+
+    .content { padding: 24px 36px; }
+
+    /* BADGES TOTAIS */
+    .totais-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .badge-total { font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 99px; display: flex; align-items: center; gap: 6px; }
+    .bt-geral { background: var(--rosa-escuro); color: #FDE8CC; }
+    .bt-adultos { background: #FAE8EC; color: var(--rosa-escuro); border: 0.5px solid var(--rosa-claro); }
+    .bt-criancas { background: var(--pessego); color: #8B4000; border: 0.5px solid var(--laranja-s); }
+    .bt-confirmados { background: var(--verde-menta); color: var(--verde); border: 0.5px solid var(--verde-m); }
+    .bt-pendentes { background: #FDE8CC; color: #8B4000; border: 0.5px solid var(--laranja-s); }
+
+    /* FILTROS */
+    .filters { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filter-pill { font-size: 11px; font-weight: 600; padding: 6px 14px; border-radius: 99px; cursor: pointer; font-family: 'Cinzel', serif; letter-spacing: 0.05em; transition: all 0.15s; border: 0.5px solid transparent; }
+    .f-todos { background: var(--rosa-escuro); color: white; }
+    .f-convidado { background: #E6F1FB; color: #185FA5; border-color: #378ADD; }
+    .f-aguardando { background: var(--pessego); color: #8B4000; border-color: var(--laranja-s); }
+    .f-confirmado { background: var(--verde-menta); color: var(--verde); border-color: var(--verde-m); }
+    .f-recusado { background: #FCEBEB; color: #A32D2D; border-color: #E24B4A; }
+    .f-espera { background: #F1EFE8; color: #5F5E5A; border-color: #D3D1C7; }
+
+    /* LISTA */
+    .lista-wrap { background: var(--branco); border-radius: 16px; border: 0.5px solid #EED8C8; overflow: hidden; }
+    .letra-header { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.12em; color: var(--rosa); padding: 10px 20px; background: #FAE8EC; border-bottom: 0.5px solid #EED8C8; }
+    .guest-row { display: flex; align-items: center; gap: 14px; padding: 12px 20px; border-bottom: 0.5px solid #F5EDE4; transition: background 0.1s; }
+    .guest-row:hover { background: var(--creme); }
+    .guest-row:last-child { border-bottom: none; }
+    .guest-avatar { width: 36px; height: 36px; border-radius: 50%; background: #FAE8EC; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--rosa-escuro); flex-shrink: 0; }
+    .guest-info { flex: 1; min-width: 0; }
+    .guest-nome { font-size: 13px; font-weight: 600; color: #3E3530; }
+    .guest-sub { font-size: 11px; color: var(--taupe); margin-top: 1px; }
+    .guest-tags { display: flex; align-items: center; gap: 6px; }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+    .tag-funcao { background: var(--verde-menta); color: var(--verde); border: 0.5px solid var(--verde-m); }
+    .tag-crianca { background: var(--pessego); color: #8B4000; border: 0.5px solid var(--laranja-s); }
+    .status-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 99px; white-space: nowrap; cursor: pointer; }
+    .s-convidado { background: #E6F1FB; color: #185FA5; border: 0.5px solid #378ADD; }
+    .s-aguardando { background: var(--pessego); color: #8B4000; border: 0.5px solid var(--laranja-s); }
+    .s-confirmado { background: var(--verde-menta); color: var(--verde); border: 0.5px solid var(--verde-m); }
+    .s-recusado { background: #FCEBEB; color: #A32D2D; border: 0.5px solid #E24B4A; }
+    .s-espera { background: #F1EFE8; color: #5F5E5A; border: 0.5px solid #D3D1C7; }
+    .btn-del { background: none; border: none; cursor: pointer; color: var(--taupe); font-size: 14px; padding: 4px; opacity: 0.6; transition: opacity 0.15s; }
+    .btn-del:hover { opacity: 1; color: #A32D2D; }
+    .empty-state { text-align: center; padding: 48px; color: var(--taupe); font-size: 13px; }
+    .empty-state i { font-size: 32px; display: block; margin-bottom: 8px; opacity: 0.4; }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(139,34,64,0.3); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--branco); border-radius: 20px; border: 0.5px solid #EED8C8; padding: 28px; width: 460px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(139,34,64,0.2); }
+    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--rosa-escuro); margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.1em; color: var(--taupe); text-transform: uppercase; margin-bottom: 5px; display: block; }
+    .form-input, .form-select { width: 100%; border: 0.5px solid #EED8C8; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-family: 'Nunito', sans-serif; background: var(--creme); color: #3E3530; outline: none; }
+    .form-input:focus, .form-select:focus { border-color: var(--rosa-claro); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #3E3530; cursor: pointer; }
+    .form-check input { width: 16px; height: 16px; accent-color: var(--rosa); cursor: pointer; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-salvar { flex: 1; background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 11px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; }
+    .btn-salvar:hover { background: var(--rosa-escuro); }
+    .btn-cancelar { padding: 11px 20px; background: var(--creme); color: var(--taupe); border: 0.5px solid #EED8C8; border-radius: 10px; font-size: 13px; cursor: pointer; font-family: 'Nunito', sans-serif; }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="initials">💍 J & E</div>
+      <div class="names">João & Ester</div>
+      <div class="date">20 de junho de 2027</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="convidados.html" class="nav-item active"><i class="ti ti-users"></i> Convidados</a>
+      <a href="#" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
+      <a href="#" class="nav-item"><i class="ti ti-music"></i> Músicas</a>
+      <a href="#" class="nav-item"><i class="ti ti-file-text"></i> Papelaria</a>
+      <a href="#" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
+      <a href="#" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
+      <a href="#" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
+      <a href="#" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto;">
+      <a href="#" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Convidados</h1>
+        <p>Gerencie a lista de convidados do casamento</p>
+      </div>
+      <div class="topbar-right">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input class="search-input" placeholder="Buscar convidado..." oninput="renderizar(this.value.toLowerCase())" />
+        </div>
+        <button class="btn-add" onclick="abrirModal()"><i class="ti ti-plus"></i> Novo convidado</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="totais-row" id="totais-row"></div>
+      <div class="filters">
+        <span class="filter-pill f-todos" onclick="setFiltro('todos', this)">Todos</span>
+        <span class="filter-pill f-convidado" onclick="setFiltro('convidado', this)">Convidado</span>
+        <span class="filter-pill f-aguardando" onclick="setFiltro('aguardando', this)">Aguardando resposta</span>
+        <span class="filter-pill f-confirmado" onclick="setFiltro('confirmado', this)">Confirmado</span>
+        <span class="filter-pill f-recusado" onclick="setFiltro('recusado', this)">Recusado</span>
+        <span class="filter-pill f-espera" onclick="setFiltro('espera', this)">Lista de espera</span>
+      </div>
+      <div id="lista-container"></div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title">Novo Convidado</div>
+      <div class="form-group">
+        <label class="form-label">Nome completo</label>
+        <input class="form-input" id="g-nome" placeholder="Nome do convidado" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">WhatsApp</label>
+          <input class="form-input" id="g-whatsapp" placeholder="+55 61 9 XXXX-XXXX" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="g-status">
+            <option value="espera">Lista de espera</option>
+            <option value="convidado">Convidado</option>
+            <option value="aguardando">Aguardando resposta</option>
+            <option value="confirmado">Confirmado</option>
+            <option value="recusado">Recusado</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Função no cortejo (opcional)</label>
+        <select class="form-select" id="g-funcao">
+          <option value="">Nenhuma</option>
+          <option value="Padrinho">Padrinho</option>
+          <option value="Madrinha">Madrinha</option>
+          <option value="Pajem">Pajem</option>
+          <option value="Daminha">Daminha</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-check">
+          <input type="checkbox" id="g-crianca" onchange="toggleIdade()" />
+          É criança (filho/a de convidado)
+        </label>
+      </div>
+      <div class="form-group" id="idade-wrap" style="display:none;">
+        <label class="form-label">Idade da criança</label>
+        <input class="form-input" id="g-idade" type="number" min="0" max="17" placeholder="Ex: 7" />
+        <div style="font-size:11px;color:var(--taupe);margin-top:4px;">Apenas crianças com mais de 5 anos contam na lista.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-salvar" onclick="salvarConvidado()">Salvar convidado</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STATUS_LABELS = { convidado:'Convidado', aguardando:'Aguardando resposta', confirmado:'Confirmado', recusado:'Recusado', espera:'Lista de espera' };
+    const STATUS_CLASSES = { convidado:'s-convidado', aguardando:'s-aguardando', confirmado:'s-confirmado', recusado:'s-recusado', espera:'s-espera' };
+
+    let convidados = JSON.parse(localStorage.getItem('convidados') || '[]');
+    let filtroAtivo = 'todos';
+
+    function salvar() { localStorage.setItem('convidados', JSON.stringify(convidados)); }
+    function abrirModal() { document.getElementById('modal').classList.add('open'); }
+    function fecharModal() {
+      document.getElementById('modal').classList.remove('open');
+      ['g-nome','g-whatsapp','g-idade'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('g-crianca').checked = false;
+      document.getElementById('g-funcao').value = '';
+      document.getElementById('g-status').value = 'espera';
+      document.getElementById('idade-wrap').style.display = 'none';
+    }
+
+    function toggleIdade() {
+      document.getElementById('idade-wrap').style.display = document.getElementById('g-crianca').checked ? 'block' : 'none';
+    }
+
+    function salvarConvidado() {
+      const nome = document.getElementById('g-nome').value.trim();
+      if (!nome) { alert('Informe o nome do convidado.'); return; }
+      const isCrianca = document.getElementById('g-crianca').checked;
+      const idade = parseInt(document.getElementById('g-idade').value) || 0;
+      convidados.push({
+        id: Date.now(),
+        nome,
+        whatsapp: document.getElementById('g-whatsapp').value,
+        status: document.getElementById('g-status').value,
+        funcao: document.getElementById('g-funcao').value,
+        crianca: isCrianca,
+        idade: isCrianca ? idade : null,
+      });
+      salvar();
+      fecharModal();
+      renderizar();
+    }
+
+    function excluir(id) {
+      if (!confirm('Remover este convidado?')) return;
+      convidados = convidados.filter(g => g.id !== id);
+      salvar();
+      renderizar();
+    }
+
+    function alterarStatus(id) {
+      const ordem = ['espera','convidado','aguardando','confirmado','recusado'];
+      const g = convidados.find(g => g.id === id);
+      if (!g) return;
+      const idx = ordem.indexOf(g.status);
+      g.status = ordem[(idx + 1) % ordem.length];
+      salvar();
+      renderizar();
+    }
+
+    function setFiltro(f, el) {
+      filtroAtivo = f;
+      document.querySelectorAll('.filter-pill').forEach(p => p.style.opacity = '0.55');
+      el.style.opacity = '1';
+      renderizar();
+    }
+
+    function iniciais(nome) {
+      return nome.split(' ').slice(0,2).map(p => p[0]).join('').toUpperCase();
+    }
+
+    function renderizar(busca = '') {
+      let lista = [...convidados];
+      if (filtroAtivo !== 'todos') lista = lista.filter(g => g.status === filtroAtivo);
+      if (busca) lista = lista.filter(g => g.nome.toLowerCase().includes(busca));
+      lista.sort((a,b) => a.nome.localeCompare(b.nome));
+
+      // Totais
+      const todos = convidados;
+      const adultos = todos.filter(g => !g.crianca || (g.crianca && g.idade > 5));
+      const criancas = todos.filter(g => g.crianca && g.idade > 5);
+      const confirmados = todos.filter(g => g.status === 'confirmado');
+      const aguardando = todos.filter(g => g.status === 'aguardando' || g.status === 'convidado');
+
+      document.getElementById('totais-row').innerHTML = `
+        <div class="badge-total bt-geral"><i class="ti ti-users" style="font-size:14px;"></i> ${todos.length} total</div>
+        <div class="badge-total bt-adultos"><i class="ti ti-user" style="font-size:14px;"></i> ${adultos.length} adultos</div>
+        <div class="badge-total bt-criancas"><i class="ti ti-baby-carriage" style="font-size:14px;"></i> ${criancas.length} crianças (+5 anos)</div>
+        <div class="badge-total bt-confirmados"><i class="ti ti-check" style="font-size:14px;"></i> ${confirmados.length} confirmados</div>
+        <div class="badge-total bt-pendentes"><i class="ti ti-clock" style="font-size:14px;"></i> ${aguardando.length} aguardando</div>
+      `;
+
+      const container = document.getElementById('lista-container');
+      if (lista.length === 0) {
+        container.innerHTML = `<div class="lista-wrap"><div class="empty-state"><i class="ti ti-users"></i>Nenhum convidado encontrado.<br>Clique em "Novo convidado" para adicionar.</div></div>`;
+        return;
+      }
+
+      // Agrupar por letra
+      const grupos = {};
+      lista.forEach(g => {
+        const letra = g.nome[0].toUpperCase();
+        if (!grupos[letra]) grupos[letra] = [];
+        grupos[letra].push(g);
+      });
+
+      container.innerHTML = '';
+      const wrap = document.createElement('div');
+      wrap.className = 'lista-wrap';
+
+      Object.keys(grupos).sort().forEach(letra => {
+        const lh = document.createElement('div');
+        lh.className = 'letra-header';
+        lh.textContent = letra;
+        wrap.appendChild(lh);
+
+        grupos[letra].forEach(g => {
+          const row = document.createElement('div');
+          row.className = 'guest-row';
+          row.innerHTML = `
+            <div class="guest-avatar">${iniciais(g.nome)}</div>
+            <div class="guest-info">
+              <div class="guest-nome">${g.nome}</div>
+              <div class="guest-sub">${g.whatsapp || '—'}${g.crianca ? ` · ${g.idade} anos` : ''}</div>
+            </div>
+            <div class="guest-tags">
+              ${g.funcao ? `<span class="tag tag-funcao">${g.funcao}</span>` : ''}
+              ${g.crianca ? `<span class="tag tag-crianca">Criança</span>` : ''}
+            </div>
+            <span class="status-badge ${STATUS_CLASSES[g.status]}" onclick="alterarStatus(${g.id})" title="Clique para avançar status">${STATUS_LABELS[g.status]}</span>
+            <button class="btn-del" onclick="excluir(${g.id})"><i class="ti ti-trash"></i></button>
+          `;
+          wrap.appendChild(row);
+        });
+      });
+
+      container.appendChild(wrap);
+    }
+
+    document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
+    renderizar();
+  </script>
+</body>
+</html>
