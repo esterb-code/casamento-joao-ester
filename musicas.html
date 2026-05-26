@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Músicas · João & Ester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <style>
+    :root {
+      --rosa: #C2516A; --rosa-claro: #F4AABB; --rosa-escuro: #8B2240;
+      --verde: #2C6E3A; --verde-m: #5FA870; --verde-menta: #C8E8CE;
+      --laranja: #E8760A; --laranja-s: #F4A860; --pessego: #FDE8CC;
+      --creme: #FDF5EC; --taupe: #9A7060; --branco: #FDFAF7;
+      --sidebar-w: 220px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; background: var(--creme); color: #3E3530; display: flex; min-height: 100vh; }
+    .sidebar { width: var(--sidebar-w); background: var(--rosa-escuro); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow-y: auto; }
+    .sidebar-logo { padding: 24px 20px 20px; border-bottom: 0.5px solid rgba(194,81,106,0.5); margin-bottom: 8px; }
+    .sidebar-logo .initials { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.15em; color: var(--pessego); margin-bottom: 4px; }
+    .sidebar-logo .names { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #fff; line-height: 1.2; }
+    .sidebar-logo .date { font-size: 11px; color: var(--rosa-claro); margin-top: 3px; font-weight: 300; }
+    .nav-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.12em; color: rgba(244,170,187,0.5); padding: 8px 20px 4px; text-transform: uppercase; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: rgba(253,221,230,0.8); cursor: pointer; transition: all 0.15s; text-decoration: none; border-left: 2px solid transparent; }
+    .nav-item:hover { background: rgba(194,81,106,0.2); color: #fff; }
+    .nav-item.active { background: rgba(194,81,106,0.25); color: #fff; border-left-color: var(--rosa-claro); font-weight: 600; }
+    .nav-item i { font-size: 16px; opacity: 0.8; }
+    .nav-section { padding: 8px 0; }
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { padding: 20px 36px; background: var(--branco); border-bottom: 0.5px solid #EED8C8; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar-left h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--rosa-escuro); }
+    .topbar-left p { font-size: 12px; color: var(--taupe); margin-top: 2px; }
+    .content { padding: 24px 36px; }
+
+    /* TABS CERIMÔNIA / FESTA */
+    .main-tabs { display: flex; gap: 0; background: var(--branco); border-radius: 14px; border: 0.5px solid #EED8C8; overflow: hidden; margin-bottom: 28px; width: fit-content; }
+    .main-tab { padding: 12px 28px; font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.1em; color: var(--taupe); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; text-transform: uppercase; }
+    .main-tab:hover { color: var(--rosa); background: #FAE8EC; }
+    .main-tab.active { color: var(--rosa-escuro); border-bottom-color: var(--rosa); background: #FAE8EC; font-weight: 600; }
+
+    /* MOMENTOS */
+    .momento-section { margin-bottom: 20px; }
+    .momento-header { display: flex; align-items: center; justify-content: space-between; background: #FAE8EC; border-radius: 12px; padding: 10px 16px; margin-bottom: 8px; cursor: pointer; }
+    .momento-header.festa { background: var(--pessego); }
+    .momento-left { display: flex; align-items: center; gap: 8px; }
+    .momento-left i { font-size: 16px; color: var(--rosa); }
+    .momento-left.festa i { color: #8B4000; }
+    .momento-nome { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.08em; color: var(--rosa-escuro); text-transform: uppercase; }
+    .momento-nome.festa { color: #8B4000; }
+    .btn-add-musica { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--rosa); background: none; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 600; padding: 4px 8px; border-radius: 8px; transition: background 0.15s; }
+    .btn-add-musica:hover { background: rgba(194,81,106,0.1); }
+    .btn-add-musica.festa { color: #8B4000; }
+
+    /* MÚSICA ROW */
+    .musica-row { display: flex; align-items: center; gap: 12px; background: var(--branco); border-radius: 12px; border: 0.5px solid #EED8C8; padding: 12px 16px; margin-bottom: 6px; }
+    .musica-num { font-size: 11px; color: var(--taupe); width: 18px; text-align: center; flex-shrink: 0; }
+    .musica-info { flex: 1; min-width: 0; }
+    .musica-nome { font-size: 13px; font-weight: 600; color: #3E3530; }
+    .musica-artista { font-size: 11px; color: var(--taupe); margin-top: 2px; }
+    .musica-links { display: flex; gap: 6px; }
+    .link-btn { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 99px; border: 0.5px solid; display: flex; align-items: center; gap: 4px; cursor: pointer; text-decoration: none; transition: opacity 0.15s; }
+    .link-btn:hover { opacity: 0.75; }
+    .link-spotify { color: #1DB954; border-color: #1DB954; background: #F0FBF4; }
+    .link-youtube { color: #FF0000; border-color: #FF0000; background: #FFF0F0; }
+    .link-btn i { font-size: 12px; }
+    .btn-del { background: none; border: none; cursor: pointer; color: var(--taupe); font-size: 14px; opacity: 0.5; transition: opacity 0.15s; }
+    .btn-del:hover { opacity: 1; color: #A32D2D; }
+
+    /* EMPTY MOMENTO */
+    .empty-momento { display: flex; align-items: center; gap: 8px; background: var(--creme); border: 0.5px dashed var(--rosa-claro); border-radius: 12px; padding: 12px 16px; margin-bottom: 6px; color: var(--taupe); font-size: 12px; cursor: pointer; transition: all 0.15s; }
+    .empty-momento:hover { border-color: var(--rosa); color: var(--rosa); background: #FAE8EC; }
+    .empty-momento i { font-size: 16px; }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(139,34,64,0.3); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--branco); border-radius: 20px; border: 0.5px solid #EED8C8; padding: 28px; width: 460px; box-shadow: 0 20px 60px rgba(139,34,64,0.2); }
+    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--rosa-escuro); margin-bottom: 6px; }
+    .modal-subtitle { font-size: 12px; color: var(--taupe); margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.1em; color: var(--taupe); text-transform: uppercase; margin-bottom: 5px; display: block; }
+    .form-input { width: 100%; border: 0.5px solid #EED8C8; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-family: 'Nunito', sans-serif; background: var(--creme); color: #3E3530; outline: none; }
+    .form-input:focus { border-color: var(--rosa-claro); }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-salvar { flex: 1; background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 11px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; }
+    .btn-cancelar { padding: 11px 20px; background: var(--creme); color: var(--taupe); border: 0.5px solid #EED8C8; border-radius: 10px; font-size: 13px; cursor: pointer; font-family: 'Nunito', sans-serif; }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="initials">💍 J & E</div>
+      <div class="names">João & Ester</div>
+      <div class="date">20 de junho de 2027</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
+      <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
+      <a href="musicas.html" class="nav-item active"><i class="ti ti-music"></i> Músicas</a>
+      <a href="#" class="nav-item"><i class="ti ti-file-text"></i> Papelaria</a>
+      <a href="#" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
+      <a href="#" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
+      <a href="#" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
+      <a href="#" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto;">
+      <a href="#" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Músicas</h1>
+        <p>Repertório da cerimônia e da festa</p>
+      </div>
+    </div>
+    <div class="content">
+      <div class="main-tabs">
+        <div class="main-tab active" onclick="setAba('cerimonia', this)">Cerimônia</div>
+        <div class="main-tab" onclick="setAba('festa', this)">Festa</div>
+      </div>
+      <div id="momentos-container"></div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title">Adicionar Música</div>
+      <div class="modal-subtitle" id="modal-momento-label"></div>
+      <div class="form-group">
+        <label class="form-label">Nome da música</label>
+        <input class="form-input" id="mus-nome" placeholder="Ex: A Thousand Years" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Artista</label>
+        <input class="form-input" id="mus-artista" placeholder="Ex: Christina Perri" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Link Spotify (opcional)</label>
+        <input class="form-input" id="mus-spotify" placeholder="https://open.spotify.com/..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Link YouTube (opcional)</label>
+        <input class="form-input" id="mus-youtube" placeholder="https://youtube.com/..." />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-salvar" onclick="salvarMusica()">Salvar música</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MOMENTOS_CERIMONIA = [
+      { id: 'entrada-padrinhos', nome: 'Entrada dos padrinhos', icon: 'ti-users' },
+      { id: 'entrada-noivo', nome: 'Entrada do noivo', icon: 'ti-user' },
+      { id: 'entrada-mae', nome: 'Entrada da mãe do noivo / pais', icon: 'ti-heart' },
+      { id: 'entrada-pajens', nome: 'Entrada dos pajens e daminhas', icon: 'ti-star' },
+      { id: 'entrada-noiva', nome: 'Entrada da noiva', icon: 'ti-heart-filled' },
+      { id: 'aleluia', nome: 'Aclamação ao Evangelho (Aleluia)', icon: 'ti-book' },
+      { id: 'ofertorio', nome: 'Ofertório', icon: 'ti-bread' },
+      { id: 'assinaturas', nome: 'Assinaturas', icon: 'ti-pencil' },
+      { id: 'aliancas', nome: 'Alianças', icon: 'ti-circle' },
+      { id: 'comunhao', nome: 'Comunhão', icon: 'ti-sun' },
+      { id: 'nossa-senhora', nome: 'Homenagem à Nossa Senhora', icon: 'ti-star' },
+      { id: 'saida-noivos', nome: 'Saída dos noivos', icon: 'ti-confetti' },
+      { id: 'saida-convidados', nome: 'Saída dos padrinhos/convidados', icon: 'ti-door-exit' },
+    ];
+
+    const MOMENTOS_FESTA = [
+      { id: 'entrada-salao', nome: 'Entrada dos noivos no salão', icon: 'ti-door-enter' },
+      { id: 'brinde', nome: 'Brinde', icon: 'ti-glass-champagne' },
+      { id: 'bolo', nome: 'Corte do bolo', icon: 'ti-cake' },
+      { id: 'primeira-danca', nome: 'Primeira dança dos noivos', icon: 'ti-heart' },
+      { id: 'buque', nome: 'Jogar o buquê', icon: 'ti-flower' },
+      { id: 'abertura-pista', nome: 'Abertura da pista de dança', icon: 'ti-music' },
+      { id: 'balada', nome: 'Balada / Festa', icon: 'ti-headphones' },
+      { id: 'encerramento', nome: 'Encerramento', icon: 'ti-moon' },
+    ];
+
+    let musicas = JSON.parse(localStorage.getItem('musicas') || '{}');
+    let abaAtiva = 'cerimonia';
+    let momentoAtivo = '';
+
+    function salvarDados() { localStorage.setItem('musicas', JSON.stringify(musicas)); }
+
+    function setAba(aba, el) {
+      abaAtiva = aba;
+      document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      renderizar();
+    }
+
+    function abrirModal(momentoId, momentoNome) {
+      momentoAtivo = momentoId;
+      document.getElementById('modal-momento-label').textContent = momentoNome;
+      document.getElementById('modal').classList.add('open');
+    }
+
+    function fecharModal() {
+      document.getElementById('modal').classList.remove('open');
+      ['mus-nome','mus-artista','mus-spotify','mus-youtube'].forEach(id => document.getElementById(id).value = '');
+    }
+
+    function salvarMusica() {
+      const nome = document.getElementById('mus-nome').value.trim();
+      if (!nome) { alert('Informe o nome da música.'); return; }
+      if (!musicas[momentoAtivo]) musicas[momentoAtivo] = [];
+      musicas[momentoAtivo].push({
+        id: Date.now(),
+        nome,
+        artista: document.getElementById('mus-artista').value.trim(),
+        spotify: document.getElementById('mus-spotify').value.trim(),
+        youtube: document.getElementById('mus-youtube').value.trim(),
+      });
+      salvarDados();
+      fecharModal();
+      renderizar();
+    }
+
+    function excluirMusica(momentoId, musicaId) {
+      if (!confirm('Remover esta música?')) return;
+      musicas[momentoId] = (musicas[momentoId] || []).filter(m => m.id !== musicaId);
+      salvarDados();
+      renderizar();
+    }
+
+    function renderizar() {
+      const momentos = abaAtiva === 'cerimonia' ? MOMENTOS_CERIMONIA : MOMENTOS_FESTA;
+      const isFesta = abaAtiva === 'festa';
+      const container = document.getElementById('momentos-container');
+      container.innerHTML = '';
+
+      momentos.forEach(momento => {
+        const lista = musicas[momento.id] || [];
+        const sec = document.createElement('div');
+        sec.className = 'momento-section';
+
+        const header = document.createElement('div');
+        header.className = `momento-header${isFesta ? ' festa' : ''}`;
+        header.innerHTML = `
+          <div class="momento-left${isFesta ? ' festa' : ''}">
+            <i class="ti ${momento.icon}"></i>
+            <span class="momento-nome${isFesta ? ' festa' : ''}">${momento.nome}</span>
+          </div>
+          <button class="btn-add-musica${isFesta ? ' festa' : ''}" onclick="abrirModal('${momento.id}', '${momento.nome}')">
+            <i class="ti ti-plus"></i> Adicionar
+          </button>
+        `;
+        sec.appendChild(header);
+
+        if (lista.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'empty-momento';
+          empty.innerHTML = `<i class="ti ti-music"></i> Adicionar música para este momento`;
+          empty.onclick = () => abrirModal(momento.id, momento.nome);
+          sec.appendChild(empty);
+        } else {
+          lista.forEach((m, idx) => {
+            const row = document.createElement('div');
+            row.className = 'musica-row';
+            row.innerHTML = `
+              <div class="musica-num">${idx + 1}</div>
+              <div class="musica-info">
+                <div class="musica-nome">${m.nome}</div>
+                ${m.artista ? `<div class="musica-artista">${m.artista}</div>` : ''}
+              </div>
+              <div class="musica-links">
+                ${m.spotify ? `<a href="${m.spotify}" target="_blank" class="link-btn link-spotify"><i class="ti ti-brand-spotify"></i> Spotify</a>` : ''}
+                ${m.youtube ? `<a href="${m.youtube}" target="_blank" class="link-btn link-youtube"><i class="ti ti-brand-youtube"></i> YouTube</a>` : ''}
+              </div>
+              <button class="btn-del" onclick="excluirMusica('${momento.id}', ${m.id})"><i class="ti ti-trash"></i></button>
+            `;
+            sec.appendChild(row);
+          });
+        }
+
+        container.appendChild(sec);
+      });
+    }
+
+    document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
+    renderizar();
+  </script>
+</body>
+</html>
