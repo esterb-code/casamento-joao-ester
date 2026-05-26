@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Igreja · João & Ester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  <style>
+    :root{--rosa:#C2516A;--rosa-claro:#F4AABB;--rosa-escuro:#8B2240;--verde:#2C6E3A;--verde-m:#5FA870;--verde-menta:#C8E8CE;--laranja:#E8760A;--laranja-s:#F4A860;--pessego:#FDE8CC;--creme:#FDF5EC;--taupe:#9A7060;--branco:#FDFAF7;--sidebar-w:220px}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;display:flex;min-height:100vh}
+    .sidebar{width:var(--sidebar-w);background:var(--rosa-escuro);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+    .sidebar-logo{padding:24px 20px 20px;border-bottom:.5px solid rgba(194,81,106,.5);margin-bottom:8px}
+    .sidebar-logo .initials{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.15em;color:var(--pessego);margin-bottom:4px}
+    .sidebar-logo .names{font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;line-height:1.2}
+    .sidebar-logo .date{font-size:11px;color:var(--rosa-claro);margin-top:3px;font-weight:300}
+    .nav-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:rgba(244,170,187,.5);padding:8px 20px 4px;text-transform:uppercase}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(253,221,230,.8);cursor:pointer;transition:all .15s;text-decoration:none;border-left:2px solid transparent}
+    .nav-item:hover{background:rgba(194,81,106,.2);color:#fff}
+    .nav-item.active{background:rgba(194,81,106,.25);color:#fff;border-left-color:var(--rosa-claro);font-weight:600}
+    .nav-item i{font-size:16px;opacity:.8}
+    .nav-section{padding:8px 0}
+    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+    .topbar{padding:20px 36px;background:var(--branco);border-bottom:.5px solid #EED8C8;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .topbar-left h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--rosa-escuro)}
+    .topbar-left p{font-size:12px;color:var(--taupe);margin-top:2px}
+    .btn-edit{background:#FAE8EC;color:var(--rosa-escuro);border:.5px solid var(--rosa-claro);border-radius:10px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif}
+    .content{padding:24px 36px;display:flex;flex-direction:column;gap:20px}
+    .section-card{background:var(--branco);border-radius:16px;border:.5px solid #EED8C8;overflow:hidden}
+    .section-header{background:#FAE8EC;padding:12px 18px;display:flex;align-items:center;gap:8px}
+    .section-header i{font-size:16px;color:var(--rosa)}
+    .section-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--rosa-escuro);text-transform:uppercase}
+    .section-body{padding:16px 18px}
+    .info-row{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:.5px solid #F5EDE4}
+    .info-row:last-child{border-bottom:none}
+    .info-label{font-size:11px;color:var(--taupe);width:140px;flex-shrink:0;padding-top:1px}
+    .info-val{font-size:13px;color:#3E3530;font-weight:600;flex:1}
+    .info-val a{color:var(--rosa);text-decoration:none}
+    .info-val a:hover{text-decoration:underline}
+    .horario-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid #F5EDE4}
+    .horario-row:last-child{border-bottom:none}
+    .horario-icon{width:34px;height:34px;border-radius:10px;background:#FAE8EC;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .horario-icon i{font-size:16px;color:var(--rosa)}
+    .horario-nome{font-size:13px;font-weight:600;color:#3E3530}
+    .horario-hora{font-size:11px;color:var(--taupe);margin-top:2px}
+    .prog-docs{margin-bottom:14px}
+    .prog-top{display:flex;justify-content:space-between;margin-bottom:5px}
+    .prog-label{font-size:11px;color:var(--taupe)}
+    .prog-pct{font-size:11px;font-weight:600;color:var(--rosa-escuro)}
+    .prog-bar{height:5px;background:#FAE8EC;border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;background:var(--rosa);border-radius:99px;transition:width .4s}
+    .doc-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid #F5EDE4}
+    .doc-row:last-child{border-bottom:none}
+    .doc-nome{flex:1;font-size:13px;color:#3E3530}
+    .status-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap;cursor:pointer}
+    .s-separacao{background:var(--pessego);color:#8B4000;border:.5px solid var(--laranja-s)}
+    .s-entregue{background:var(--verde-menta);color:var(--verde);border:.5px solid var(--verde-m)}
+    .s-cancelado{background:#F1EFE8;color:#5F5E5A;border:.5px solid #D3D1C7}
+    .btn-add-doc{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--rosa);background:none;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:600;margin-top:12px;padding:8px 0}
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(139,34,64,.3);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--branco);border-radius:20px;border:.5px solid #EED8C8;padding:28px;width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(139,34,64,.2)}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--rosa-escuro);margin-bottom:20px}
+    .form-group{margin-bottom:14px}
+    .form-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--taupe);text-transform:uppercase;margin-bottom:5px;display:block}
+    .form-input{width:100%;border:.5px solid #EED8C8;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;outline:none}
+    .form-input:focus{border-color:var(--rosa-claro)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .modal-actions{display:flex;gap:10px;margin-top:20px}
+    .btn-salvar{flex:1;background:var(--rosa);color:white;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif}
+    .btn-cancelar{padding:11px 20px;background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif}
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="initials">💍 J & E</div>
+      <div class="names">João & Ester</div>
+      <div class="date">20 de junho de 2027</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
+      <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
+      <a href="musicas.html" class="nav-item"><i class="ti ti-music"></i> Músicas</a>
+      <a href="papelaria.html" class="nav-item"><i class="ti ti-file-text"></i> Papelaria</a>
+      <a href="ideias.html" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
+      <a href="checklist.html" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
+      <a href="reunioes.html" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
+      <a href="igreja.html" class="nav-item active"><i class="ti ti-building-church"></i> Igreja</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto">
+      <a href="configuracoes.html" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
+    </div>
+  </nav>
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Igreja</h1><p>Detalhes da cerimônia católica</p></div>
+      <button class="btn-edit" onclick="abrirModal()"><i class="ti ti-pencil"></i> Editar dados</button>
+    </div>
+    <div class="content">
+      <div class="section-card">
+        <div class="section-header"><i class="ti ti-building-church"></i><span class="section-title">Dados da Igreja</span></div>
+        <div class="section-body" id="dados-igreja">
+          <div style="text-align:center;padding:32px;color:var(--taupe);font-size:13px;"><i class="ti ti-building-church" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4;"></i>Clique em "Editar dados" para cadastrar as informações da Igreja.</div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-header"><i class="ti ti-clock"></i><span class="section-title">Horários</span></div>
+        <div class="section-body" id="horarios-section">
+          <div style="color:var(--taupe);font-size:12px;">Preencha os dados da Igreja para ver os horários.</div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-header"><i class="ti ti-files"></i><span class="section-title">Documentos</span></div>
+        <div class="section-body">
+          <div class="prog-docs">
+            <div class="prog-top"><span class="prog-label" id="prog-label-doc">0 de 0 documentos entregues</span><span class="prog-pct" id="prog-pct-doc">0%</span></div>
+            <div class="prog-bar"><div class="prog-fill" id="prog-fill-doc" style="width:0%"></div></div>
+          </div>
+          <div id="docs-lista"></div>
+          <button class="btn-add-doc" onclick="adicionarDoc()"><i class="ti ti-plus"></i> Adicionar documento</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title">Dados da Igreja</div>
+      <div class="form-group"><label class="form-label">Nome da Igreja</label><input class="form-input" id="ig-nome" placeholder="Ex: Paróquia Nossa Senhora de Fátima"/></div>
+      <div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="ig-endereco" placeholder="Ex: SGAS 913, Brasília, DF"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Padre responsável</label><input class="form-input" id="ig-padre" placeholder="Nome do padre"/></div>
+        <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" id="ig-whatsapp" placeholder="+55 61 9 XXXX-XXXX"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Observações</label><input class="form-input" id="ig-obs" placeholder="Informações importantes..."/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Data do ensaio</label><input class="form-input" id="ig-ensaio-data" type="date"/></div>
+        <div class="form-group"><label class="form-label">Horário do ensaio</label><input class="form-input" id="ig-ensaio-hora" type="time"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Data entrega docs</label><input class="form-input" id="ig-docs-data" type="date"/></div>
+        <div class="form-group"><label class="form-label">Horário entrega</label><input class="form-input" id="ig-docs-hora" type="time"/></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-salvar" onclick="salvarDados()">Salvar</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const STATUS_DOC=['separacao','entregue','cancelado'];
+    const STATUS_LABELS={separacao:'Em separação',entregue:'Entregue',cancelado:'Cancelado'};
+    const STATUS_CLASSES={separacao:'s-separacao',entregue:'s-entregue',cancelado:'s-cancelado'};
+    let dados=JSON.parse(localStorage.getItem('igreja-dados')||'null');
+    let docs=JSON.parse(localStorage.getItem('igreja-docs')||JSON.stringify([
+      {id:1,nome:'Certidão de nascimento (noiva)',status:'separacao'},
+      {id:2,nome:'Certidão de nascimento (noivo)',status:'separacao'},
+      {id:3,nome:'Comprovante de batismo (noiva)',status:'separacao'},
+      {id:4,nome:'Comprovante de batismo (noivo)',status:'separacao'},
+      {id:5,nome:'Comprovante de crisma',status:'separacao'},
+      {id:6,nome:'Certificado do curso de noivos',status:'separacao'},
+      {id:7,nome:'Dispensa de proclamas',status:'separacao'},
+    ]));
+    function salvarDocs(){localStorage.setItem('igreja-docs',JSON.stringify(docs))}
+    function abrirModal(){
+      if(dados){
+        ['ig-nome','ig-endereco','ig-padre','ig-whatsapp','ig-obs','ig-ensaio-data','ig-ensaio-hora','ig-docs-data','ig-docs-hora'].forEach(id=>{
+          const map={['ig-nome']:'nome',['ig-endereco']:'endereco',['ig-padre']:'padre',['ig-whatsapp']:'whatsapp',['ig-obs']:'obs',['ig-ensaio-data']:'ensaioData',['ig-ensaio-hora']:'ensaioHora',['ig-docs-data']:'docsData',['ig-docs-hora']:'docsHora'};
+          const el=document.getElementById(id);if(el&&dados[map[id]])el.value=dados[map[id]]
+        })
+      }
+      document.getElementById('modal').classList.add('open')
+    }
+    function fecharModal(){document.getElementById('modal').classList.remove('open')}
+    function salvarDados(){
+      dados={
+        nome:document.getElementById('ig-nome').value,
+        endereco:document.getElementById('ig-endereco').value,
+        padre:document.getElementById('ig-padre').value,
+        whatsapp:document.getElementById('ig-whatsapp').value,
+        obs:document.getElementById('ig-obs').value,
+        ensaioData:document.getElementById('ig-ensaio-data').value,
+        ensaioHora:document.getElementById('ig-ensaio-hora').value,
+        docsData:document.getElementById('ig-docs-data').value,
+        docsHora:document.getElementById('ig-docs-hora').value,
+      };
+      localStorage.setItem('igreja-dados',JSON.stringify(dados));
+      fecharModal();renderizar()
+    }
+    function formatarData(d){if(!d)return'—';const[y,m,dia]=d.split('-');return`${dia}/${m}/${y}`}
+    function avancarStatusDoc(id){
+      const d=docs.find(d=>d.id===id);if(!d)return;
+      d.status=STATUS_DOC[(STATUS_DOC.indexOf(d.status)+1)%STATUS_DOC.length];
+      salvarDocs();renderizar()
+    }
+    function adicionarDoc(){
+      const nome=prompt('Nome do documento:');
+      if(!nome)return;
+      docs.push({id:Date.now(),nome,status:'separacao'});
+      salvarDocs();renderizar()
+    }
+    function renderizar(){
+      // Dados
+      const dadosEl=document.getElementById('dados-igreja');
+      if(dados&&dados.nome){
+        dadosEl.innerHTML=`
+          <div class="info-row"><span class="info-label">Nome</span><span class="info-val">${dados.nome||'—'}</span></div>
+          <div class="info-row"><span class="info-label">Endereço</span><span class="info-val"><a href="https://maps.google.com/?q=${encodeURIComponent(dados.endereco||'')}" target="_blank">${dados.endereco||'—'} <i class="ti ti-external-link" style="font-size:12px;"></i></a></span></div>
+          <div class="info-row"><span class="info-label">Padre responsável</span><span class="info-val">${dados.padre||'—'}</span></div>
+          <div class="info-row"><span class="info-label">WhatsApp</span><span class="info-val">${dados.whatsapp||'—'}</span></div>
+          ${dados.obs?`<div class="info-row"><span class="info-label">Observações</span><span class="info-val" style="font-weight:400;color:var(--taupe);">${dados.obs}</span></div>`:''}
+        `
+      }
+      // Horários
+      const horariosEl=document.getElementById('horarios-section');
+      if(dados&&dados.nome){
+        horariosEl.innerHTML=`
+          ${dados.ensaioData?`<div class="horario-row"><div class="horario-icon"><i class="ti ti-music"></i></div><div><div class="horario-nome">Ensaio pré-nupcial</div><div class="horario-hora">${formatarData(dados.ensaioData)}${dados.ensaioHora?' · '+dados.ensaioHora:''}</div></div></div>`:''}
+          <div class="horario-row"><div class="horario-icon"><i class="ti ti-heart"></i></div><div><div class="horario-nome">Cerimônia</div><div class="horario-hora">20 de Junho de 2027 · 16h00</div></div></div>
+          ${dados.docsData?`<div class="horario-row"><div class="horario-icon"><i class="ti ti-file-check"></i></div><div><div class="horario-nome">Entrega de documentação</div><div class="horario-hora">${formatarData(dados.docsData)}${dados.docsHora?' · '+dados.docsHora:''}</div></div></div>`:''}
+        `
+      }
+      // Docs
+      const entregues=docs.filter(d=>d.status==='entregue').length;
+      const total=docs.filter(d=>d.status!=='cancelado').length;
+      const pct=total>0?Math.round(entregues/total*100):0;
+      document.getElementById('prog-label-doc').textContent=`${entregues} de ${total} documentos entregues`;
+      document.getElementById('prog-pct-doc').textContent=pct+'%';
+      document.getElementById('prog-fill-doc').style.width=pct+'%';
+      const lista=document.getElementById('docs-lista');lista.innerHTML='';
+      docs.forEach(d=>{
+        const row=document.createElement('div');row.className='doc-row';
+        row.innerHTML=`<span class="doc-nome">${d.nome}</span><span class="status-badge ${STATUS_CLASSES[d.status]}" onclick="avancarStatusDoc(${d.id})" title="Clique para avançar">${STATUS_LABELS[d.status]}</span>`;
+        lista.appendChild(row)
+      })
+    }
+    document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)fecharModal()});
+    renderizar()
+  </script>
+</body>
+</html>
