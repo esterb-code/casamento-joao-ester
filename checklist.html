@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checklist · João & Ester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <style>
+    :root { --rosa:#C2516A;--rosa-claro:#F4AABB;--rosa-escuro:#8B2240;--verde:#2C6E3A;--verde-m:#5FA870;--verde-menta:#C8E8CE;--laranja:#E8760A;--laranja-s:#F4A860;--pessego:#FDE8CC;--creme:#FDF5EC;--taupe:#9A7060;--branco:#FDFAF7;--sidebar-w:220px; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;display:flex;min-height:100vh}
+    .sidebar{width:var(--sidebar-w);background:var(--rosa-escuro);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+    .sidebar-logo{padding:24px 20px 20px;border-bottom:0.5px solid rgba(194,81,106,0.5);margin-bottom:8px}
+    .sidebar-logo .initials{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.15em;color:var(--pessego);margin-bottom:4px}
+    .sidebar-logo .names{font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;line-height:1.2}
+    .sidebar-logo .date{font-size:11px;color:var(--rosa-claro);margin-top:3px;font-weight:300}
+    .nav-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:rgba(244,170,187,.5);padding:8px 20px 4px;text-transform:uppercase}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(253,221,230,.8);cursor:pointer;transition:all .15s;text-decoration:none;border-left:2px solid transparent}
+    .nav-item:hover{background:rgba(194,81,106,.2);color:#fff}
+    .nav-item.active{background:rgba(194,81,106,.25);color:#fff;border-left-color:var(--rosa-claro);font-weight:600}
+    .nav-item i{font-size:16px;opacity:.8}
+    .nav-section{padding:8px 0}
+    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+    .topbar{padding:20px 36px;background:var(--branco);border-bottom:.5px solid #EED8C8;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .topbar-left h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--rosa-escuro)}
+    .topbar-left p{font-size:12px;color:var(--taupe);margin-top:2px}
+    .btn-add{background:var(--rosa);color:white;border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif}
+    .btn-add:hover{background:var(--rosa-escuro)}
+    .content{padding:24px 36px}
+    .progress-card{background:var(--branco);border-radius:16px;border:.5px solid #EED8C8;padding:20px 24px;margin-bottom:24px}
+    .prog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .prog-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--taupe);text-transform:uppercase}
+    .prog-pct{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:var(--rosa-escuro)}
+    .prog-bar{height:8px;background:#FAE8EC;border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--rosa-claro),var(--rosa));border-radius:99px;transition:width .5s}
+    .prog-sub{font-size:11px;color:var(--taupe);margin-top:8px}
+    .meses-nav{display:flex;gap:6px;margin-bottom:24px;overflow-x:auto;padding-bottom:4px}
+    .mes-btn{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;padding:8px 14px;border-radius:10px;border:.5px solid #EED8C8;background:var(--branco);color:var(--taupe);cursor:pointer;white-space:nowrap;transition:all .15s;text-transform:uppercase}
+    .mes-btn:hover{border-color:var(--rosa-claro);color:var(--rosa)}
+    .mes-btn.active{background:var(--rosa-escuro);color:var(--pessego);border-color:var(--rosa-escuro)}
+    .mes-btn.done{background:var(--verde-menta);color:var(--verde);border-color:var(--verde-m)}
+    .mes-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .mes-titulo{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--rosa-escuro)}
+    .mes-prog{font-size:12px;color:var(--taupe)}
+    .tarefa-card{background:var(--branco);border-radius:14px;border:.5px solid #EED8C8;padding:14px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;transition:all .15s}
+    .tarefa-card:hover{border-color:var(--rosa-claro)}
+    .tarefa-card.done{opacity:.55}
+    .check-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--rosa);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+    .check-box.checked{background:var(--rosa);border-color:var(--rosa)}
+    .check-box.checked i{font-size:12px;color:white}
+    .tarefa-info{flex:1;min-width:0}
+    .tarefa-nome{font-size:13px;font-weight:600;color:#3E3530}
+    .tarefa-nome.riscado{text-decoration:line-through;color:var(--taupe)}
+    .tarefa-tags{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+    .tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px}
+    .tag-gasto{background:var(--pessego);color:#8B4000;border:.5px solid var(--laranja-s)}
+    .tag-urgente{background:#FCEBEB;color:#A32D2D;border:.5px solid #E24B4A}
+    .tag-cerimonialista{background:#E6F1FB;color:#185FA5;border:.5px solid #378ADD}
+    .sugestao-card{background:#EEF6FF;border-radius:14px;border:.5px dashed #378ADD;padding:14px 16px;margin-bottom:8px}
+    .sug-label{font-size:10px;font-weight:600;color:#185FA5;margin-bottom:4px;display:flex;align-items:center;gap:4px}
+    .sug-nome{font-size:13px;color:#3E3530;margin-bottom:8px}
+    .sug-actions{display:flex;gap:6px}
+    .btn-aceitar{font-size:11px;padding:4px 12px;border-radius:99px;background:var(--verde-menta);color:var(--verde);border:.5px solid var(--verde-m);cursor:pointer}
+    .btn-recusar{font-size:11px;padding:4px 12px;border-radius:99px;background:#FCEBEB;color:#A32D2D;border:.5px solid #E24B4A;cursor:pointer}
+    .btn-del{background:none;border:none;cursor:pointer;color:var(--taupe);font-size:14px;opacity:.5}
+    .btn-del:hover{opacity:1;color:#A32D2D}
+    .modal-overlay{position:fixed;inset:0;background:rgba(139,34,64,.3);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--branco);border-radius:20px;border:.5px solid #EED8C8;padding:28px;width:460px;box-shadow:0 20px 60px rgba(139,34,64,.2)}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--rosa-escuro);margin-bottom:20px}
+    .form-group{margin-bottom:14px}
+    .form-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--taupe);text-transform:uppercase;margin-bottom:5px;display:block}
+    .form-input,.form-select{width:100%;border:.5px solid #EED8C8;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;outline:none}
+    .form-input:focus,.form-select:focus{border-color:var(--rosa-claro)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .form-check{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+    .form-check input{width:16px;height:16px;accent-color:var(--rosa)}
+    .modal-actions{display:flex;gap:10px;margin-top:20px}
+    .btn-salvar{flex:1;background:var(--rosa);color:white;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif}
+    .btn-cancelar{padding:11px 20px;background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif}
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="initials">💍 J & E</div>
+      <div class="names">João & Ester</div>
+      <div class="date">20 de junho de 2027</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
+      <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
+      <a href="musicas.html" class="nav-item"><i class="ti ti-music"></i> Músicas</a>
+      <a href="papelaria.html" class="nav-item"><i class="ti ti-file-text"></i> Papelaria</a>
+      <a href="ideias.html" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
+      <a href="checklist.html" class="nav-item active"><i class="ti ti-checkbox"></i> Checklist</a>
+      <a href="reunioes.html" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
+      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto">
+      <a href="configuracoes.html" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
+    </div>
+  </nav>
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Checklist</h1><p>Cronograma de tarefas por mês</p></div>
+      <button class="btn-add" onclick="abrirModal()"><i class="ti ti-plus"></i> Nova tarefa</button>
+    </div>
+    <div class="content">
+      <div class="progress-card">
+        <div class="prog-header">
+          <span class="prog-label">Progresso Geral</span>
+          <span class="prog-pct" id="pct-geral">0%</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+        <div class="prog-sub" id="prog-sub">0 de 0 tarefas concluídas</div>
+      </div>
+      <div class="meses-nav" id="meses-nav"></div>
+      <div id="tarefas-container"></div>
+    </div>
+  </main>
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title">Nova Tarefa</div>
+      <div class="form-group">
+        <label class="form-label">Descrição da tarefa</label>
+        <input class="form-input" id="t-nome" placeholder="Ex: Fechar contrato com fotógrafo" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Mês</label>
+          <select class="form-select" id="t-mes"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gasto associado (R$)</label>
+          <input class="form-input" id="t-gasto" type="number" placeholder="0" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-check"><input type="checkbox" id="t-urgente" /> Marcar como urgente</label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-salvar" onclick="salvarTarefa()">Salvar tarefa</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const MESES = ['Abr/2026','Mai/2026','Jun/2026','Jul/2026','Ago/2026','Set/2026','Out/2026','Nov/2026','Dez/2026','Jan/2027','Fev/2027','Mar/2027','Abr/2027','Mai/2027','Jun/2027'];
+    let tarefas = JSON.parse(localStorage.getItem('checklist') || '[]');
+    let sugestoes = JSON.parse(localStorage.getItem('checklist-sugestoes') || '[]');
+    let mesAtivo = MESES[0];
+    function salvar(){localStorage.setItem('checklist',JSON.stringify(tarefas))}
+    function abrirModal(){document.getElementById('modal').classList.add('open')}
+    function fecharModal(){document.getElementById('modal').classList.remove('open');document.getElementById('t-nome').value='';document.getElementById('t-gasto').value='';document.getElementById('t-urgente').checked=false}
+    function salvarTarefa(){
+      const nome=document.getElementById('t-nome').value.trim();
+      if(!nome){alert('Informe a descrição.');return}
+      tarefas.push({id:Date.now(),nome,mes:document.getElementById('t-mes').value,gasto:parseFloat(document.getElementById('t-gasto').value)||0,urgente:document.getElementById('t-urgente').checked,done:false,cerimonialista:false});
+      salvar();fecharModal();renderizar()
+    }
+    function toggleDone(id){const t=tarefas.find(t=>t.id===id);if(t){t.done=!t.done;salvar();renderizar()}}
+    function excluir(id){if(!confirm('Remover esta tarefa?'))return;tarefas=tarefas.filter(t=>t.id!==id);salvar();renderizar()}
+    function aceitarSugestao(id){const s=sugestoes.find(s=>s.id===id);if(!s)return;tarefas.push({id:Date.now(),nome:s.nome,mes:s.mes,gasto:0,urgente:false,done:false,cerimonialista:true});sugestoes=sugestoes.filter(s=>s.id!==id);localStorage.setItem('checklist-sugestoes',JSON.stringify(sugestoes));salvar();renderizar()}
+    function recusarSugestao(id){sugestoes=sugestoes.filter(s=>s.id!==id);localStorage.setItem('checklist-sugestoes',JSON.stringify(sugestoes));renderizar()}
+    function renderizar(){
+      // Meses nav
+      const nav=document.getElementById('meses-nav');nav.innerHTML='';
+      const sel=document.getElementById('t-mes');if(sel){sel.innerHTML=MESES.map(m=>`<option>${m}</option>`).join('')}
+      MESES.forEach(m=>{
+        const done=tarefas.filter(t=>t.mes===m).length>0&&tarefas.filter(t=>t.mes===m).every(t=>t.done);
+        const btn=document.createElement('div');
+        btn.className='mes-btn'+(m===mesAtivo?' active':'')+(done?' done':'');
+        btn.textContent=m;btn.onclick=()=>{mesAtivo=m;renderizar()};
+        nav.appendChild(btn)
+      });
+      // Progresso geral
+      const total=tarefas.length,done=tarefas.filter(t=>t.done).length,pct=total>0?Math.round(done/total*100):0;
+      document.getElementById('pct-geral').textContent=pct+'%';
+      document.getElementById('prog-fill').style.width=pct+'%';
+      document.getElementById('prog-sub').textContent=`${done} de ${total} tarefas concluídas`;
+      // Tarefas do mês
+      const container=document.getElementById('tarefas-container');container.innerHTML='';
+      const lista=tarefas.filter(t=>t.mes===mesAtivo);
+      const sug=sugestoes.filter(s=>s.mes===mesAtivo);
+      const mesTotal=lista.length,mesDone=lista.filter(t=>t.done).length;
+      const header=document.createElement('div');header.className='mes-header';
+      header.innerHTML=`<div class="mes-titulo">${mesAtivo}</div><div class="mes-prog">${mesDone} de ${mesTotal} tarefas concluídas</div>`;
+      container.appendChild(header);
+      if(lista.length===0&&sug.length===0){
+        container.innerHTML+=`<div style="text-align:center;padding:40px;color:var(--taupe);font-size:13px;"><i class="ti ti-checkbox" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4;"></i>Nenhuma tarefa para este mês.</div>`;
+      }
+      lista.forEach(t=>{
+        const card=document.createElement('div');card.className='tarefa-card'+(t.done?' done':'');
+        card.innerHTML=`
+          <div class="check-box ${t.done?'checked':''}" onclick="toggleDone(${t.id})">${t.done?'<i class="ti ti-check"></i>':''}</div>
+          <div class="tarefa-info">
+            <div class="tarefa-nome ${t.done?'riscado':''}">${t.nome}</div>
+            <div class="tarefa-tags">
+              ${t.gasto>0?`<span class="tag tag-gasto">R$ ${t.gasto.toLocaleString('pt-BR')}</span>`:'<span class="tag tag-gasto" style="opacity:.5;">sem gasto</span>'}
+              ${t.urgente?'<span class="tag tag-urgente">urgente</span>':''}
+              ${t.cerimonialista?'<span class="tag tag-cerimonialista">sugerida pela cerimonialista</span>':''}
+            </div>
+          </div>
+          <button class="btn-del" onclick="excluir(${t.id})"><i class="ti ti-trash"></i></button>
+        `;
+        container.appendChild(card)
+      });
+      sug.forEach(s=>{
+        const card=document.createElement('div');card.className='sugestao-card';
+        card.innerHTML=`
+          <div class="sug-label"><i class="ti ti-user" style="font-size:11px;"></i> Sugerido pela cerimonialista</div>
+          <div class="sug-nome">${s.nome}</div>
+          <div class="sug-actions">
+            <button class="btn-aceitar" onclick="aceitarSugestao(${s.id})">Aceitar</button>
+            <button class="btn-recusar" onclick="recusarSugestao(${s.id})">Recusar</button>
+          </div>
+        `;
+        container.appendChild(card)
+      })
+    }
+    document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)fecharModal()});
+    renderizar()
+  </script>
+</body>
+</html>
