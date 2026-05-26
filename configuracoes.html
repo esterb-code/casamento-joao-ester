@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Configurações · João & Ester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  <style>
+    :root{--rosa:#C2516A;--rosa-claro:#F4AABB;--rosa-escuro:#8B2240;--verde:#2C6E3A;--verde-m:#5FA870;--verde-menta:#C8E8CE;--laranja:#E8760A;--laranja-s:#F4A860;--pessego:#FDE8CC;--creme:#FDF5EC;--taupe:#9A7060;--branco:#FDFAF7;--sidebar-w:220px}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;display:flex;min-height:100vh}
+    .sidebar{width:var(--sidebar-w);background:var(--rosa-escuro);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+    .sidebar-logo{padding:24px 20px 20px;border-bottom:.5px solid rgba(194,81,106,.5);margin-bottom:8px}
+    .sidebar-logo .initials{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.15em;color:var(--pessego);margin-bottom:4px}
+    .sidebar-logo .names{font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;line-height:1.2}
+    .sidebar-logo .date{font-size:11px;color:var(--rosa-claro);margin-top:3px;font-weight:300}
+    .nav-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:rgba(244,170,187,.5);padding:8px 20px 4px;text-transform:uppercase}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(253,221,230,.8);cursor:pointer;transition:all .15s;text-decoration:none;border-left:2px solid transparent}
+    .nav-item:hover{background:rgba(194,81,106,.2);color:#fff}
+    .nav-item.active{background:rgba(194,81,106,.25);color:#fff;border-left-color:var(--rosa-claro);font-weight:600}
+    .nav-item i{font-size:16px;opacity:.8}
+    .nav-section{padding:8px 0}
+    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+    .topbar{padding:20px 36px;background:var(--branco);border-bottom:.5px solid #EED8C8;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .topbar-left h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--rosa-escuro)}
+    .topbar-left p{font-size:12px;color:var(--taupe);margin-top:2px}
+    .content{padding:24px 36px;display:flex;flex-direction:column;gap:20px;max-width:700px}
+    .section-card{background:var(--branco);border-radius:16px;border:.5px solid #EED8C8;overflow:hidden}
+    .section-header{background:#FAE8EC;padding:12px 18px;display:flex;align-items:center;gap:8px}
+    .section-header i{font-size:16px;color:var(--rosa)}
+    .section-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--rosa-escuro);text-transform:uppercase}
+    .section-body{padding:16px 18px}
+    /* BANNER PREVIEW */
+    .banner-preview{width:100%;height:100px;border-radius:12px;overflow:hidden;position:relative;margin-bottom:12px;background:linear-gradient(135deg,var(--rosa),var(--rosa-escuro));cursor:pointer}
+    .banner-preview img{width:100%;height:100%;object-fit:cover;object-position:center 25%}
+    .banner-change{position:absolute;bottom:8px;right:8px;background:rgba(255,255,255,.9);border-radius:99px;padding:4px 12px;font-size:10px;font-weight:600;color:var(--rosa-escuro);display:flex;align-items:center;gap:4px;cursor:pointer}
+    /* FORM */
+    .field-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid #F5EDE4}
+    .field-row:last-child{border-bottom:none}
+    .field-label{font-size:12px;color:var(--taupe)}
+    .field-val{font-size:13px;font-weight:600;color:#3E3530}
+    .btn-change{font-size:11px;color:var(--rosa);background:#FAE8EC;border:.5px solid var(--rosa-claro);border-radius:99px;padding:3px 12px;cursor:pointer;white-space:nowrap}
+    .form-input{border:.5px solid #EED8C8;border-radius:8px;padding:7px 10px;font-size:12px;font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;outline:none;width:200px}
+    .form-input:focus{border-color:var(--rosa-claro)}
+    /* FONTES */
+    .font-item{display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--creme);border-radius:10px;border:.5px solid #EED8C8;margin-bottom:8px}
+    .font-role{font-size:10px;color:var(--taupe)}
+    .font-name{font-size:13px;color:var(--rosa-escuro);font-weight:600}
+    .font-sample{font-size:16px;color:#3E3530}
+    /* COLABORADORES */
+    .colab-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid #F5EDE4}
+    .colab-row:last-child{border-bottom:none}
+    .colab-avatar{width:34px;height:34px;border-radius:50%;background:#FAE8EC;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--rosa-escuro);flex-shrink:0}
+    .colab-info{flex:1}
+    .colab-nome{font-size:13px;font-weight:600;color:#3E3530}
+    .colab-email{font-size:11px;color:var(--taupe)}
+    .tipo-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px}
+    .t-cerimonialista{background:#E6F1FB;color:#185FA5;border:.5px solid #378ADD}
+    .t-noiva{background:#FAE8EC;color:var(--rosa-escuro);border:.5px solid var(--rosa-claro)}
+    .t-noivo{background:var(--verde-menta);color:var(--verde);border:.5px solid var(--verde-m)}
+    .btn-del{background:none;border:none;cursor:pointer;color:var(--taupe);font-size:14px;opacity:.5}
+    .btn-del:hover{opacity:1;color:#A32D2D}
+    .btn-convidar{width:100%;background:var(--rosa);color:white;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Nunito',sans-serif;margin-top:14px}
+    .btn-convidar:hover{background:var(--rosa-escuro)}
+    /* LOGOUT */
+    .logout-row{display:flex;align-items:center;gap:8px;padding:12px 0;color:#A32D2D;cursor:pointer;font-size:13px;font-weight:600}
+    .logout-row i{font-size:16px}
+    /* MODAL INVITE */
+    .modal-overlay{position:fixed;inset:0;background:rgba(139,34,64,.3);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--branco);border-radius:20px;border:.5px solid #EED8C8;padding:28px;width:420px;box-shadow:0 20px 60px rgba(139,34,64,.2)}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--rosa-escuro);margin-bottom:20px}
+    .form-group{margin-bottom:14px}
+    .form-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--taupe);text-transform:uppercase;margin-bottom:5px;display:block}
+    .form-input-full{width:100%;border:.5px solid #EED8C8;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;outline:none}
+    .form-input-full:focus{border-color:var(--rosa-claro)}
+    .form-select{width:100%;border:.5px solid #EED8C8;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;outline:none}
+    .modal-actions{display:flex;gap:10px;margin-top:20px}
+    .btn-salvar{flex:1;background:var(--rosa);color:white;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif}
+    .btn-cancelar{padding:11px 20px;background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif}
+    .file-input{display:none}
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="initials">💍 J & E</div>
+      <div class="names">João & Ester</div>
+      <div class="date">20 de junho de 2027</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
+      <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
+      <a href="musicas.html" class="nav-item"><i class="ti ti-music"></i> Músicas</a>
+      <a href="papelaria.html" class="nav-item"><i class="ti ti-file-text"></i> Papelaria</a>
+      <a href="ideias.html" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
+      <a href="checklist.html" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
+      <a href="reunioes.html" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
+      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto">
+      <a href="configuracoes.html" class="nav-item active"><i class="ti ti-settings"></i> Configurações</a>
+    </div>
+  </nav>
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Configurações</h1><p>Personalize o app do casamento</p></div>
+    </div>
+    <div class="content">
+
+      <!-- EVENTO -->
+      <div class="section-card">
+        <div class="section-header"><i class="ti ti-heart"></i><span class="section-title">Dados do Evento</span></div>
+        <div class="section-body">
+          <div class="banner-preview" id="banner-preview" onclick="document.getElementById('banner-input').click()">
+            <div class="banner-change"><i class="ti ti-camera" style="font-size:12px;"></i> Alterar foto de capa</div>
+          </div>
+          <input type="file" id="banner-input" class="file-input" accept="image/*" onchange="trocarBanner(event)"/>
+          <div class="field-row">
+            <span class="field-label">Data do casamento</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="date" class="form-input" id="ev-data" value="2027-06-20" onchange="salvarEvento()"/>
+            </div>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Horário</span>
+            <input type="time" class="form-input" id="ev-hora" value="16:00" onchange="salvarEvento()"/>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Local</span>
+            <input class="form-input" id="ev-local" placeholder="A definir" onchange="salvarEvento()"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIPOGRAFIA -->
+      <div class="section-card">
+        <div class="section-header"><i class="ti ti-typography"></i><span class="section-title">Tipografia</span></div>
+        <div class="section-body">
+          <div class="font-item">
+            <div><div class="font-role">Display / Títulos principais</div><div class="font-name">Perandory</div></div>
+            <span class="font-sample" style="font-style:italic;font-family:'Cormorant Garamond',serif;">João & Ester</span>
+          </div>
+          <div class="font-item">
+            <div><div class="font-role">Detalhes / Elementos decorativos</div><div class="font-name">ITC Edwardian Script</div></div>
+            <span class="font-sample" style="font-style:italic;font-family:'Cormorant Garamond',serif;">20 de junho de 2027</span>
+          </div>
+          <div class="font-item">
+            <div><div class="font-role">Navegação / Headings secundários</div><div class="font-name">Cinzel</div></div>
+            <span class="font-sample" style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:.06em;">DASHBOARD</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLABORADORES -->
+      <div class="section-card">
+        <div class="section-header"><i class="ti ti-users"></i><span class="section-title">Colaboradores</span></div>
+        <div class="section-body">
+          <div id="colab-lista"></div>
+          <button class="btn-convidar" onclick="abrirModal()"><i class="ti ti-plus"></i> Convidar colaborador</button>
+        </div>
+      </div>
+
+      <!-- CONTA -->
+      <div class="section-card">
+        <div class="section-header"><i class="ti ti-user-circle"></i><span class="section-title">Conta</span></div>
+        <div class="section-body">
+          <div class="field-row">
+            <span class="field-label">Nome</span>
+            <span class="field-val">João & Ester</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Site</span>
+            <span class="field-val" style="font-size:12px;color:var(--taupe);">casamento-joao-ester.vercel.app</span>
+          </div>
+          <div class="logout-row" onclick="if(confirm('Tem certeza que deseja sair?'))alert('Logout realizado!')">
+            <i class="ti ti-logout"></i> Sair da conta
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL CONVIDAR -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title">Convidar Colaborador</div>
+      <div class="form-group">
+        <label class="form-label">Nome</label>
+        <input class="form-input-full" id="c-nome" placeholder="Nome do colaborador"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input class="form-input-full" id="c-email" type="email" placeholder="email@exemplo.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de acesso</label>
+        <select class="form-select" id="c-tipo">
+          <option value="cerimonialista">Cerimonialista</option>
+          <option value="noiva">Família da noiva</option>
+          <option value="noivo">Família do noivo</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-salvar" onclick="convidar()">Convidar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TIPO_LABELS={cerimonialista:'Cerimonialista',noiva:'Família da noiva',noivo:'Família do noivo'};
+    const TIPO_CLASSES={cerimonialista:'t-cerimonialista',noiva:'t-noiva',noivo:'t-noivo'};
+    let colaboradores=JSON.parse(localStorage.getItem('colaboradores')||'[]');
+
+    function salvarColaboradores(){localStorage.setItem('colaboradores',JSON.stringify(colaboradores))}
+    function abrirModal(){document.getElementById('modal').classList.add('open')}
+    function fecharModal(){document.getElementById('modal').classList.remove('open');document.getElementById('c-nome').value='';document.getElementById('c-email').value=''}
+    function convidar(){
+      const nome=document.getElementById('c-nome').value.trim();
+      const email=document.getElementById('c-email').value.trim();
+      if(!nome||!email){alert('Preencha nome e e-mail.');return}
+      colaboradores.push({id:Date.now(),nome,email,tipo:document.getElementById('c-tipo').value});
+      salvarColaboradores();fecharModal();renderColabs()
+    }
+    function removerColab(id){if(!confirm('Remover colaborador?'))return;colaboradores=colaboradores.filter(c=>c.id!==id);salvarColaboradores();renderColabs()}
+    function renderColabs(){
+      const lista=document.getElementById('colab-lista');lista.innerHTML='';
+      if(colaboradores.length===0){lista.innerHTML='<div style="font-size:12px;color:var(--taupe);padding:8px 0;">Nenhum colaborador convidado ainda.</div>';return}
+      colaboradores.forEach(c=>{
+        const iniciais=c.nome.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
+        const row=document.createElement('div');row.className='colab-row';
+        row.innerHTML=`
+          <div class="colab-avatar">${iniciais}</div>
+          <div class="colab-info"><div class="colab-nome">${c.nome}</div><div class="colab-email">${c.email}</div></div>
+          <span class="tipo-badge ${TIPO_CLASSES[c.tipo]}">${TIPO_LABELS[c.tipo]}</span>
+          <button class="btn-del" onclick="removerColab(${c.id})"><i class="ti ti-trash"></i></button>
+        `;
+        lista.appendChild(row)
+      })
+    }
+
+    // Banner
+    const bannerSalvo=localStorage.getItem('banner-capa');
+    const bannerEl=document.getElementById('banner-preview');
+    if(bannerSalvo){const img=document.createElement('img');img.src=bannerSalvo;bannerEl.insertBefore(img,bannerEl.firstChild)}
+
+    function trocarBanner(e){
+      const file=e.target.files[0];if(!file)return;
+      const reader=new FileReader();
+      reader.onload=ev=>{
+        localStorage.setItem('banner-capa',ev.target.result);
+        const old=bannerEl.querySelector('img');if(old)old.remove();
+        const img=document.createElement('img');img.src=ev.target.result;
+        bannerEl.insertBefore(img,bannerEl.firstChild)
+      };
+      reader.readAsDataURL(file)
+    }
+
+    // Evento
+    const evSalvo=JSON.parse(localStorage.getItem('evento-config')||'{}');
+    if(evSalvo.data)document.getElementById('ev-data').value=evSalvo.data;
+    if(evSalvo.hora)document.getElementById('ev-hora').value=evSalvo.hora;
+    if(evSalvo.local)document.getElementById('ev-local').value=evSalvo.local;
+
+    function salvarEvento(){
+      localStorage.setItem('evento-config',JSON.stringify({
+        data:document.getElementById('ev-data').value,
+        hora:document.getElementById('ev-hora').value,
+        local:document.getElementById('ev-local').value,
+      }))
+    }
+
+    document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)fecharModal()});
+    renderColabs()
+  </script>
+</body>
+</html>
