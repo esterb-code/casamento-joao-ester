@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reuniões · João & Ester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  <style>
+    :root{--rosa:#C2516A;--rosa-claro:#F4AABB;--rosa-escuro:#8B2240;--verde:#2C6E3A;--verde-m:#5FA870;--verde-menta:#C8E8CE;--laranja:#E8760A;--laranja-s:#F4A860;--pessego:#FDE8CC;--creme:#FDF5EC;--taupe:#9A7060;--branco:#FDFAF7;--sidebar-w:220px}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;display:flex;min-height:100vh}
+    .sidebar{width:var(--sidebar-w);background:var(--rosa-escuro);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+    .sidebar-logo{padding:24px 20px 20px;border-bottom:.5px solid rgba(194,81,106,.5);margin-bottom:8px}
+    .sidebar-logo .initials{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.15em;color:var(--pessego);margin-bottom:4px}
+    .sidebar-logo .names{font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;line-height:1.2}
+    .sidebar-logo .date{font-size:11px;color:var(--rosa-claro);margin-top:3px;font-weight:300}
+    .nav-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:rgba(244,170,187,.5);padding:8px 20px 4px;text-transform:uppercase}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(253,221,230,.8);cursor:pointer;transition:all .15s;text-decoration:none;border-left:2px solid transparent}
+    .nav-item:hover{background:rgba(194,81,106,.2);color:#fff}
+    .nav-item.active{background:rgba(194,81,106,.25);color:#fff;border-left-color:var(--rosa-claro);font-weight:600}
+    .nav-item i{font-size:16px;opacity:.8}
+    .nav-section{padding:8px 0}
+    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+    .topbar{padding:20px 36px;background:var(--branco);border-bottom:.5px solid #EED8C8;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .topbar-left h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--rosa-escuro)}
+    .topbar-left p{font-size:12px;color:var(--taupe);margin-top:2px}
+    .btn-add{background:var(--rosa);color:white;border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif}
+    .btn-add:hover{background:var(--rosa-escuro)}
+    .content{padding:24px 36px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+    .col-left,.col-right{display:flex;flex-direction:column;gap:16px}
+    /* CALENDÁRIO */
+    .cal-card{background:var(--branco);border-radius:16px;border:.5px solid #EED8C8;padding:20px}
+    .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .cal-titulo{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--rosa-escuro)}
+    .cal-nav{display:flex;gap:6px}
+    .cal-btn{background:#FAE8EC;border:none;border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--rosa)}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+    .cal-dia-nome{font-family:'Cinzel',serif;font-size:9px;color:var(--taupe);text-align:center;padding:4px 0;letter-spacing:.05em}
+    .cal-dia{height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#3E3530;cursor:pointer;position:relative;transition:background .1s}
+    .cal-dia:hover{background:#FAE8EC}
+    .cal-dia.outro{color:#D3D1C7}
+    .cal-dia.hoje{background:#FAE8EC;color:var(--rosa-escuro);font-weight:700}
+    .cal-dia.tem-reuniao::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--rosa)}
+    .cal-dia.selecionado{background:var(--rosa);color:white}
+    .cal-dia.selecionado::after{background:white}
+    /* LISTA */
+    .section-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--rosa-escuro);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .reuniao-card{background:var(--branco);border-radius:14px;border:.5px solid #EED8C8;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;transition:all .15s;margin-bottom:8px}
+    .reuniao-card:hover{border-color:var(--rosa-claro)}
+    .reuniao-card.passada{opacity:.55}
+    .reuniao-data{background:#FAE8EC;border-radius:10px;padding:8px 12px;text-align:center;flex-shrink:0;min-width:48px}
+    .reuniao-dia{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--rosa-escuro);display:block;line-height:1}
+    .reuniao-mes{font-family:'Cinzel',serif;font-size:8px;color:var(--rosa);text-transform:uppercase;letter-spacing:.05em}
+    .reuniao-info{flex:1;min-width:0}
+    .reuniao-titulo{font-size:13px;font-weight:600;color:#3E3530;margin-bottom:4px}
+    .reuniao-meta{font-size:11px;color:var(--taupe);display:flex;gap:10px;flex-wrap:wrap}
+    .reuniao-meta span{display:flex;align-items:center;gap:3px}
+    .reuniao-meta i{font-size:12px}
+    .tipo-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap;align-self:flex-start}
+    .t-fornecedor{background:var(--pessego);color:#8B4000;border:.5px solid var(--laranja-s)}
+    .t-cerimonialista{background:#E6F1FB;color:#185FA5;border:.5px solid #378ADD}
+    .t-padre{background:var(--verde-menta);color:var(--verde);border:.5px solid var(--verde-m)}
+    .t-familia{background:#FAE8EC;color:var(--rosa-escuro);border:.5px solid var(--rosa-claro)}
+    .btn-del{background:none;border:none;cursor:pointer;color:var(--taupe);font-size:14px;opacity:.5}
+    .btn-del:hover{opacity:1;color:#A32D2D}
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(139,34,64,.3);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--branco);border-radius:20px;border:.5px solid #EED8C8;padding:28px;width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(139,34,64,.2)}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--rosa-escuro);margin-bottom:20px}
+    .form-group{margin-bottom:14px}
+    .form-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--taupe);text-transform:uppercase;margin-bottom:5px;display:block}
+    .form-input,.form-select{width:100%;border:.5px solid #EED8C8;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;outline:none}
+    .form-input:focus,.form-select:focus{border-color:var(--rosa-claro)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .modal-actions{display:flex;gap:10px;margin-top:20px}
+    .btn-salvar{flex:1;background:var(--rosa);color:white;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif}
+    .btn-cancelar{padding:11px 20px;background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif}
+    /* GCAL POPUP */
+    .gcal-popup{position:fixed;bottom:24px;right:24px;background:var(--branco);border-radius:16px;border:.5px solid #EED8C8;padding:20px 24px;box-shadow:0 8px 32px rgba(139,34,64,.15);z-index:300;display:none;animation:slideUp .3s ease}
+    .gcal-popup.show{display:block}
+    @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .gcal-title{font-size:13px;font-weight:600;color:#3E3530;margin-bottom:4px}
+    .gcal-sub{font-size:11px;color:var(--taupe);margin-bottom:14px}
+    .gcal-actions{display:flex;gap:8px}
+    .btn-gcal{background:var(--rosa);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif;display:flex;align-items:center;gap:5px}
+    .btn-dispensar{background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif}
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="initials">💍 J & E</div>
+      <div class="names">João & Ester</div>
+      <div class="date">20 de junho de 2027</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
+      <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
+      <a href="musicas.html" class="nav-item"><i class="ti ti-music"></i> Músicas</a>
+      <a href="papelaria.html" class="nav-item"><i class="ti ti-file-text"></i> Papelaria</a>
+      <a href="ideias.html" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
+      <a href="checklist.html" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
+      <a href="reunioes.html" class="nav-item active"><i class="ti ti-calendar"></i> Reuniões</a>
+      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto">
+      <a href="configuracoes.html" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
+    </div>
+  </nav>
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Reuniões</h1><p>Agenda de reuniões e compromissos</p></div>
+      <button class="btn-add" onclick="abrirModal()"><i class="ti ti-plus"></i> Nova reunião</button>
+    </div>
+    <div class="content">
+      <div class="col-left">
+        <div class="cal-card">
+          <div class="cal-header">
+            <div class="cal-titulo" id="cal-titulo"></div>
+            <div class="cal-nav">
+              <button class="cal-btn" onclick="mudarMes(-1)"><i class="ti ti-chevron-left"></i></button>
+              <button class="cal-btn" onclick="mudarMes(1)"><i class="ti ti-chevron-right"></i></button>
+            </div>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+        </div>
+      </div>
+      <div class="col-right">
+        <div class="section-title"><i class="ti ti-calendar-event"></i> Próximas reuniões</div>
+        <div id="proximas-container"></div>
+        <div class="section-title" style="margin-top:8px"><i class="ti ti-history"></i> Reuniões passadas</div>
+        <div id="passadas-container"></div>
+      </div>
+    </div>
+  </main>
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title">Nova Reunião</div>
+      <div class="form-group">
+        <label class="form-label">Título</label>
+        <input class="form-input" id="r-titulo" placeholder="Ex: Visita ao espaço" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tipo</label>
+          <select class="form-select" id="r-tipo">
+            <option value="fornecedor">Fornecedor</option>
+            <option value="cerimonialista">Cerimonialista</option>
+            <option value="padre">Padre</option>
+            <option value="familia">Família</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pessoa / Empresa</label>
+          <input class="form-input" id="r-pessoa" placeholder="Nome" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Data</label>
+          <input class="form-input" id="r-data" type="date" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Horário</label>
+          <input class="form-input" id="r-hora" type="time" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Local</label>
+          <select class="form-select" id="r-local-tipo">
+            <option>Presencial</option>
+            <option>Online</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Endereço / Link</label>
+          <input class="form-input" id="r-local" placeholder="Local ou link" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-salvar" onclick="salvarReuniao()">Salvar reunião</button>
+      </div>
+    </div>
+  </div>
+  <div class="gcal-popup" id="gcal-popup">
+    <div class="gcal-title">Adicionar ao Google Calendar?</div>
+    <div class="gcal-sub" id="gcal-sub"></div>
+    <div class="gcal-actions">
+      <button class="btn-gcal" id="gcal-btn"><i class="ti ti-calendar"></i> Adicionar</button>
+      <button class="btn-dispensar" onclick="dispensarGcal()">Dispensar</button>
+    </div>
+  </div>
+  <script>
+    const TIPOS={fornecedor:{label:'Fornecedor',cls:'t-fornecedor'},cerimonialista:{label:'Cerimonialista',cls:'t-cerimonialista'},padre:{label:'Padre',cls:'t-padre'},familia:{label:'Família',cls:'t-familia'}};
+    const MESES_PT=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const DIAS_PT=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    let reunioes=JSON.parse(localStorage.getItem('reunioes')||'[]');
+    let calData=new Date();let ultimaReuniao=null;
+    function salvar(){localStorage.setItem('reunioes',JSON.stringify(reunioes))}
+    function abrirModal(){document.getElementById('modal').classList.add('open')}
+    function fecharModal(){document.getElementById('modal').classList.remove('open');['r-titulo','r-pessoa','r-data','r-hora','r-local'].forEach(id=>document.getElementById(id).value='')}
+    function salvarReuniao(){
+      const titulo=document.getElementById('r-titulo').value.trim();
+      const data=document.getElementById('r-data').value;
+      if(!titulo||!data){alert('Preencha título e data.');return}
+      const r={id:Date.now(),titulo,tipo:document.getElementById('r-tipo').value,pessoa:document.getElementById('r-pessoa').value,data,hora:document.getElementById('r-hora').value,localTipo:document.getElementById('r-local-tipo').value,local:document.getElementById('r-local').value};
+      reunioes.push(r);salvar();ultimaReuniao=r;fecharModal();renderizar();mostrarGcal(r)
+    }
+    function excluir(id){if(!confirm('Remover esta reunião?'))return;reunioes=reunioes.filter(r=>r.id!==id);salvar();renderizar()}
+    function mostrarGcal(r){
+      const popup=document.getElementById('gcal-popup');
+      document.getElementById('gcal-sub').textContent=`${r.titulo} · ${formatarData(r.data)}${r.hora?' às '+r.hora:''}`;
+      const url=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(r.titulo)}&dates=${r.data.replace(/-/g,'')}/${r.data.replace(/-/g,'')}&details=${encodeURIComponent(r.pessoa||'')}`;
+      document.getElementById('gcal-btn').onclick=()=>{window.open(url,'_blank');dispensarGcal()};
+      popup.classList.add('show');
+    }
+    function dispensarGcal(){document.getElementById('gcal-popup').classList.remove('show')}
+    function formatarData(d){if(!d)return'';const[y,m,dia]=d.split('-');return`${dia}/${m}/${y}`}
+    function mudarMes(delta){calData=new Date(calData.getFullYear(),calData.getMonth()+delta,1);renderCal()}
+    function renderCal(){
+      const y=calData.getFullYear(),m=calData.getMonth();
+      document.getElementById('cal-titulo').textContent=`${MESES_PT[m]} ${y}`;
+      const grid=document.getElementById('cal-grid');grid.innerHTML='';
+      DIAS_PT.forEach(d=>{const el=document.createElement('div');el.className='cal-dia-nome';el.textContent=d;grid.appendChild(el)});
+      const primeiro=new Date(y,m,1).getDay();
+      const diasMes=new Date(y,m+1,0).getDate();
+      const diasAnt=new Date(y,m,0).getDate();
+      const hoje=new Date();
+      const datasReuniao=reunioes.map(r=>r.data);
+      for(let i=0;i<primeiro;i++){const el=document.createElement('div');el.className='cal-dia outro';el.textContent=diasAnt-primeiro+1+i;grid.appendChild(el)}
+      for(let d=1;d<=diasMes;d++){
+        const el=document.createElement('div');el.className='cal-dia';
+        const dateStr=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        if(d===hoje.getDate()&&m===hoje.getMonth()&&y===hoje.getFullYear())el.classList.add('hoje');
+        if(datasReuniao.includes(dateStr))el.classList.add('tem-reuniao');
+        el.textContent=d;grid.appendChild(el)
+      }
+    }
+    function renderizar(){
+      renderCal();
+      const agora=new Date();
+      const proximas=reunioes.filter(r=>new Date(r.data+'T'+(r.hora||'00:00'))>=agora).sort((a,b)=>new Date(a.data)-new Date(b.data));
+      const passadas=reunioes.filter(r=>new Date(r.data+'T'+(r.hora||'00:00'))<agora).sort((a,b)=>new Date(b.data)-new Date(a.data));
+      function renderLista(lista,container,passada){
+        const el=document.getElementById(container);el.innerHTML='';
+        if(lista.length===0){el.innerHTML=`<div style="font-size:12px;color:var(--taupe);padding:12px 0;">Nenhuma reunião ${passada?'passada':'próxima'}.</div>`;return}
+        lista.slice(0,5).forEach(r=>{
+          const [y,m,d]=r.data.split('-');
+          const card=document.createElement('div');card.className='reuniao-card'+(passada?' passada':'');
+          card.innerHTML=`
+            <div class="reuniao-data"><span class="reuniao-dia">${d}</span><span class="reuniao-mes">${['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][parseInt(m)-1]}</span></div>
+            <div class="reuniao-info">
+              <div class="reuniao-titulo">${r.titulo}</div>
+              <div class="reuniao-meta">
+                ${r.hora?`<span><i class="ti ti-clock"></i>${r.hora}</span>`:''}
+                ${r.localTipo?`<span><i class="ti ti-map-pin"></i>${r.localTipo}</span>`:''}
+                ${r.pessoa?`<span><i class="ti ti-user"></i>${r.pessoa}</span>`:''}
+              </div>
+            </div>
+            <span class="tipo-badge ${TIPOS[r.tipo]?.cls||'t-fornecedor'}">${TIPOS[r.tipo]?.label||r.tipo}</span>
+            <button class="btn-del" onclick="excluir(${r.id})"><i class="ti ti-trash"></i></button>
+          `;
+          el.appendChild(card)
+        })
+      }
+      renderLista(proximas,'proximas-container',false);
+      renderLista(passadas,'passadas-container',true);
+    }
+    document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)fecharModal()});
+    renderizar()
+  </script>
+</body>
+</html>
