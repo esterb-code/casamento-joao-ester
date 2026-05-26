@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cortejo · João & Ester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <style>
+    :root {
+      --rosa: #C2516A; --rosa-claro: #F4AABB; --rosa-escuro: #8B2240;
+      --verde: #2C6E3A; --verde-m: #5FA870; --verde-menta: #C8E8CE;
+      --laranja: #E8760A; --laranja-s: #F4A860; --pessego: #FDE8CC;
+      --creme: #FDF5EC; --taupe: #9A7060; --branco: #FDFAF7;
+      --sidebar-w: 220px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; background: var(--creme); color: #3E3530; display: flex; min-height: 100vh; }
+
+    .sidebar { width: var(--sidebar-w); background: var(--rosa-escuro); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow-y: auto; }
+    .sidebar-logo { padding: 24px 20px 20px; border-bottom: 0.5px solid rgba(194,81,106,0.5); margin-bottom: 8px; }
+    .sidebar-logo .initials { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.15em; color: var(--pessego); margin-bottom: 4px; }
+    .sidebar-logo .names { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #fff; line-height: 1.2; }
+    .sidebar-logo .date { font-size: 11px; color: var(--rosa-claro); margin-top: 3px; font-weight: 300; }
+    .nav-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.12em; color: rgba(244,170,187,0.5); padding: 8px 20px 4px; text-transform: uppercase; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: rgba(253,221,230,0.8); cursor: pointer; transition: all 0.15s; text-decoration: none; border-left: 2px solid transparent; }
+    .nav-item:hover { background: rgba(194,81,106,0.2); color: #fff; }
+    .nav-item.active { background: rgba(194,81,106,0.25); color: #fff; border-left-color: var(--rosa-claro); font-weight: 600; }
+    .nav-item i { font-size: 16px; opacity: 0.8; }
+    .nav-section { padding: 8px 0; }
+
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    .topbar { padding: 20px 36px; background: var(--branco); border-bottom: 0.5px solid #EED8C8; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar-left h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--rosa-escuro); }
+    .topbar-left p { font-size: 12px; color: var(--taupe); margin-top: 2px; }
+    .btn-add { background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 9px 16px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Nunito', sans-serif; transition: background 0.15s; }
+    .btn-add:hover { background: var(--rosa-escuro); }
+
+    .content { padding: 24px 36px; }
+
+    /* TABS */
+    .grupos-tabs { display: flex; gap: 0; background: var(--branco); border-radius: 14px; border: 0.5px solid #EED8C8; overflow: hidden; margin-bottom: 24px; }
+    .grupo-tab { flex: 1; text-align: center; padding: 12px 8px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.08em; color: var(--taupe); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; text-transform: uppercase; }
+    .grupo-tab:hover { color: var(--rosa); background: #FAE8EC; }
+    .grupo-tab.active { color: var(--rosa-escuro); border-bottom-color: var(--rosa); font-weight: 600; background: #FAE8EC; }
+
+    /* RESUMO */
+    .resumo-pills { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .resumo-pill { font-size: 11px; font-weight: 600; padding: 5px 14px; border-radius: 99px; }
+    .rp-confirmado { background: var(--verde-menta); color: var(--verde); border: 0.5px solid var(--verde-m); }
+    .rp-aguardando { background: var(--pessego); color: #8B4000; border: 0.5px solid var(--laranja-s); }
+    .rp-convidado { background: #E6F1FB; color: #185FA5; border: 0.5px solid #378ADD; }
+    .rp-recusado { background: #FCEBEB; color: #A32D2D; border: 0.5px solid #E24B4A; }
+
+    /* CASAIS / MEMBROS */
+    .casal-bloco { margin-bottom: 16px; }
+    .casal-label { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .casal-linha { flex: 1; height: 0.5px; background: #EED8C8; }
+    .casal-texto { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.1em; color: var(--taupe); text-transform: uppercase; white-space: nowrap; }
+
+    .membro-card { background: var(--branco); border-radius: 14px; border: 0.5px solid #EED8C8; padding: 14px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; transition: all 0.15s; }
+    .membro-card:hover { border-color: var(--rosa-claro); }
+    .membro-avatar { width: 38px; height: 38px; border-radius: 50%; background: #FAE8EC; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--rosa-escuro); flex-shrink: 0; }
+    .membro-avatar.verde { background: var(--verde-menta); color: var(--verde); }
+    .membro-info { flex: 1; min-width: 0; }
+    .membro-nome { font-size: 13px; font-weight: 600; color: #3E3530; }
+    .membro-sub { font-size: 11px; color: var(--taupe); margin-top: 2px; }
+    .membro-actions { display: flex; align-items: center; gap: 8px; }
+
+    .status-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 99px; white-space: nowrap; cursor: pointer; }
+    .s-convidado { background: #E6F1FB; color: #185FA5; border: 0.5px solid #378ADD; }
+    .s-aguardando { background: var(--pessego); color: #8B4000; border: 0.5px solid var(--laranja-s); }
+    .s-confirmado { background: var(--verde-menta); color: var(--verde); border: 0.5px solid var(--verde-m); }
+    .s-recusado { background: #FCEBEB; color: #A32D2D; border: 0.5px solid #E24B4A; }
+
+    .presente-btn { display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 99px; border: 0.5px solid #EED8C8; background: var(--creme); color: var(--taupe); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+    .presente-btn.entregue { background: var(--verde-menta); color: var(--verde); border-color: var(--verde-m); }
+    .presente-btn i { font-size: 12px; }
+
+    .casal-tag { font-size: 10px; color: var(--rosa); background: #FAE8EC; padding: 2px 8px; border-radius: 99px; border: 0.5px solid var(--rosa-claro); white-space: nowrap; }
+
+    .btn-del { background: none; border: none; cursor: pointer; color: var(--taupe); font-size: 14px; opacity: 0.5; transition: opacity 0.15s; }
+    .btn-del:hover { opacity: 1; color: #A32D2D; }
+
+    .empty-state { text-align: center; padding: 48px; color: var(--taupe); font-size: 13px; background: var(--branco); border-radius: 16px; border: 0.5px solid #EED8C8; }
+    .empty-state i { font-size: 32px; display: block; margin-bottom: 8px; opacity: 0.4; }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(139,34,64,0.3); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--branco); border-radius: 20px; border: 0.5px solid #EED8C8; padding: 28px; width: 460px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(139,34,64,0.2); }
+    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--rosa-escuro); margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.1em; color: var(--taupe); text-transform: uppercase; margin-bottom: 5px; display: block; }
+    .form-input, .form-select { width: 100%; border: 0.5px solid #EED8C8; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-family: 'Nunito', sans-serif; background: var(--creme); color: #3E3530; outline: none; }
+    .form-input:focus, .form-select:focus { border-color: var(--rosa-claro); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #3E3530; cursor: pointer; }
+    .form-check input { width: 16px; height: 16px; accent-color: var(--rosa); }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-salvar { flex: 1; background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 11px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; }
+    .btn-salvar:hover { background: var(--rosa-escuro); }
+    .btn-cancelar { padding: 11px 20px; background: var(--creme); color: var(--taupe); border: 0.5px solid #EED8C8; border-radius: 10px; font-size: 13px; cursor: pointer; font-family: 'Nunito', sans-serif; }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="initials">💍 J & E</div>
+      <div class="names">João & Ester</div>
+      <div class="date">20 de junho de 2027</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
+      <a href="cortejo.html" class="nav-item active"><i class="ti ti-heart"></i> Cortejo</a>
+      <a href="#" class="nav-item"><i class="ti ti-music"></i> Músicas</a>
+      <a href="#" class="nav-item"><i class="ti ti-file-text"></i> Papelaria</a>
+      <a href="#" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
+      <a href="#" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
+      <a href="#" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
+      <a href="#" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto;">
+      <a href="#" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Cortejo</h1>
+        <p>Gerencie os membros do cortejo do casamento</p>
+      </div>
+      <button class="btn-add" onclick="abrirModal()"><i class="ti ti-plus"></i> Novo membro</button>
+    </div>
+
+    <div class="content">
+      <div class="grupos-tabs" id="grupos-tabs"></div>
+      <div class="resumo-pills" id="resumo-pills"></div>
+      <div id="membros-container"></div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title">Novo Membro do Cortejo</div>
+      <div class="form-group">
+        <label class="form-label">Grupo</label>
+        <select class="form-select" id="m-grupo">
+          <option>Pais</option>
+          <option>Padrinhos & Madrinhas</option>
+          <option>Pajens & Daminhas</option>
+          <option>Primeira Leitura</option>
+          <option>Segunda Leitura</option>
+          <option>Padre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nome completo</label>
+        <input class="form-input" id="m-nome" placeholder="Nome do membro" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Função</label>
+          <input class="form-input" id="m-funcao" placeholder="Ex: Padrinho, Madrinha..." />
+        </div>
+        <div class="form-group">
+          <label class="form-label">WhatsApp</label>
+          <input class="form-input" id="m-whatsapp" placeholder="+55 61 9 XXXX-XXXX" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="m-status">
+            <option value="convidado">Convidado</option>
+            <option value="aguardando">Aguardando resposta</option>
+            <option value="confirmado">Confirmado</option>
+            <option value="recusado">Recusado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Par / Casal com</label>
+          <input class="form-input" id="m-par" placeholder="Nome do par (opcional)" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-salvar" onclick="salvarMembro()">Salvar membro</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const GRUPOS = ['Pais', 'Padrinhos & Madrinhas', 'Pajens & Daminhas', 'Primeira Leitura', 'Segunda Leitura', 'Padre'];
+    const STATUS_LABELS = { convidado:'Convidado', aguardando:'Aguardando resposta', confirmado:'Confirmado', recusado:'Recusado' };
+    const STATUS_CLASSES = { convidado:'s-convidado', aguardando:'s-aguardando', confirmado:'s-confirmado', recusado:'s-recusado' };
+
+    let membros = JSON.parse(localStorage.getItem('cortejo') || '[]');
+    let grupoAtivo = GRUPOS[0];
+
+    function salvar() { localStorage.setItem('cortejo', JSON.stringify(membros)); }
+    function abrirModal() { document.getElementById('modal').classList.add('open'); }
+    function fecharModal() {
+      document.getElementById('modal').classList.remove('open');
+      ['m-nome','m-funcao','m-whatsapp','m-par'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('m-status').value = 'convidado';
+    }
+
+    function salvarMembro() {
+      const nome = document.getElementById('m-nome').value.trim();
+      if (!nome) { alert('Informe o nome do membro.'); return; }
+      membros.push({
+        id: Date.now(),
+        grupo: document.getElementById('m-grupo').value,
+        nome,
+        funcao: document.getElementById('m-funcao').value,
+        whatsapp: document.getElementById('m-whatsapp').value,
+        status: document.getElementById('m-status').value,
+        par: document.getElementById('m-par').value.trim(),
+        presente: false,
+      });
+      salvar();
+      fecharModal();
+      renderizar();
+    }
+
+    function excluir(id) {
+      if (!confirm('Remover este membro?')) return;
+      membros = membros.filter(m => m.id !== id);
+      salvar();
+      renderizar();
+    }
+
+    function togglePresente(id) {
+      const m = membros.find(m => m.id === id);
+      if (m) { m.presente = !m.presente; salvar(); renderizar(); }
+    }
+
+    function avancarStatus(id) {
+      const ordem = ['convidado','aguardando','confirmado','recusado'];
+      const m = membros.find(m => m.id === id);
+      if (!m) return;
+      m.status = ordem[(ordem.indexOf(m.status) + 1) % ordem.length];
+      salvar();
+      renderizar();
+    }
+
+    function iniciais(nome) {
+      return nome.split(' ').slice(0,2).map(p => p[0]).join('').toUpperCase();
+    }
+
+    function renderTabs() {
+      const container = document.getElementById('grupos-tabs');
+      container.innerHTML = '';
+      GRUPOS.forEach(g => {
+        const count = membros.filter(m => m.grupo === g).length;
+        const tab = document.createElement('div');
+        tab.className = 'grupo-tab' + (g === grupoAtivo ? ' active' : '');
+        tab.innerHTML = `${g} ${count > 0 ? `<span style="font-size:9px;opacity:0.7;">(${count})</span>` : ''}`;
+        tab.onclick = () => { grupoAtivo = g; renderizar(); };
+        container.appendChild(tab);
+      });
+    }
+
+    function renderizar() {
+      renderTabs();
+      const lista = membros.filter(m => m.grupo === grupoAtivo);
+
+      // Resumo
+      const confirmados = lista.filter(m => m.status === 'confirmado').length;
+      const aguardando = lista.filter(m => m.status === 'aguardando').length;
+      const convidados = lista.filter(m => m.status === 'convidado').length;
+      const recusados = lista.filter(m => m.status === 'recusado').length;
+
+      document.getElementById('resumo-pills').innerHTML = `
+        ${confirmados > 0 ? `<span class="resumo-pill rp-confirmado">${confirmados} confirmado${confirmados > 1 ? 's' : ''}</span>` : ''}
+        ${aguardando > 0 ? `<span class="resumo-pill rp-aguardando">${aguardando} aguardando</span>` : ''}
+        ${convidados > 0 ? `<span class="resumo-pill rp-convidado">${convidados} convidado${convidados > 1 ? 's' : ''}</span>` : ''}
+        ${recusados > 0 ? `<span class="resumo-pill rp-recusado">${recusados} recusado${recusados > 1 ? 's' : ''}</span>` : ''}
+        ${lista.length === 0 ? '<span style="font-size:12px;color:var(--taupe);">Nenhum membro neste grupo ainda.</span>' : ''}
+      `;
+
+      const container = document.getElementById('membros-container');
+
+      if (lista.length === 0) {
+        container.innerHTML = `<div class="empty-state"><i class="ti ti-heart"></i>Nenhum membro cadastrado neste grupo.<br>Clique em "Novo membro" para adicionar.</div>`;
+        return;
+      }
+
+      container.innerHTML = '';
+
+      // Agrupar por par
+      const comPar = [];
+      const semPar = [];
+      const paresVistos = new Set();
+
+      lista.forEach(m => {
+        if (m.par && !paresVistos.has(m.nome)) {
+          const parceiro = lista.find(p => p.nome === m.par);
+          if (parceiro) {
+            comPar.push([m, parceiro]);
+            paresVistos.add(m.nome);
+            paresVistos.add(parceiro.nome);
+          } else {
+            semPar.push(m);
+            paresVistos.add(m.nome);
+          }
+        } else if (!paresVistos.has(m.nome)) {
+          semPar.push(m);
+          paresVistos.add(m.nome);
+        }
+      });
+
+      let casalNum = 1;
+      comPar.forEach(([a, b]) => {
+        const bloco = document.createElement('div');
+        bloco.className = 'casal-bloco';
+        bloco.innerHTML = `<div class="casal-label"><div class="casal-linha"></div><span class="casal-texto">Casal ${casalNum++}</span><div class="casal-linha"></div></div>`;
+        [a, b].forEach((m, i) => {
+          const card = criarCard(m, true, i === 1);
+          bloco.appendChild(card);
+        });
+        container.appendChild(bloco);
+      });
+
+      if (semPar.length > 0) {
+        const bloco = document.createElement('div');
+        bloco.className = 'casal-bloco';
+        if (comPar.length > 0) bloco.innerHTML = `<div class="casal-label"><div class="casal-linha"></div><span class="casal-texto">Individual</span><div class="casal-linha"></div></div>`;
+        semPar.forEach(m => bloco.appendChild(criarCard(m, false, false)));
+        container.appendChild(bloco);
+      }
+    }
+
+    function criarCard(m, temPar, isVerde) {
+      const card = document.createElement('div');
+      card.className = 'membro-card';
+      card.innerHTML = `
+        <div class="membro-avatar ${isVerde ? 'verde' : ''}">${iniciais(m.nome)}</div>
+        <div class="membro-info">
+          <div class="membro-nome">${m.nome}</div>
+          <div class="membro-sub">${m.funcao || ''}${m.whatsapp ? ' · ' + m.whatsapp : ''}</div>
+        </div>
+        <div class="membro-actions">
+          ${temPar ? `<span class="casal-tag">casal</span>` : ''}
+          <div class="presente-btn ${m.presente ? 'entregue' : ''}" onclick="togglePresente(${m.id})">
+            <i class="ti ti-gift"></i> ${m.presente ? 'Entregue' : 'Pendente'}
+          </div>
+          <span class="status-badge ${STATUS_CLASSES[m.status]}" onclick="avancarStatus(${m.id})" title="Clique para avançar">${STATUS_LABELS[m.status]}</span>
+          <button class="btn-del" onclick="excluir(${m.id})"><i class="ti ti-trash"></i></button>
+        </div>
+      `;
+      return card;
+    }
+
+    document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
+    renderizar();
+  </script>
+</body>
+</html>
