@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Banco de Ideias · João & Ester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <style>
+    :root {
+      --rosa: #C2516A; --rosa-claro: #F4AABB; --rosa-escuro: #8B2240;
+      --verde: #2C6E3A; --verde-m: #5FA870; --verde-menta: #C8E8CE;
+      --laranja: #E8760A; --laranja-s: #F4A860; --pessego: #FDE8CC;
+      --creme: #FDF5EC; --taupe: #9A7060; --branco: #FDFAF7;
+      --sidebar-w: 220px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; background: var(--creme); color: #3E3530; display: flex; min-height: 100vh; }
+    .sidebar { width: var(--sidebar-w); background: var(--rosa-escuro); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow-y: auto; }
+    .sidebar-logo { padding: 24px 20px 20px; border-bottom: 0.5px solid rgba(194,81,106,0.5); margin-bottom: 8px; }
+    .sidebar-logo .initials { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.15em; color: var(--pessego); margin-bottom: 4px; }
+    .sidebar-logo .names { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #fff; line-height: 1.2; }
+    .sidebar-logo .date { font-size: 11px; color: var(--rosa-claro); margin-top: 3px; font-weight: 300; }
+    .nav-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.12em; color: rgba(244,170,187,0.5); padding: 8px 20px 4px; text-transform: uppercase; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: rgba(253,221,230,0.8); cursor: pointer; transition: all 0.15s; text-decoration: none; border-left: 2px solid transparent; }
+    .nav-item:hover { background: rgba(194,81,106,0.2); color: #fff; }
+    .nav-item.active { background: rgba(194,81,106,0.25); color: #fff; border-left-color: var(--rosa-claro); font-weight: 600; }
+    .nav-item i { font-size: 16px; opacity: 0.8; }
+    .nav-section { padding: 8px 0; }
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { padding: 20px 36px; background: var(--branco); border-bottom: 0.5px solid #EED8C8; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar-left h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--rosa-escuro); }
+    .topbar-left p { font-size: 12px; color: var(--taupe); margin-top: 2px; }
+    .content { padding: 24px 36px; }
+
+    /* GRID DE CATEGORIAS */
+    .cats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .cat-card { background: var(--branco); border-radius: 18px; border: 0.5px solid #EED8C8; overflow: hidden; cursor: pointer; transition: all 0.18s; }
+    .cat-card:hover { border-color: var(--rosa-claro); box-shadow: 0 6px 24px rgba(194,81,106,0.12); transform: translateY(-3px); }
+    .cat-thumb { height: 100px; display: flex; align-items: center; justify-content: center; position: relative; }
+    .cat-thumb i { font-size: 36px; }
+    .cat-thumb.t1 { background: #FAE8EC; } .cat-thumb.t1 i { color: var(--rosa); }
+    .cat-thumb.t2 { background: var(--pessego); } .cat-thumb.t2 i { color: #8B4000; }
+    .cat-thumb.t3 { background: var(--verde-menta); } .cat-thumb.t3 i { color: var(--verde); }
+    .cat-thumb.t4 { background: #E6F1FB; } .cat-thumb.t4 i { color: #185FA5; }
+    .cat-thumb.t5 { background: #F5EDE4; } .cat-thumb.t5 i { color: var(--taupe); }
+    .lock-badge { position: absolute; top: 8px; right: 8px; background: var(--rosa-escuro); border-radius: 99px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+    .lock-badge i { font-size: 12px; color: var(--pessego); }
+    .restricted-label { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font-size: 9px; color: var(--rosa-escuro); background: rgba(250,232,236,0.92); padding: 3px 0; font-family: 'Cinzel', serif; letter-spacing: 0.05em; }
+    .cat-info { padding: 12px 14px; }
+    .cat-nome { font-size: 13px; font-weight: 600; color: #3E3530; margin-bottom: 3px; display: flex; align-items: center; gap: 5px; }
+    .cat-count { font-size: 11px; color: var(--taupe); }
+    .subcats { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+    .subcat { font-size: 9px; color: var(--rosa); background: #FAE8EC; padding: 2px 7px; border-radius: 99px; border: 0.5px solid var(--rosa-claro); }
+
+    /* MODAL SENHA */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(139,34,64,0.35); backdrop-filter: blur(5px); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--branco); border-radius: 20px; border: 0.5px solid #EED8C8; padding: 28px; width: 320px; box-shadow: 0 20px 60px rgba(139,34,64,0.2); }
+    .modal-back { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--taupe); cursor: pointer; margin-bottom: 18px; transition: color 0.15s; }
+    .modal-back:hover { color: var(--rosa); }
+    .modal-icon { width: 48px; height: 48px; border-radius: 50%; background: #FAE8EC; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+    .modal-icon i { font-size: 22px; color: var(--rosa-escuro); }
+    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--rosa-escuro); text-align: center; margin-bottom: 6px; }
+    .modal-sub { font-size: 11px; color: var(--taupe); text-align: center; margin-bottom: 20px; line-height: 1.5; }
+    .input-wrap { position: relative; margin-bottom: 10px; }
+    .senha-input { width: 100%; border: 0.5px solid #EED8C8; border-radius: 10px; padding: 10px 38px 10px 12px; font-size: 13px; font-family: 'Nunito', sans-serif; background: var(--creme); color: #3E3530; outline: none; }
+    .senha-input:focus { border-color: var(--rosa-claro); }
+    .senha-input.erro { border-color: #E24B4A; }
+    .eye-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--taupe); font-size: 16px; }
+    .erro-msg { font-size: 11px; color: #A32D2D; margin-bottom: 10px; display: none; }
+    .erro-msg.show { display: block; }
+    .btn-acessar { width: 100%; background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 11px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; }
+    .hint { font-size: 10px; color: var(--taupe); text-align: center; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+
+    /* MODAL GALERIA */
+    .modal-galeria { background: var(--branco); border-radius: 20px; padding: 28px; width: 680px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(139,34,64,0.2); }
+    .galeria-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .galeria-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--rosa-escuro); }
+    .btn-voltar { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--taupe); cursor: pointer; background: none; border: none; font-family: 'Nunito', sans-serif; }
+    .btn-voltar:hover { color: var(--rosa); }
+    .btn-upload { background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; display: flex; align-items: center; gap: 6px; }
+    .fotos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .foto-item { border-radius: 12px; overflow: hidden; aspect-ratio: 1; position: relative; background: #FAE8EC; }
+    .foto-item img { width: 100%; height: 100%; object-fit: cover; }
+    .foto-del { position: absolute; top: 6px; right: 6px; background: rgba(139,34,64,0.8); border: none; border-radius: 99px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 12px; opacity: 0; transition: opacity 0.15s; }
+    .foto-item:hover .foto-del { opacity: 1; }
+    .add-foto { border: 0.5px dashed var(--rosa-claro); border-radius: 12px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: var(--rosa); font-size: 11px; font-weight: 600; transition: all 0.15s; }
+    .add-foto:hover { background: #FAE8EC; }
+    .add-foto i { font-size: 24px; }
+    .subcats-galeria { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .subcat-btn { font-size: 11px; font-weight: 600; padding: 5px 14px; border-radius: 99px; cursor: pointer; border: 0.5px solid var(--rosa-claro); background: #FAE8EC; color: var(--rosa-escuro); transition: all 0.15s; }
+    .subcat-btn.active { background: var(--rosa-escuro); color: var(--pessego); border-color: var(--rosa-escuro); }
+    .file-input { display: none; }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="initials">💍 J & E</div>
+      <div class="names">João & Ester</div>
+      <div class="date">20 de junho de 2027</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
+      <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
+      <a href="musicas.html" class="nav-item"><i class="ti ti-music"></i> Músicas</a>
+      <a href="papelaria.html" class="nav-item"><i class="ti ti-file-text"></i> Papelaria</a>
+      <a href="ideias.html" class="nav-item active"><i class="ti ti-bulb"></i> Banco de Ideias</a>
+      <a href="#" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
+      <a href="#" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
+      <a href="#" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto;">
+      <a href="#" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Banco de Ideias</h1>
+        <p>Inspirações visuais para o casamento</p>
+      </div>
+    </div>
+    <div class="content">
+      <div class="cats-grid" id="cats-grid"></div>
+    </div>
+  </main>
+
+  <!-- MODAL SENHA -->
+  <div class="modal-overlay" id="modal-senha">
+    <div class="modal">
+      <div class="modal-back" onclick="fecharSenha()"><i class="ti ti-arrow-left"></i> Voltar às categorias</div>
+      <div class="modal-icon"><i class="ti ti-lock"></i></div>
+      <div class="modal-title">Categoria protegida</div>
+      <div class="modal-sub">Esta categoria é visível apenas para Ester e a cerimonialista. Digite a senha para acessar.</div>
+      <div class="input-wrap">
+        <input type="password" class="senha-input" id="senha-field" placeholder="Digite a senha..." onkeydown="if(event.key==='Enter')verificarSenha()" />
+        <button class="eye-btn" onclick="toggleOlho()" id="eye-btn"><i class="ti ti-eye" id="eye-icon"></i></button>
+      </div>
+      <div class="erro-msg" id="erro-msg">Senha incorreta. Tente novamente.</div>
+      <button class="btn-acessar" onclick="verificarSenha()">Acessar</button>
+      <div class="hint"><i class="ti ti-lock" style="font-size:11px;"></i> Só você e a cerimonialista têm acesso</div>
+    </div>
+  </div>
+
+  <!-- MODAL GALERIA -->
+  <div class="modal-overlay" id="modal-galeria">
+    <div class="modal-galeria">
+      <div class="galeria-header">
+        <div>
+          <button class="btn-voltar" onclick="fecharGaleria()"><i class="ti ti-arrow-left"></i> Voltar</button>
+          <div class="galeria-title" id="galeria-title" style="margin-top:4px;"></div>
+        </div>
+        <button class="btn-upload" onclick="document.getElementById('foto-input').click()"><i class="ti ti-upload"></i> Adicionar imagem</button>
+      </div>
+      <div class="subcats-galeria" id="subcats-galeria"></div>
+      <div class="fotos-grid" id="fotos-grid"></div>
+      <input type="file" id="foto-input" class="file-input" accept="image/*" multiple onchange="adicionarFotos(event)" />
+    </div>
+  </div>
+
+  <script>
+    const CATS = [
+      { id:'noivado', nome:'Noivado', icon:'ti-diamond', cor:'t1', protegida: false },
+      { id:'convite', nome:'Convite', icon:'ti-mail', cor:'t2', protegida: false },
+      { id:'padrinhos', nome:'Padrinhos & Madrinhas', icon:'ti-heart', cor:'t3', protegida: false },
+      { id:'decoracao', nome:'Decoração', icon:'ti-palette', cor:'t4', protegida: false },
+      { id:'noiva', nome:'Noiva', icon:'ti-lock', cor:'t1', protegida: true, subcats:['vestido','buquê','terço','sapato','maquiagem','cabelo'] },
+      { id:'noivo', nome:'Noivo', icon:'ti-tie', cor:'t5', protegida: false },
+      { id:'fotos', nome:'Fotos', icon:'ti-camera', cor:'t2', protegida: false },
+      { id:'mesa', nome:'Mesa', icon:'ti-layout-rows', cor:'t3', protegida: false },
+      { id:'igreja', nome:'Igreja', icon:'ti-building-church', cor:'t4', protegida: false },
+      { id:'aleatorios', nome:'Aleatórios', icon:'ti-sparkles', cor:'t5', protegida: false },
+    ];
+
+    const SENHA_NOIVA = 'noivabter2027';
+    let noivaSenhaOk = false;
+    let catAberta = null;
+    let subcatAtiva = 'todas';
+    let fotos = JSON.parse(localStorage.getItem('ideias-fotos') || '{}');
+
+    function salvar() { localStorage.setItem('ideias-fotos', JSON.stringify(fotos)); }
+
+    function renderCats() {
+      const grid = document.getElementById('cats-grid');
+      grid.innerHTML = '';
+      CATS.forEach(cat => {
+        const imgs = fotos[cat.id] || {};
+        const total = Object.values(imgs).flat().length;
+        const card = document.createElement('div');
+        card.className = 'cat-card';
+        card.onclick = () => abrirCategoria(cat);
+        card.innerHTML = `
+          <div class="cat-thumb ${cat.cor}">
+            <i class="ti ${cat.protegida ? 'ti-lock' : cat.icon}"></i>
+            ${cat.protegida ? `<div class="lock-badge"><i class="ti ti-lock"></i></div><div class="restricted-label">Ester & cerimonialista</div>` : ''}
+          </div>
+          <div class="cat-info">
+            <div class="cat-nome">${cat.protegida ? `<i class="ti ti-lock" style="font-size:12px;color:var(--rosa);"></i>` : ''} ${cat.nome}</div>
+            <div class="cat-count">${total} imagem${total !== 1 ? 'ns' : ''}</div>
+            ${cat.subcats ? `<div class="subcats">${cat.subcats.map(s=>`<span class="subcat">${s}</span>`).join('')}</div>` : ''}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function abrirCategoria(cat) {
+      if (cat.protegida && !noivaSenhaOk) {
+        catAberta = cat;
+        document.getElementById('modal-senha').classList.add('open');
+        document.getElementById('senha-field').value = '';
+        document.getElementById('erro-msg').classList.remove('show');
+        document.getElementById('senha-field').classList.remove('erro');
+        return;
+      }
+      abrirGaleria(cat);
+    }
+
+    function fecharSenha() { document.getElementById('modal-senha').classList.remove('open'); }
+
+    function toggleOlho() {
+      const inp = document.getElementById('senha-field');
+      const icon = document.getElementById('eye-icon');
+      if (inp.type === 'password') { inp.type = 'text'; icon.className = 'ti ti-eye-off'; }
+      else { inp.type = 'password'; icon.className = 'ti ti-eye'; }
+    }
+
+    function verificarSenha() {
+      const val = document.getElementById('senha-field').value;
+      if (val === SENHA_NOIVA) {
+        noivaSenhaOk = true;
+        fecharSenha();
+        if (catAberta) abrirGaleria(catAberta);
+      } else {
+        document.getElementById('senha-field').classList.add('erro');
+        document.getElementById('erro-msg').classList.add('show');
+        document.getElementById('senha-field').value = '';
+      }
+    }
+
+    function abrirGaleria(cat) {
+      catAberta = cat;
+      subcatAtiva = 'todas';
+      document.getElementById('galeria-title').textContent = cat.nome;
+      document.getElementById('modal-galeria').classList.add('open');
+      renderGaleria();
+    }
+
+    function fecharGaleria() {
+      document.getElementById('modal-galeria').classList.remove('open');
+      catAberta = null;
+      renderCats();
+    }
+
+    function renderGaleria() {
+      if (!catAberta) return;
+      const catFotos = fotos[catAberta.id] || {};
+      const subcatsEl = document.getElementById('subcats-galeria');
+      subcatsEl.innerHTML = '';
+
+      if (catAberta.subcats) {
+        const btnTodas = document.createElement('span');
+        btnTodas.className = 'subcat-btn' + (subcatAtiva === 'todas' ? ' active' : '');
+        btnTodas.textContent = 'Todas';
+        btnTodas.onclick = () => { subcatAtiva = 'todas'; renderGaleria(); };
+        subcatsEl.appendChild(btnTodas);
+
+        catAberta.subcats.forEach(sc => {
+          const btn = document.createElement('span');
+          btn.className = 'subcat-btn' + (subcatAtiva === sc ? ' active' : '');
+          btn.textContent = sc;
+          btn.onclick = () => { subcatAtiva = sc; renderGaleria(); };
+          subcatsEl.appendChild(btn);
+        });
+      }
+
+      const grid = document.getElementById('fotos-grid');
+      grid.innerHTML = '';
+
+      let listaFotos = [];
+      if (subcatAtiva === 'todas') {
+        listaFotos = Object.values(catFotos).flat();
+      } else {
+        listaFotos = catFotos[subcatAtiva] || [];
+      }
+
+      listaFotos.forEach((src, idx) => {
+        const item = document.createElement('div');
+        item.className = 'foto-item';
+        item.innerHTML = `
+          <img src="${src}" alt="Inspiração" />
+          <button class="foto-del" onclick="excluirFoto(${idx})"><i class="ti ti-x"></i></button>
+        `;
+        grid.appendChild(item);
+      });
+
+      const addCard = document.createElement('div');
+      addCard.className = 'add-foto';
+      addCard.innerHTML = '<i class="ti ti-plus"></i> Adicionar';
+      addCard.onclick = () => document.getElementById('foto-input').click();
+      grid.appendChild(addCard);
+    }
+
+    function adicionarFotos(e) {
+      const files = Array.from(e.target.files);
+      if (!catAberta) return;
+      const chave = subcatAtiva === 'todas' ? '_geral' : subcatAtiva;
+      if (!fotos[catAberta.id]) fotos[catAberta.id] = {};
+      if (!fotos[catAberta.id][chave]) fotos[catAberta.id][chave] = [];
+
+      let lidos = 0;
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          fotos[catAberta.id][chave].push(ev.target.result);
+          lidos++;
+          if (lidos === files.length) { salvar(); renderGaleria(); }
+        };
+        reader.readAsDataURL(file);
+      });
+      e.target.value = '';
+    }
+
+    function excluirFoto(idx) {
+      if (!confirm('Remover esta imagem?')) return;
+      const chave = subcatAtiva === 'todas' ? '_geral' : subcatAtiva;
+      if (subcatAtiva === 'todas') {
+        const todas = Object.values(fotos[catAberta.id] || {}).flat();
+        todas.splice(idx, 1);
+      } else {
+        fotos[catAberta.id][chave].splice(idx, 1);
+      }
+      salvar();
+      renderGaleria();
+    }
+
+    renderCats();
+  </script>
+</body>
+</html>
