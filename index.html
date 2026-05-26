@@ -1,6 +1,797 @@
 <!DOCTYPE html>
-<html>
-  <body>
-    <h1>João & Ester</h1>
-  </body>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>João & Ester · 20.06.2027</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <style>
+    :root {
+      --rosa: #C2516A;
+      --rosa-claro: #F4AABB;
+      --rosa-escuro: #8B2240;
+      --verde: #2C6E3A;
+      --verde-m: #5FA870;
+      --verde-menta: #C8E8CE;
+      --laranja: #E8760A;
+      --laranja-s: #F4A860;
+      --pessego: #FDE8CC;
+      --creme: #FDF5EC;
+      --taupe: #9A7060;
+      --branco: #FDFAF7;
+      --sidebar-w: 220px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--creme);
+      color: #3E3530;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--rosa-escuro);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      border-bottom: 0.5px solid rgba(194,81,106,0.5);
+      margin-bottom: 8px;
+    }
+
+    .sidebar-logo .initials {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: var(--pessego);
+      margin-bottom: 4px;
+    }
+
+    .sidebar-logo .names {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .sidebar-logo .date {
+      font-size: 11px;
+      color: var(--rosa-claro);
+      margin-top: 3px;
+      font-weight: 300;
+    }
+
+    .nav-section {
+      padding: 8px 0;
+    }
+
+    .nav-label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: rgba(244,170,187,0.5);
+      padding: 8px 20px 4px;
+      text-transform: uppercase;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      font-size: 13px;
+      color: rgba(253,221,230,0.8);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      border-left: 2px solid transparent;
+    }
+
+    .nav-item:hover { background: rgba(194,81,106,0.2); color: #fff; }
+    .nav-item.active {
+      background: rgba(194,81,106,0.25);
+      color: #fff;
+      border-left-color: var(--rosa-claro);
+      font-weight: 600;
+    }
+
+    .nav-item i { font-size: 16px; opacity: 0.8; }
+    .nav-item.active i { opacity: 1; }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── BANNER ── */
+    .banner {
+      width: 100%;
+      height: 320px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+    }
+
+    .banner-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(139,34,64,0.1) 0%,
+        rgba(139,34,64,0.15) 40%,
+        rgba(139,34,64,0.75) 80%,
+        rgba(139,34,64,0.9) 100%
+      );
+    }
+
+    .banner-content {
+      position: absolute;
+      bottom: 28px;
+      left: 36px;
+      right: 36px;
+    }
+
+    .banner-content .pre-title {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--rosa-claro);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .banner-content .title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 48px;
+      font-weight: 300;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .banner-content .subtitle {
+      font-size: 13px;
+      color: rgba(253,221,230,0.9);
+      font-weight: 300;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      padding: 28px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── COUNTDOWN ── */
+    .countdown-card {
+      background: linear-gradient(135deg, var(--rosa) 0%, var(--rosa-escuro) 100%);
+      border-radius: 16px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 8px 32px rgba(194,81,106,0.25);
+    }
+
+    .countdown-left .label {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--rosa-claro);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .countdown-left .title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-style: italic;
+      color: #fff;
+      font-weight: 300;
+    }
+
+    .countdown-blocks {
+      display: flex;
+      gap: 10px;
+    }
+
+    .countdown-block {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border: 0.5px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      text-align: center;
+      min-width: 64px;
+    }
+
+    .countdown-block .num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px;
+      font-weight: 500;
+      color: #fff;
+      line-height: 1;
+      display: block;
+    }
+
+    .countdown-block .unit {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      color: var(--rosa-claro);
+      text-transform: uppercase;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ── GRID ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--branco);
+      border-radius: 16px;
+      border: 0.5px solid #EED8C8;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 14px 18px 10px;
+      border-bottom: 0.5px solid #F5EDE4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--taupe);
+      text-transform: uppercase;
+    }
+
+    .card-body { padding: 18px; }
+
+    /* ── FINANCEIRO ── */
+    .privacy-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--taupe);
+      cursor: pointer;
+      user-select: none;
+      padding: 4px 10px;
+      border-radius: 99px;
+      background: #FAE8EC;
+      border: 0.5px solid var(--rosa-claro);
+      transition: all 0.15s;
+    }
+
+    .privacy-toggle:hover { background: var(--rosa-claro); color: var(--rosa-escuro); }
+    .privacy-toggle i { font-size: 13px; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+    .stat-item {
+      background: var(--creme);
+      border-radius: 12px;
+      border: 0.5px solid #EED8C8;
+      padding: 14px 16px;
+    }
+
+    .stat-item .stat-label {
+      font-size: 11px;
+      color: var(--taupe);
+      margin-bottom: 6px;
+    }
+
+    .stat-item .stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--rosa-escuro);
+      transition: filter 0.3s;
+    }
+
+    .stat-item .stat-value.blurred { filter: blur(8px); }
+
+    .stat-item .stat-sub {
+      font-size: 10px;
+      color: var(--verde-m);
+      margin-top: 3px;
+    }
+
+    /* ── ALERTAS ── */
+    .alert-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 0.5px solid #F5EDE4;
+    }
+
+    .alert-item:last-child { border-bottom: none; }
+
+    .alert-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .alert-dot.urgente { background: var(--laranja); }
+    .alert-dot.hoje { background: var(--rosa); }
+
+    .alert-info { flex: 1; }
+    .alert-fornecedor { font-size: 13px; font-weight: 600; color: #3E3530; }
+    .alert-parcela { font-size: 11px; color: var(--taupe); margin-top: 1px; }
+
+    .alert-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+
+    .alert-badge.hoje { background: #FAE8EC; color: var(--rosa); border: 0.5px solid var(--rosa-claro); }
+    .alert-badge.amanha { background: var(--pessego); color: #8B4000; border: 0.5px solid var(--laranja-s); }
+
+    /* ── LOGÍSTICA ── */
+    .logistica-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 0.5px solid #F5EDE4;
+    }
+
+    .logistica-item:last-child { border-bottom: none; }
+
+    .log-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: #FAE8EC;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .log-icon i { font-size: 17px; color: var(--rosa); }
+    .log-label { font-size: 11px; color: var(--taupe); }
+    .log-value { font-size: 13px; font-weight: 600; color: #3E3530; margin-top: 1px; }
+    .log-link { font-size: 11px; color: var(--rosa); text-decoration: none; display: flex; align-items: center; gap: 3px; margin-top: 2px; }
+    .log-link:hover { text-decoration: underline; }
+
+    /* ── ATALHOS ── */
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .shortcut {
+      background: var(--branco);
+      border-radius: 14px;
+      border: 0.5px solid #EED8C8;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .shortcut:hover {
+      border-color: var(--rosa-claro);
+      background: #FAE8EC;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(194,81,106,0.12);
+    }
+
+    .shortcut i { font-size: 22px; color: var(--rosa); }
+    .shortcut span { font-size: 11px; color: var(--taupe); text-align: center; font-weight: 500; }
+
+    /* ── PROGRESSO GERAL ── */
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 0.5px solid #F5EDE4;
+    }
+
+    .progress-row:last-child { border-bottom: none; }
+    .progress-label { font-size: 12px; color: #3E3530; flex: 1; }
+    .progress-bar-wrap { width: 100px; }
+    .progress-bar { height: 5px; background: #FAE8EC; border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--rosa); border-radius: 99px; }
+    .progress-pct { font-size: 11px; font-weight: 600; color: var(--rosa-escuro); width: 36px; text-align: right; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .content > * {
+      animation: fadeInUp 0.4s ease both;
+    }
+
+    .content > *:nth-child(1) { animation-delay: 0.05s; }
+    .content > *:nth-child(2) { animation-delay: 0.1s; }
+    .content > *:nth-child(3) { animation-delay: 0.15s; }
+    .content > *:nth-child(4) { animation-delay: 0.2s; }
+    .content > *:nth-child(5) { animation-delay: 0.25s; }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="initials">💍 J & E</div>
+      <div class="names">João & Ester</div>
+      <div class="date">20 de junho de 2027</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="#" class="nav-item active"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="#" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="#" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
+      <a href="#" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
+      <a href="#" class="nav-item"><i class="ti ti-music"></i> Músicas</a>
+      <a href="#" class="nav-item"><i class="ti ti-file-text"></i> Papelaria</a>
+      <a href="#" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
+      <a href="#" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
+      <a href="#" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
+      <a href="#" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
+    </div>
+
+    <div class="nav-section" style="margin-top:auto;">
+      <a href="#" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- BANNER -->
+    <div class="banner">
+      <img src="foto-casal.jpg" alt="João e Ester" />
+      <div class="banner-overlay"></div>
+      <div class="banner-content">
+        <div class="pre-title">O Caminho para o Sim</div>
+        <div class="title">João & Ester</div>
+        <div class="subtitle">20 de Junho de 2027 &nbsp;·&nbsp; 16h00 &nbsp;·&nbsp; Brasília, DF</div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- COUNTDOWN -->
+      <div class="countdown-card">
+        <div class="countdown-left">
+          <div class="label">Contagem regressiva</div>
+          <div class="title">Falta pouco para o grande dia! 🌸</div>
+        </div>
+        <div class="countdown-blocks">
+          <div class="countdown-block">
+            <span class="num" id="dias">--</span>
+            <span class="unit">Dias</span>
+          </div>
+          <div class="countdown-block">
+            <span class="num" id="horas">--</span>
+            <span class="unit">Horas</span>
+          </div>
+          <div class="countdown-block">
+            <span class="num" id="minutos">--</span>
+            <span class="unit">Min</span>
+          </div>
+          <div class="countdown-block">
+            <span class="num" id="segundos">--</span>
+            <span class="unit">Seg</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINANCEIRO + ALERTAS -->
+      <div class="grid-2">
+
+        <!-- FINANCEIRO -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Resumo Financeiro</span>
+            <div class="privacy-toggle" onclick="togglePrivacy()" id="privacy-btn">
+              <i class="ti ti-eye" id="privacy-icon"></i>
+              <span id="privacy-text">Ocultar valores</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="stat-grid">
+              <div class="stat-item">
+                <div class="stat-label">Investimento total</div>
+                <div class="stat-value blurred" id="val-total">R$ 85.000</div>
+                <div class="stat-sub">orçado</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Valor pago</div>
+                <div class="stat-value blurred" id="val-pago">R$ 32.000</div>
+                <div class="stat-sub">38% quitado</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Saldo pendente</div>
+                <div class="stat-value blurred" id="val-pendente">R$ 53.000</div>
+                <div class="stat-sub">a pagar</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALERTAS -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">⚠️ Parcelas Vencendo em 48h</span>
+          </div>
+          <div class="card-body">
+            <div class="alert-item">
+              <div class="alert-dot hoje"></div>
+              <div class="alert-info">
+                <div class="alert-fornecedor">Ateliê da Noiva</div>
+                <div class="alert-parcela">2ª parcela · R$ 2.200</div>
+              </div>
+              <span class="alert-badge hoje">Hoje</span>
+            </div>
+            <div class="alert-item">
+              <div class="alert-dot urgente"></div>
+              <div class="alert-info">
+                <div class="alert-fornecedor">Buffet Requinte</div>
+                <div class="alert-parcela">1ª parcela · R$ 4.500</div>
+              </div>
+              <span class="alert-badge amanha">Amanhã</span>
+            </div>
+            <div class="alert-item">
+              <div class="alert-dot urgente"></div>
+              <div class="alert-info">
+                <div class="alert-fornecedor">Studio J Fotografia</div>
+                <div class="alert-parcela">3ª parcela · R$ 3.000</div>
+              </div>
+              <span class="alert-badge amanha">Amanhã</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOGÍSTICA + PROGRESSO -->
+      <div class="grid-2">
+
+        <!-- LOGÍSTICA -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Logística do Evento</span>
+          </div>
+          <div class="card-body">
+            <div class="logistica-item">
+              <div class="log-icon"><i class="ti ti-map-pin"></i></div>
+              <div>
+                <div class="log-label">Local</div>
+                <div class="log-value">A definir</div>
+                <div style="font-size:11px; color:var(--taupe);">Atualize nas Configurações</div>
+              </div>
+            </div>
+            <div class="logistica-item">
+              <div class="log-icon"><i class="ti ti-clock"></i></div>
+              <div>
+                <div class="log-label">Horário da cerimônia</div>
+                <div class="log-value">16h00</div>
+              </div>
+            </div>
+            <div class="logistica-item">
+              <div class="log-icon"><i class="ti ti-sun"></i></div>
+              <div>
+                <div class="log-label">Pôr do sol estimado</div>
+                <div class="log-value">17h52 · Brasília</div>
+              </div>
+            </div>
+            <div class="logistica-item">
+              <div class="log-icon"><i class="ti ti-navigation"></i></div>
+              <div>
+                <div class="log-label">Como chegar</div>
+                <a href="#" class="log-link"><i class="ti ti-brand-google-maps" style="font-size:13px;"></i> Google Maps</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROGRESSO GERAL -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Progresso Geral</span>
+          </div>
+          <div class="card-body">
+            <div class="progress-row">
+              <div class="progress-label">Checklist</div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar"><div class="progress-fill" style="width:34%"></div></div>
+              </div>
+              <div class="progress-pct">34%</div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label">Convidados confirmados</div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar"><div class="progress-fill" style="width:48%"></div></div>
+              </div>
+              <div class="progress-pct">48%</div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label">Fornecedores fechados</div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
+              </div>
+              <div class="progress-pct">60%</div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label">Documentos da Igreja</div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar"><div class="progress-fill" style="width:57%"></div></div>
+              </div>
+              <div class="progress-pct">57%</div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label">Cortejo confirmado</div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar"><div class="progress-fill" style="width:67%"></div></div>
+              </div>
+              <div class="progress-pct">67%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATALHOS -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Acesso Rápido</span>
+        </div>
+        <div class="card-body">
+          <div class="shortcuts-grid">
+            <a href="#" class="shortcut">
+              <i class="ti ti-building-store"></i>
+              <span>Fornecedores</span>
+            </a>
+            <a href="#" class="shortcut">
+              <i class="ti ti-users"></i>
+              <span>Convidados</span>
+            </a>
+            <a href="#" class="shortcut">
+              <i class="ti ti-heart"></i>
+              <span>Cortejo</span>
+            </a>
+            <a href="#" class="shortcut">
+              <i class="ti ti-checkbox"></i>
+              <span>Checklist</span>
+            </a>
+            <a href="#" class="shortcut">
+              <i class="ti ti-bulb"></i>
+              <span>Banco de Ideias</span>
+            </a>
+            <a href="#" class="shortcut">
+              <i class="ti ti-music"></i>
+              <span>Músicas</span>
+            </a>
+            <a href="#" class="shortcut">
+              <i class="ti ti-building-church"></i>
+              <span>Igreja</span>
+            </a>
+            <a href="#" class="shortcut">
+              <i class="ti ti-calendar"></i>
+              <span>Reuniões</span>
+            </a>
+            <a href="#" class="shortcut">
+              <i class="ti ti-file-text"></i>
+              <span>Papelaria</span>
+            </a>
+            <a href="#" class="shortcut">
+              <i class="ti ti-settings"></i>
+              <span>Configurações</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // ── COUNTDOWN ──
+    function updateCountdown() {
+      const target = new Date('2027-06-20T16:00:00-03:00');
+      const now = new Date();
+      const diff = target - now;
+
+      if (diff <= 0) {
+        document.getElementById('dias').textContent = '0';
+        document.getElementById('horas').textContent = '0';
+        document.getElementById('minutos').textContent = '0';
+        document.getElementById('segundos').textContent = '0';
+        return;
+      }
+
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
+
+      document.getElementById('dias').textContent = days;
+      document.getElementById('horas').textContent = String(hours).padStart(2, '0');
+      document.getElementById('minutos').textContent = String(mins).padStart(2, '0');
+      document.getElementById('segundos').textContent = String(secs).padStart(2, '0');
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // ── PRIVACY TOGGLE ──
+    let isBlurred = true;
+
+    function togglePrivacy() {
+      isBlurred = !isBlurred;
+      const vals = document.querySelectorAll('.stat-value');
+      const icon = document.getElementById('privacy-icon');
+      const text = document.getElementById('privacy-text');
+
+      vals.forEach(v => {
+        if (isBlurred) v.classList.add('blurred');
+        else v.classList.remove('blurred');
+      });
+
+      if (isBlurred) {
+        icon.className = 'ti ti-eye';
+        text.textContent = 'Ocultar valores';
+      } else {
+        icon.className = 'ti ti-eye-off';
+        text.textContent = 'Revelar valores';
+      }
+
+      localStorage.setItem('privacy', isBlurred ? 'blurred' : 'visible');
+    }
+
+    // Restaurar estado do toggle
+    const saved = localStorage.getItem('privacy');
+    if (saved === 'visible') togglePrivacy();
+  </script>
+
+</body>
 </html>
