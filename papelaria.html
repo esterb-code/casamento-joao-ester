@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Papelaria · João & Ester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <style>
+    :root {
+      --rosa: #C2516A; --rosa-claro: #F4AABB; --rosa-escuro: #8B2240;
+      --verde: #2C6E3A; --verde-m: #5FA870; --verde-menta: #C8E8CE;
+      --laranja: #E8760A; --laranja-s: #F4A860; --pessego: #FDE8CC;
+      --creme: #FDF5EC; --taupe: #9A7060; --branco: #FDFAF7;
+      --sidebar-w: 220px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; background: var(--creme); color: #3E3530; display: flex; min-height: 100vh; }
+    .sidebar { width: var(--sidebar-w); background: var(--rosa-escuro); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow-y: auto; }
+    .sidebar-logo { padding: 24px 20px 20px; border-bottom: 0.5px solid rgba(194,81,106,0.5); margin-bottom: 8px; }
+    .sidebar-logo .initials { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.15em; color: var(--pessego); margin-bottom: 4px; }
+    .sidebar-logo .names { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #fff; line-height: 1.2; }
+    .sidebar-logo .date { font-size: 11px; color: var(--rosa-claro); margin-top: 3px; font-weight: 300; }
+    .nav-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.12em; color: rgba(244,170,187,0.5); padding: 8px 20px 4px; text-transform: uppercase; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: rgba(253,221,230,0.8); cursor: pointer; transition: all 0.15s; text-decoration: none; border-left: 2px solid transparent; }
+    .nav-item:hover { background: rgba(194,81,106,0.2); color: #fff; }
+    .nav-item.active { background: rgba(194,81,106,0.25); color: #fff; border-left-color: var(--rosa-claro); font-weight: 600; }
+    .nav-item i { font-size: 16px; opacity: 0.8; }
+    .nav-section { padding: 8px 0; }
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { padding: 20px 36px; background: var(--branco); border-bottom: 0.5px solid #EED8C8; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar-left h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--rosa-escuro); }
+    .topbar-left p { font-size: 12px; color: var(--taupe); margin-top: 2px; }
+    .content { padding: 24px 36px; }
+
+    /* VISION BOARD */
+    .vision-section { margin-bottom: 32px; }
+    .section-title { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.12em; color: var(--rosa-escuro); text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .section-title i { font-size: 16px; color: var(--rosa); }
+    .vision-board { background: var(--branco); border-radius: 20px; border: 0.5px solid #EED8C8; overflow: hidden; position: relative; min-height: 280px; display: flex; align-items: center; justify-content: center; }
+    .vision-img { width: 100%; height: 320px; object-fit: cover; display: block; }
+    .vision-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 60px; cursor: pointer; color: var(--taupe); width: 100%; }
+    .vision-empty i { font-size: 40px; opacity: 0.4; color: var(--rosa); }
+    .vision-empty p { font-size: 13px; }
+    .vision-overlay { position: absolute; bottom: 16px; right: 16px; }
+    .btn-vision { background: rgba(139,34,64,0.85); color: white; border: none; border-radius: 10px; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); }
+
+    /* CATEGORIAS */
+    .categoria-section { margin-bottom: 28px; }
+    .cat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 0.5px solid #EED8C8; }
+    .cat-info { display: flex; align-items: center; gap: 8px; }
+    .cat-icon { font-size: 18px; color: var(--rosa); }
+    .cat-nome { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.08em; color: var(--rosa-escuro); text-transform: uppercase; }
+    .cat-count { font-size: 11px; color: var(--taupe); background: #FAE8EC; padding: 2px 10px; border-radius: 99px; }
+
+    /* STATUS FILTERS */
+    .status-filters { display: flex; gap: 6px; margin-bottom: 16px; }
+    .sf-pill { font-size: 10px; font-weight: 600; padding: 4px 12px; border-radius: 99px; cursor: pointer; font-family: 'Cinzel', serif; letter-spacing: 0.05em; border: 0.5px solid transparent; }
+    .sf-todos { background: var(--rosa-escuro); color: white; }
+    .sf-producao { background: #E6F1FB; color: #185FA5; border-color: #378ADD; }
+    .sf-aprovada { background: var(--verde-menta); color: var(--verde); border-color: var(--verde-m); }
+    .sf-impressa { background: var(--pessego); color: #8B4000; border-color: var(--laranja-s); }
+
+    /* ARTES GRID */
+    .artes-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .arte-card { background: var(--branco); border-radius: 14px; border: 0.5px solid #EED8C8; overflow: hidden; cursor: pointer; transition: all 0.15s; }
+    .arte-card:hover { border-color: var(--rosa-claro); box-shadow: 0 4px 16px rgba(194,81,106,0.1); transform: translateY(-2px); }
+    .arte-thumb { height: 100px; display: flex; align-items: center; justify-content: center; position: relative; }
+    .arte-thumb.rosa { background: #FAE8EC; }
+    .arte-thumb.verde { background: var(--verde-menta); }
+    .arte-thumb.laranja { background: var(--pessego); }
+    .arte-thumb.azul { background: #E6F1FB; }
+    .arte-thumb i { font-size: 32px; color: var(--rosa); }
+    .arte-thumb.verde i { color: var(--verde); }
+    .arte-thumb.laranja i { color: #8B4000; }
+    .arte-thumb.azul i { color: #185FA5; }
+    .arte-info { padding: 10px 12px; }
+    .arte-nome { font-size: 12px; font-weight: 600; color: #3E3530; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .arte-bottom { display: flex; align-items: center; justify-content: space-between; }
+    .arte-meta { font-size: 10px; color: var(--taupe); }
+    .status-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; cursor: pointer; }
+    .s-producao { background: #E6F1FB; color: #185FA5; border: 0.5px solid #378ADD; }
+    .s-aprovada { background: var(--verde-menta); color: var(--verde); border: 0.5px solid var(--verde-m); }
+    .s-impressa { background: var(--pessego); color: #8B4000; border: 0.5px solid var(--laranja-s); }
+
+    /* ADD CARD */
+    .add-arte { background: var(--creme); border: 0.5px dashed var(--rosa-claro); border-radius: 14px; height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: var(--rosa); font-size: 12px; font-weight: 600; transition: all 0.15s; }
+    .add-arte:hover { background: #FAE8EC; border-color: var(--rosa); }
+    .add-arte i { font-size: 24px; }
+
+    /* INPUT FILE HIDDEN */
+    .file-input { display: none; }
+
+    /* MODAL PREVIEW */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(139,34,64,0.4); backdrop-filter: blur(6px); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--branco); border-radius: 20px; padding: 28px; width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(139,34,64,0.2); }
+    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--rosa-escuro); margin-bottom: 16px; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.1em; color: var(--taupe); text-transform: uppercase; margin-bottom: 5px; display: block; }
+    .form-input, .form-select { width: 100%; border: 0.5px solid #EED8C8; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-family: 'Nunito', sans-serif; background: var(--creme); color: #3E3530; outline: none; }
+    .form-input:focus, .form-select:focus { border-color: var(--rosa-claro); }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-salvar { flex: 1; background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 11px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; }
+    .btn-cancelar { padding: 11px 20px; background: var(--creme); color: var(--taupe); border: 0.5px solid #EED8C8; border-radius: 10px; font-size: 13px; cursor: pointer; font-family: 'Nunito', sans-serif; }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="initials">💍 J & E</div>
+      <div class="names">João & Ester</div>
+      <div class="date">20 de junho de 2027</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
+      <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
+      <a href="musicas.html" class="nav-item"><i class="ti ti-music"></i> Músicas</a>
+      <a href="papelaria.html" class="nav-item active"><i class="ti ti-file-text"></i> Papelaria</a>
+      <a href="#" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
+      <a href="#" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
+      <a href="#" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
+      <a href="#" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto;">
+      <a href="#" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Papelaria</h1>
+        <p>Vision board, convites, save the date e mais</p>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- VISION BOARD -->
+      <div class="vision-section">
+        <div class="section-title"><i class="ti ti-layout-board"></i> Vision Board</div>
+        <div class="vision-board" id="vision-board">
+          <div class="vision-empty" id="vision-empty" onclick="document.getElementById('vision-input').click()">
+            <i class="ti ti-photo"></i>
+            <p>Clique para adicionar a imagem do Vision Board</p>
+            <div style="font-size:11px;color:var(--rosa);font-weight:600;">+ Fazer upload</div>
+          </div>
+          <div class="vision-overlay" id="vision-overlay" style="display:none;">
+            <button class="btn-vision" onclick="document.getElementById('vision-input').click()"><i class="ti ti-pencil"></i> Trocar imagem</button>
+          </div>
+        </div>
+        <input type="file" id="vision-input" class="file-input" accept="image/*" onchange="carregarVision(event)" />
+      </div>
+
+      <!-- CATEGORIAS -->
+      <div id="categorias-container"></div>
+    </div>
+  </main>
+
+  <!-- MODAL ADD ARTE -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title" id="modal-cat-title">Adicionar Arte</div>
+      <div class="form-group">
+        <label class="form-label">Nome da arte</label>
+        <input class="form-input" id="a-nome" placeholder="Ex: Convite Frente e Verso" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="a-status">
+          <option value="producao">Em produção</option>
+          <option value="aprovada">Aprovada</option>
+          <option value="impressa">Impressa</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-salvar" onclick="salvarArte()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CATEGORIAS = [
+      { id: 'convites', nome: 'Convites', icon: 'ti-mail', cor: 'rosa' },
+      { id: 'save-the-date', nome: 'Save the Date', icon: 'ti-calendar-event', cor: 'verde' },
+      { id: 'menus', nome: 'Menus', icon: 'ti-tools-kitchen-2', cor: 'laranja' },
+      { id: 'caixa-padrinhos', nome: 'Caixa dos Padrinhos', icon: 'ti-gift', cor: 'azul' },
+    ];
+
+    const STATUS_LABELS = { producao: 'Em produção', aprovada: 'Aprovada', impressa: 'Impressa' };
+    const STATUS_CLASSES = { producao: 's-producao', aprovada: 's-aprovada', impressa: 's-impressa' };
+
+    let artes = JSON.parse(localStorage.getItem('papelaria-artes') || '{}');
+    let catAtiva = '';
+    let filtroStatus = 'todos';
+
+    function salvarDados() { localStorage.setItem('papelaria-artes', JSON.stringify(artes)); }
+
+    // Vision Board
+    const visionSalvo = localStorage.getItem('vision-board');
+    if (visionSalvo) mostrarVision(visionSalvo);
+
+    function carregarVision(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        localStorage.setItem('vision-board', ev.target.result);
+        mostrarVision(ev.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function mostrarVision(src) {
+      const board = document.getElementById('vision-board');
+      document.getElementById('vision-empty').style.display = 'none';
+      const img = document.createElement('img');
+      img.src = src;
+      img.className = 'vision-img';
+      img.alt = 'Vision Board';
+      board.insertBefore(img, board.firstChild);
+      document.getElementById('vision-overlay').style.display = 'block';
+    }
+
+    function abrirModal(catId) {
+      catAtiva = catId;
+      const cat = CATEGORIAS.find(c => c.id === catId);
+      document.getElementById('modal-cat-title').textContent = `Adicionar Arte — ${cat.nome}`;
+      document.getElementById('a-nome').value = '';
+      document.getElementById('a-status').value = 'producao';
+      document.getElementById('modal').classList.add('open');
+    }
+
+    function fecharModal() { document.getElementById('modal').classList.remove('open'); }
+
+    function salvarArte() {
+      const nome = document.getElementById('a-nome').value.trim();
+      if (!nome) { alert('Informe o nome da arte.'); return; }
+      if (!artes[catAtiva]) artes[catAtiva] = [];
+      artes[catAtiva].push({ id: Date.now(), nome, status: document.getElementById('a-status').value });
+      salvarDados();
+      fecharModal();
+      renderizar();
+    }
+
+    function avancarStatus(catId, arteId) {
+      const ordem = ['producao', 'aprovada', 'impressa'];
+      const arte = (artes[catId] || []).find(a => a.id === arteId);
+      if (!arte) return;
+      arte.status = ordem[(ordem.indexOf(arte.status) + 1) % ordem.length];
+      salvarDados();
+      renderizar();
+    }
+
+    function excluirArte(catId, arteId) {
+      if (!confirm('Remover esta arte?')) return;
+      artes[catId] = (artes[catId] || []).filter(a => a.id !== arteId);
+      salvarDados();
+      renderizar();
+    }
+
+    function renderizar() {
+      const container = document.getElementById('categorias-container');
+      container.innerHTML = '';
+
+      CATEGORIAS.forEach(cat => {
+        const lista = artes[cat.id] || [];
+        const sec = document.createElement('div');
+        sec.className = 'categoria-section';
+        sec.innerHTML = `
+          <div class="cat-header">
+            <div class="cat-info">
+              <i class="ti ${cat.icon} cat-icon"></i>
+              <span class="cat-nome">${cat.nome}</span>
+              <span class="cat-count">${lista.length} arte${lista.length !== 1 ? 's' : ''}</span>
+            </div>
+          </div>
+          <div class="artes-grid" id="grid-${cat.id}"></div>
+        `;
+        container.appendChild(sec);
+
+        const grid = sec.querySelector(`#grid-${cat.id}`);
+        lista.forEach(arte => {
+          const card = document.createElement('div');
+          card.className = 'arte-card';
+          card.innerHTML = `
+            <div class="arte-thumb ${cat.cor}"><i class="ti ${cat.icon}"></i></div>
+            <div class="arte-info">
+              <div class="arte-nome">${arte.nome}</div>
+              <div class="arte-bottom">
+                <span class="arte-meta">${cat.nome}</span>
+                <span class="status-badge ${STATUS_CLASSES[arte.status]}" onclick="avancarStatus('${cat.id}', ${arte.id})">${STATUS_LABELS[arte.status]}</span>
+              </div>
+              <div style="margin-top:6px;"><button onclick="excluirArte('${cat.id}',${arte.id})" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--taupe);display:flex;align-items:center;gap:3px;"><i class="ti ti-trash"></i> Remover</button></div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+        const addCard = document.createElement('div');
+        addCard.className = 'add-arte';
+        addCard.innerHTML = '<i class="ti ti-upload"></i> Adicionar arte';
+        addCard.onclick = () => abrirModal(cat.id);
+        grid.appendChild(addCard);
+      });
+    }
+
+    document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
+    renderizar();
+  </script>
+</body>
+</html>
