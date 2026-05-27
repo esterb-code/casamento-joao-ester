@@ -255,20 +255,6 @@
       });
       salvar();
       fecharModal();
-  
-    // ── SYNC SUPABASE ──
-    async function syncFromSupabase() {
-      if (typeof db === 'undefined') return;
-      const dados = await db.getMany(['convidados']);
-            if (dados['convidados'] !== null) localStorage.setItem('convidados', JSON.stringify(dados['convidados']));
-      
-    }
-
-    async function saveToSupabase(key, value) {
-      if (typeof db !== 'undefined') await db.set(key, value);
-    }
-
-    syncFromSupabase().then(() => {
     renderizar();
     });
     }
@@ -417,7 +403,20 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
-    renderizar();
+
+    // Inicialização com Supabase
+    async function initApp() {
+      if (typeof db !== 'undefined') {
+        const dados = await db.get('convidados');
+        if (dados !== null) {
+          convidados = dados;
+          localStorage.setItem('convidados', JSON.stringify(dados));
+        }
+      }
+      renderizar();
+    }
+
+    initApp();
   </script>
 
   <div class="modal-overlay" id="modal-editar-conv" style="z-index:250;">
