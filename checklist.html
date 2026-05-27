@@ -228,22 +228,19 @@
     }
     document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)fecharModal()});
 
-    // ── SYNC SUPABASE ──
-    async function syncFromSupabase() {
-      if (typeof db === 'undefined') return;
-      const dados = await db.getMany(['checklist', 'checklist-sugestoes']);
-            if (dados['checklist'] !== null) localStorage.setItem('checklist', JSON.stringify(dados['checklist']));
-      
-      if (dados['checklist-sugestoes'] !== null) localStorage.setItem('checklist-sugestoes', JSON.stringify(dados['checklist-sugestoes']));
-      
+    // Inicialização com Supabase
+    async function initApp() {
+      if (typeof db !== 'undefined') {
+        const dados = await db.get('checklist');
+        if (dados !== null) {
+          tarefas = dados;
+          localStorage.setItem('checklist', JSON.stringify(dados));
+        }
+      }
+      renderizar();
     }
 
-    async function saveToSupabase(key, value) {
-      if (typeof db !== 'undefined') await db.set(key, value);
-    }
-
-    syncFromSupabase().then(() => {
-    renderizar()
+    initApp();
 
     });  </script>
 </body>
