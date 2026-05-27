@@ -229,20 +229,6 @@
       });
       salvar();
       fecharModal();
-  
-    // ── SYNC SUPABASE ──
-    async function syncFromSupabase() {
-      if (typeof db === 'undefined') return;
-      const dados = await db.getMany(['cortejo']);
-            if (dados['cortejo'] !== null) localStorage.setItem('cortejo', JSON.stringify(dados['cortejo']));
-      
-    }
-
-    async function saveToSupabase(key, value) {
-      if (typeof db !== 'undefined') await db.set(key, value);
-    }
-
-    syncFromSupabase().then(() => {
     renderizar();
     });
     }
@@ -378,7 +364,20 @@
     }
 
     document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
-    renderizar();
+
+    // Inicialização com Supabase
+    async function initApp() {
+      if (typeof db !== 'undefined') {
+        const dados = await db.get('cortejo');
+        if (dados !== null) {
+          membros = dados;
+          localStorage.setItem('cortejo', JSON.stringify(dados));
+        }
+      }
+      renderizar();
+    }
+
+    initApp();
   </script>
 
   <div class="modal-overlay" id="modal-editar-membro" style="z-index:250;">
