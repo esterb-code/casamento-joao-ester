@@ -303,7 +303,14 @@
     }
 
     document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
-    renderizar();
+    async function initApp() {
+      if (typeof db !== 'undefined') {
+        const dados = await db.get('musicas');
+        if (dados !== null) { musicas = dados; localStorage.setItem('musicas', JSON.stringify(dados)); }
+      }
+      renderizar();
+    }
+    initApp();
   </script>
 </body>
 </html>
