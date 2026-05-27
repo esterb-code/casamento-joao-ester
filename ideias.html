@@ -280,7 +280,14 @@
     }
 
     syncFromSupabase().then(() => {
-    renderCats();
+    async function initApp() {
+      if (typeof db !== 'undefined') {
+        const dados = await db.get('ideias-fotos');
+        if (dados !== null) { fotos = dados; localStorage.setItem('ideias-fotos', JSON.stringify(dados)); }
+      }
+      renderCats();
+    }
+    initApp();
     });
     }
 
