@@ -88,6 +88,7 @@
     .btn-salvar { flex: 1; background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 11px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; }
     .btn-cancelar { padding: 11px 20px; background: var(--creme); color: var(--taupe); border: 0.5px solid #EED8C8; border-radius: 10px; font-size: 13px; cursor: pointer; font-family: 'Nunito', sans-serif; }
   </style>
+  <script src="supabase.js"></script>
 </head>
 <body>
   <nav class="sidebar">
@@ -99,6 +100,7 @@
     <div class="nav-section">
       <div class="nav-label">Menu</div>
       <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
       <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
       <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
       <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
@@ -107,7 +109,6 @@
       <a href="ideias.html" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
       <a href="checklist.html" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
       <a href="reunioes.html" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
-      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
     </div>
     <div class="nav-section" style="margin-top:auto">
       <a href="configuracoes.html" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
@@ -189,13 +190,28 @@
     let abaAtiva = 'cerimonia';
     let momentoAtivo = '';
 
-    function salvarDados() { localStorage.setItem('musicas', JSON.stringify(musicas)); }
+    function salvarDados() { localStorage.setItem('musicas', JSON.stringify(musicas)); if(typeof db!=='undefined') db.set('musicas', musicas); }
 
     function setAba(aba, el) {
       abaAtiva = aba;
       document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
       el.classList.add('active');
-      renderizar();
+  
+    // ── SYNC SUPABASE ──
+    async function syncFromSupabase() {
+      if (typeof db === 'undefined') return;
+      const dados = await db.getMany(['musicas']);
+            if (dados['musicas'] !== null) localStorage.setItem('musicas', JSON.stringify(dados['musicas']));
+      
+    }
+
+    async function saveToSupabase(key, value) {
+      if (typeof db !== 'undefined') await db.set(key, value);
+    }
+
+    syncFromSupabase().then(() => {
+    renderizar();
+    });
     }
 
     function abrirModal(momentoId, momentoNome) {
