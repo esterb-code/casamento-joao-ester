@@ -362,7 +362,18 @@
     }
 
     document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
-    renderizar();
+    async function initApp() {
+      if (typeof db !== 'undefined') {
+        const multi = await db.getMany(['papelaria-artes', 'vision-board']);
+        if (multi['papelaria-artes']) { artes = multi['papelaria-artes']; localStorage.setItem('papelaria-artes', JSON.stringify(artes)); }
+        if (multi['vision-board'] && multi['vision-board'] !== null) {
+          localStorage.setItem('vision-board', JSON.stringify(multi['vision-board']));
+          mostrarVision(multi['vision-board']);
+        }
+      }
+      renderizar();
+    }
+    initApp();
   </script>
 </body>
 </html>
