@@ -280,7 +280,14 @@
     }
 
     document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)fecharModal()});
-    renderColabs()
+    async function initApp() {
+      if (typeof db !== 'undefined') {
+        const dados = await db.get('colaboradores');
+        if (dados !== null) { colaboradores = dados; localStorage.setItem('colaboradores', JSON.stringify(dados)); }
+      }
+      renderColabs();
+    }
+    initApp();
   </script>
 </body>
 </html>
