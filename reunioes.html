@@ -90,13 +90,14 @@
     .btn-dispensar{background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif}
   </style>
   <script src="supabase.js"></script>
+  <script src="config.js"></script>
 </head>
 <body>
   <nav class="sidebar">
     <div class="sidebar-logo">
       <div class="initials">💍 J & E</div>
-      <div class="names">João & Ester</div>
-      <div class="date">20 de junho de 2027</div>
+      <div class="names" id="sidebar-names">João & Ester</div>
+      <div class="date" id="sidebar-date">20 de junho de 2027</div>
     </div>
     <div class="nav-section">
       <div class="nav-label">Menu</div>
@@ -292,6 +293,7 @@
 
     initApp();
 
-    });  </script>
+    });
+</script>
 </body>
 </html>
