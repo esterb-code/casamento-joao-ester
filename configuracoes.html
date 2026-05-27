@@ -83,6 +83,7 @@
     .btn-cancelar{padding:11px 20px;background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif}
     .file-input{display:none}
   </style>
+  <script src="supabase.js"></script>
 </head>
 <body>
   <nav class="sidebar">
@@ -94,6 +95,7 @@
     <div class="nav-section">
       <div class="nav-label">Menu</div>
       <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
       <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
       <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
       <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
@@ -102,7 +104,6 @@
       <a href="ideias.html" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
       <a href="checklist.html" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
       <a href="reunioes.html" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
-      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
     </div>
     <div class="nav-section" style="margin-top:auto">
       <a href="configuracoes.html" class="nav-item active"><i class="ti ti-settings"></i> Configurações</a>
@@ -220,7 +221,7 @@
     const TIPO_CLASSES={cerimonialista:'t-cerimonialista',noiva:'t-noiva',noivo:'t-noivo'};
     let colaboradores=JSON.parse(localStorage.getItem('colaboradores')||'[]');
 
-    function salvarColaboradores(){localStorage.setItem('colaboradores',JSON.stringify(colaboradores))}
+    function salvarColaboradores(){localStorage.setItem('colaboradores',JSON.stringify(colaboradores));if(typeof db!=='undefined')db.set('colaboradores',colaboradores);}
     function abrirModal(){document.getElementById('modal').classList.add('open')}
     function fecharModal(){document.getElementById('modal').classList.remove('open');document.getElementById('c-nome').value='';document.getElementById('c-email').value=''}
     function convidar(){
@@ -270,7 +271,7 @@
     if(evSalvo.hora)document.getElementById('ev-hora').value=evSalvo.hora;
     if(evSalvo.local)document.getElementById('ev-local').value=evSalvo.local;
 
-    function salvarEvento(){
+    function salvarEvento(){if(typeof db!=='undefined')db.set('evento-config',{data:document.getElementById('ev-data').value,hora:document.getElementById('ev-hora').value,local:document.getElementById('ev-local').value});
       localStorage.setItem('evento-config',JSON.stringify({
         data:document.getElementById('ev-data').value,
         hora:document.getElementById('ev-hora').value,
