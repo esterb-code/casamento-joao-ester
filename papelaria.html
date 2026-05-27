@@ -106,6 +106,7 @@
     .btn-salvar { flex: 1; background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 11px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; }
     .btn-cancelar { padding: 11px 20px; background: var(--creme); color: var(--taupe); border: 0.5px solid #EED8C8; border-radius: 10px; font-size: 13px; cursor: pointer; font-family: 'Nunito', sans-serif; }
   </style>
+  <script src="supabase.js"></script>
 </head>
 <body>
   <nav class="sidebar">
@@ -117,6 +118,7 @@
     <div class="nav-section">
       <div class="nav-label">Menu</div>
       <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
       <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
       <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
       <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
@@ -125,7 +127,6 @@
       <a href="ideias.html" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
       <a href="checklist.html" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
       <a href="reunioes.html" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
-      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
     </div>
     <div class="nav-section" style="margin-top:auto">
       <a href="configuracoes.html" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
@@ -178,6 +179,15 @@
           <option value="impressa">Impressa</option>
         </select>
       </div>
+      <div class="form-group">
+        <label class="form-label">Link externo (opcional)</label>
+        <input class="form-input" id="a-link" placeholder="https://..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Arquivo (PDF ou imagem)</label>
+        <input type="file" id="a-arquivo" accept=".pdf,image/png,image/jpeg,image/webp" style="width:100%;border:.5px solid #EED8C8;border-radius:10px;padding:8px 12px;font-size:12px;font-family:'Nunito',sans-serif;background:var(--creme);cursor:pointer;" />
+        <div style="font-size:10px;color:var(--taupe);margin-top:4px;">Formatos aceitos: PDF, PNG, JPG, WEBP</div>
+      </div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
         <button class="btn-salvar" onclick="salvarArte()">Salvar</button>
@@ -200,7 +210,7 @@
     let catAtiva = '';
     let filtroStatus = 'todos';
 
-    function salvarDados() { localStorage.setItem('papelaria-artes', JSON.stringify(artes)); }
+    function salvarDados() { localStorage.setItem('papelaria-artes', JSON.stringify(artes)); if(typeof db!=='undefined') db.set('papelaria-artes', artes); }
 
     // Vision Board
     const visionSalvo = localStorage.getItem('vision-board');
@@ -211,7 +221,7 @@
       if (!file) return;
       const reader = new FileReader();
       reader.onload = ev => {
-        localStorage.setItem('vision-board', ev.target.result);
+        localStorage.setItem('vision-board', ev.target.result);if(typeof db!=='undefined') db.set('vision-board', ev.target.result);
         mostrarVision(ev.target.result);
       };
       reader.readAsDataURL(file);
@@ -237,16 +247,29 @@
       document.getElementById('modal').classList.add('open');
     }
 
-    function fecharModal() { document.getElementById('modal').classList.remove('open'); }
+    function fecharModal() { document.getElementById('modal').classList.remove('open'); document.getElementById('a-link').value=''; document.getElementById('a-arquivo').value=''; }
 
     function salvarArte() {
       const nome = document.getElementById('a-nome').value.trim();
       if (!nome) { alert('Informe o nome da arte.'); return; }
+      const link = document.getElementById('a-link').value.trim();
+      const arquivo = document.getElementById('a-arquivo').files[0];
       if (!artes[catAtiva]) artes[catAtiva] = [];
-      artes[catAtiva].push({ id: Date.now(), nome, status: document.getElementById('a-status').value });
-      salvarDados();
-      fecharModal();
-      renderizar();
+      const novaArte = { id: Date.now(), nome, status: document.getElementById('a-status').value, link: link || null, arquivo: null, arquivoNome: null, arquivoTipo: null };
+      if (arquivo) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          novaArte.arquivo = ev.target.result;
+          novaArte.arquivoNome = arquivo.name;
+          novaArte.arquivoTipo = arquivo.type;
+          artes[catAtiva].push(novaArte);
+          salvarDados(); fecharModal(); renderizar();
+        };
+        reader.readAsDataURL(arquivo);
+      } else {
+        artes[catAtiva].push(novaArte);
+        salvarDados(); fecharModal(); renderizar();
+      }
     }
 
     function avancarStatus(catId, arteId) {
@@ -255,7 +278,24 @@
       if (!arte) return;
       arte.status = ordem[(ordem.indexOf(arte.status) + 1) % ordem.length];
       salvarDados();
-      renderizar();
+  
+    // ── SYNC SUPABASE ──
+    async function syncFromSupabase() {
+      if (typeof db === 'undefined') return;
+      const dados = await db.getMany(['papelaria-artes', 'vision-board']);
+            if (dados['papelaria-artes'] !== null) localStorage.setItem('papelaria-artes', JSON.stringify(dados['papelaria-artes']));
+      
+      if (dados['vision-board'] !== null) localStorage.setItem('vision-board', JSON.stringify(dados['vision-board']));
+      
+    }
+
+    async function saveToSupabase(key, value) {
+      if (typeof db !== 'undefined') await db.set(key, value);
+    }
+
+    syncFromSupabase().then(() => {
+    renderizar();
+    });
     }
 
     function excluirArte(catId, arteId) {
@@ -289,15 +329,25 @@
         lista.forEach(arte => {
           const card = document.createElement('div');
           card.className = 'arte-card';
+          const thumb = arte.arquivo && arte.arquivoTipo && arte.arquivoTipo.startsWith('image/')
+            ? `<div class="arte-thumb ${cat.cor}" style="background:none;overflow:hidden;"><img src="${arte.arquivo}" style="width:100%;height:100%;object-fit:cover;" alt="${arte.nome}"/></div>`
+            : arte.arquivo && arte.arquivoTipo === 'application/pdf'
+            ? `<div class="arte-thumb ${cat.cor}"><i class="ti ti-file-type-pdf" style="font-size:32px;color:#E24B4A;"></i></div>`
+            : `<div class="arte-thumb ${cat.cor}"><i class="ti ${cat.icon}"></i></div>`;
+
           card.innerHTML = `
-            <div class="arte-thumb ${cat.cor}"><i class="ti ${cat.icon}"></i></div>
+            ${thumb}
             <div class="arte-info">
               <div class="arte-nome">${arte.nome}</div>
               <div class="arte-bottom">
                 <span class="arte-meta">${cat.nome}</span>
                 <span class="status-badge ${STATUS_CLASSES[arte.status]}" onclick="avancarStatus('${cat.id}', ${arte.id})">${STATUS_LABELS[arte.status]}</span>
               </div>
-              <div style="margin-top:6px;"><button onclick="excluirArte('${cat.id}',${arte.id})" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--taupe);display:flex;align-items:center;gap:3px;"><i class="ti ti-trash"></i> Remover</button></div>
+              <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+                ${arte.link ? `<a href="${arte.link}" target="_blank" style="font-size:10px;color:var(--rosa);background:#FAE8EC;padding:2px 8px;border-radius:99px;border:.5px solid var(--rosa-claro);text-decoration:none;display:flex;align-items:center;gap:3px;"><i class="ti ti-external-link" style="font-size:11px;"></i> Ver link</a>` : ''}
+                ${arte.arquivo ? `<a href="${arte.arquivo}" download="${arte.arquivoNome||arte.nome}" style="font-size:10px;color:var(--verde);background:var(--verde-menta);padding:2px 8px;border-radius:99px;border:.5px solid var(--verde-m);text-decoration:none;display:flex;align-items:center;gap:3px;"><i class="ti ti-download" style="font-size:11px;"></i> Baixar</a>` : ''}
+                <button onclick="excluirArte('${cat.id}',${arte.id})" style="background:none;border:none;cursor:pointer;font-size:10px;color:var(--taupe);display:flex;align-items:center;gap:2px;"><i class="ti ti-trash"></i> Remover</button>
+              </div>
             </div>
           `;
           grid.appendChild(card);
