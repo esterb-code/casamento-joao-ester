@@ -10,449 +10,160 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
   <style>
     :root {
-      --rosa: #C2516A;
-      --rosa-claro: #F4AABB;
-      --rosa-escuro: #8B2240;
-      --verde: #2C6E3A;
-      --verde-m: #5FA870;
-      --verde-menta: #C8E8CE;
-      --laranja: #E8760A;
-      --laranja-s: #F4A860;
-      --pessego: #FDE8CC;
-      --creme: #FDF5EC;
-      --taupe: #9A7060;
-      --branco: #FDFAF7;
-      --sidebar-w: 220px;
+      --rosa:#C2516A;--rosa-claro:#F4AABB;--rosa-escuro:#8B2240;
+      --verde:#2C6E3A;--verde-m:#5FA870;--verde-menta:#C8E8CE;
+      --laranja:#E8760A;--laranja-s:#F4A860;--pessego:#FDE8CC;
+      --creme:#FDF5EC;--taupe:#9A7060;--branco:#FDFAF7;--sidebar-w:220px;
     }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;display:flex;min-height:100vh}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* SIDEBAR */
+    .sidebar{width:var(--sidebar-w);background:var(--rosa-escuro);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+    .sidebar-logo{padding:24px 20px 20px;border-bottom:.5px solid rgba(194,81,106,.5);margin-bottom:8px}
+    .sidebar-logo .initials{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.15em;color:var(--pessego);margin-bottom:4px}
+    .sidebar-logo .names{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:#fff;line-height:1.2}
+    .sidebar-logo .date{font-size:11px;color:var(--rosa-claro);margin-top:3px;font-weight:300}
+    .nav-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:rgba(244,170,187,.5);padding:8px 20px 4px;text-transform:uppercase}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(253,221,230,.8);cursor:pointer;transition:all .15s;text-decoration:none;border-left:2px solid transparent}
+    .nav-item:hover{background:rgba(194,81,106,.2);color:#fff}
+    .nav-item.active{background:rgba(194,81,106,.25);color:#fff;border-left-color:var(--rosa-claro);font-weight:600}
+    .nav-item i{font-size:16px;opacity:.8}
+    .nav-section{padding:8px 0}
 
-    body {
-      font-family: 'Nunito', sans-serif;
-      background: var(--creme);
-      color: #3E3530;
-      display: flex;
-      min-height: 100vh;
-    }
+    /* MAIN */
+    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
 
-    /* ── SIDEBAR ── */
-    .sidebar {
-      width: var(--sidebar-w);
-      background: var(--rosa-escuro);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
-      z-index: 100;
-      overflow-y: auto;
-    }
+    /* BANNER */
+    .banner{width:100%;height:320px;position:relative;overflow:hidden;flex-shrink:0}
+    .banner img{width:100%;height:100%;object-fit:cover;object-position:center 25%}
+    .banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(139,34,64,.1) 0%,rgba(139,34,64,.15) 40%,rgba(139,34,64,.75) 80%,rgba(139,34,64,.9) 100%)}
+    .banner-content{position:absolute;bottom:28px;left:36px;right:36px}
+    .banner-content .pre-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;color:var(--rosa-claro);margin-bottom:6px;text-transform:uppercase}
+    .banner-content .title{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:#fff;line-height:1;margin-bottom:6px}
+    .banner-content .subtitle{font-size:13px;color:rgba(253,221,230,.9);font-weight:300;letter-spacing:.04em}
+    .btn-edit-banner{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border:.5px solid rgba(255,255,255,.3);color:white;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;transition:all .15s}
+    .btn-edit-banner:hover{background:rgba(255,255,255,.25)}
 
-    .sidebar-logo {
-      padding: 24px 20px 20px;
-      border-bottom: 0.5px solid rgba(194,81,106,0.5);
-      margin-bottom: 8px;
-    }
+    /* CONTENT */
+    .content{padding:28px 36px;display:flex;flex-direction:column;gap:20px}
 
-    .sidebar-logo .initials {
-      font-family: 'Cinzel', serif;
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      color: var(--pessego);
-      margin-bottom: 4px;
-    }
+    /* EDIT BTN inline */
+    .edit-btn{background:none;border:none;cursor:pointer;color:var(--taupe);font-size:13px;padding:3px 6px;border-radius:6px;transition:all .15s;opacity:.6;display:flex;align-items:center;gap:3px}
+    .edit-btn:hover{opacity:1;color:var(--rosa);background:#FAE8EC}
+    .edit-btn i{font-size:14px}
 
-    .sidebar-logo .names {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 22px;
-      font-weight: 400;
-      color: #fff;
-      line-height: 1.2;
-    }
+    /* COUNTDOWN */
+    .countdown-card{background:linear-gradient(135deg,var(--rosa) 0%,var(--rosa-escuro) 100%);border-radius:16px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 8px 32px rgba(194,81,106,.25)}
+    .countdown-left .label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;color:var(--rosa-claro);text-transform:uppercase;margin-bottom:4px}
+    .countdown-left .cd-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:#fff;font-weight:300}
+    .countdown-left .cd-date{font-size:11px;color:rgba(255,255,255,.7);margin-top:4px;display:flex;align-items:center;gap:6px}
+    .countdown-blocks{display:flex;gap:10px}
+    .countdown-block{background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border:.5px solid rgba(255,255,255,.2);border-radius:12px;padding:12px 16px;text-align:center;min-width:64px}
+    .countdown-block .num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:500;color:#fff;line-height:1;display:block}
+    .countdown-block .unit{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;color:var(--rosa-claro);text-transform:uppercase;margin-top:4px;display:block}
 
-    .sidebar-logo .date {
-      font-size: 11px;
-      color: var(--rosa-claro);
-      margin-top: 3px;
-      font-weight: 300;
-    }
+    /* GRID */
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 
-    .nav-section {
-      padding: 8px 0;
-    }
+    /* CARD */
+    .card{background:var(--branco);border-radius:16px;border:.5px solid #EED8C8;overflow:hidden}
+    .card-header{padding:14px 18px 10px;border-bottom:.5px solid #F5EDE4;display:flex;align-items:center;justify-content:space-between}
+    .card-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;color:var(--taupe);text-transform:uppercase}
+    .card-header-right{display:flex;align-items:center;gap:8px}
+    .card-body{padding:18px}
 
-    .nav-label {
-      font-family: 'Cinzel', serif;
-      font-size: 9px;
-      letter-spacing: 0.12em;
-      color: rgba(244,170,187,0.5);
-      padding: 8px 20px 4px;
-      text-transform: uppercase;
-    }
+    /* FINANCEIRO */
+    .privacy-toggle{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--taupe);cursor:pointer;padding:4px 10px;border-radius:99px;background:#FAE8EC;border:.5px solid var(--rosa-claro);transition:all .15s}
+    .privacy-toggle:hover{background:var(--rosa-claro);color:var(--rosa-escuro)}
+    .privacy-toggle i{font-size:13px}
+    .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .stat-item{background:var(--creme);border-radius:12px;border:.5px solid #EED8C8;padding:14px 16px;position:relative}
+    .stat-label{font-size:11px;color:var(--taupe);margin-bottom:6px}
+    .stat-value{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:var(--rosa-escuro);transition:filter .3s}
+    .stat-value.blurred{filter:blur(8px)}
+    .stat-sub{font-size:10px;color:var(--verde-m);margin-top:3px}
+    .stat-edit{position:absolute;top:8px;right:8px}
 
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 20px;
-      font-size: 13px;
-      color: rgba(253,221,230,0.8);
-      cursor: pointer;
-      transition: all 0.15s;
-      text-decoration: none;
-      border-left: 2px solid transparent;
-    }
+    /* ALERTAS */
+    .alert-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid #F5EDE4}
+    .alert-item:last-child{border-bottom:none}
+    .alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .alert-dot.urgente{background:var(--laranja)}
+    .alert-dot.hoje{background:var(--rosa)}
+    .alert-info{flex:1}
+    .alert-fornecedor{font-size:13px;font-weight:600;color:#3E3530}
+    .alert-parcela{font-size:11px;color:var(--taupe);margin-top:1px}
+    .alert-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px}
+    .alert-badge.hoje{background:#FAE8EC;color:var(--rosa);border:.5px solid var(--rosa-claro)}
+    .alert-badge.amanha{background:var(--pessego);color:#8B4000;border:.5px solid var(--laranja-s)}
 
-    .nav-item:hover { background: rgba(194,81,106,0.2); color: #fff; }
-    .nav-item.active {
-      background: rgba(194,81,106,0.25);
-      color: #fff;
-      border-left-color: var(--rosa-claro);
-      font-weight: 600;
-    }
+    /* LOGÍSTICA */
+    .logistica-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:.5px solid #F5EDE4}
+    .logistica-item:last-child{border-bottom:none}
+    .log-icon{width:36px;height:36px;border-radius:10px;background:#FAE8EC;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .log-icon i{font-size:17px;color:var(--rosa)}
+    .log-label{font-size:11px;color:var(--taupe)}
+    .log-value{font-size:13px;font-weight:600;color:#3E3530;margin-top:1px}
+    .log-link{font-size:11px;color:var(--rosa);text-decoration:none;display:flex;align-items:center;gap:3px}
+    .log-link:hover{text-decoration:underline}
+    .logistica-row-inner{flex:1}
 
-    .nav-item i { font-size: 16px; opacity: 0.8; }
-    .nav-item.active i { opacity: 1; }
+    /* PROGRESSO */
+    .progress-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid #F5EDE4}
+    .progress-row:last-child{border-bottom:none}
+    .progress-label{font-size:12px;color:#3E3530;flex:1}
+    .progress-bar-wrap{width:100px}
+    .progress-bar{height:5px;background:#FAE8EC;border-radius:99px;overflow:hidden}
+    .progress-fill{height:100%;background:var(--rosa);border-radius:99px}
+    .progress-pct{font-size:11px;font-weight:600;color:var(--rosa-escuro);width:36px;text-align:right}
 
-    /* ── MAIN ── */
-    .main {
-      margin-left: var(--sidebar-w);
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+    /* ATALHOS */
+    .shortcuts-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .shortcut{background:var(--branco);border-radius:14px;border:.5px solid #EED8C8;padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;text-decoration:none;transition:all .15s}
+    .shortcut:hover{border-color:var(--rosa-claro);background:#FAE8EC;transform:translateY(-2px);box-shadow:0 4px 16px rgba(194,81,106,.12)}
+    .shortcut i{font-size:22px;color:var(--rosa)}
+    .shortcut span{font-size:11px;color:var(--taupe);text-align:center;font-weight:500}
 
-    /* ── BANNER ── */
-    .banner {
-      width: 100%;
-      height: 320px;
-      position: relative;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
+    /* MODAIS */
+    .modal-overlay{position:fixed;inset:0;background:rgba(139,34,64,.3);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--branco);border-radius:20px;border:.5px solid #EED8C8;padding:28px;width:440px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(139,34,64,.2)}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--rosa-escuro);margin-bottom:6px}
+    .modal-sub{font-size:12px;color:var(--taupe);margin-bottom:20px}
+    .form-group{margin-bottom:14px}
+    .form-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--taupe);text-transform:uppercase;margin-bottom:5px;display:block}
+    .form-input,.form-select{width:100%;border:.5px solid #EED8C8;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;outline:none;transition:border-color .15s}
+    .form-input:focus,.form-select:focus{border-color:var(--rosa-claro)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .modal-actions{display:flex;gap:10px;margin-top:20px}
+    .btn-salvar{flex:1;background:var(--rosa);color:white;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif;transition:background .15s}
+    .btn-salvar:hover{background:var(--rosa-escuro)}
+    .btn-cancelar{padding:11px 20px;background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif}
 
-    .banner img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center 25%;
-    }
+    /* MODAL CONFIRMAÇÃO */
+    .confirm-overlay{position:fixed;inset:0;background:rgba(139,34,64,.4);backdrop-filter:blur(6px);z-index:300;display:none;align-items:center;justify-content:center}
+    .confirm-overlay.open{display:flex}
+    .confirm-modal{background:var(--branco);border-radius:20px;border:.5px solid #EED8C8;padding:28px;width:380px;box-shadow:0 20px 60px rgba(139,34,64,.25);text-align:center}
+    .confirm-icon{width:52px;height:52px;border-radius:50%;background:#FAE8EC;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+    .confirm-icon i{font-size:24px;color:var(--rosa)}
+    .confirm-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--rosa-escuro);margin-bottom:6px}
+    .confirm-sub{font-size:12px;color:var(--taupe);margin-bottom:20px;line-height:1.5}
+    .confirm-actions{display:flex;gap:10px}
+    .btn-confirmar{flex:1;background:var(--rosa);color:white;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif}
+    .btn-confirmar:hover{background:var(--rosa-escuro)}
+    .btn-cancelar-confirm{flex:1;background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:10px;padding:11px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif}
 
-    .banner-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(139,34,64,0.1) 0%,
-        rgba(139,34,64,0.15) 40%,
-        rgba(139,34,64,0.75) 80%,
-        rgba(139,34,64,0.9) 100%
-      );
-    }
+    /* ALERT PARCELA ITEM */
+    .alerta-actions{display:flex;align-items:center;gap:6px}
 
-    .banner-content {
-      position: absolute;
-      bottom: 28px;
-      left: 36px;
-      right: 36px;
-    }
-
-    .banner-content .pre-title {
-      font-family: 'Cinzel', serif;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      color: var(--rosa-claro);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-    }
-
-    .banner-content .title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 48px;
-      font-weight: 300;
-      color: #fff;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-
-    .banner-content .subtitle {
-      font-size: 13px;
-      color: rgba(253,221,230,0.9);
-      font-weight: 300;
-      letter-spacing: 0.04em;
-    }
-
-    /* ── CONTENT ── */
-    .content {
-      padding: 28px 36px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* ── COUNTDOWN ── */
-    .countdown-card {
-      background: linear-gradient(135deg, var(--rosa) 0%, var(--rosa-escuro) 100%);
-      border-radius: 16px;
-      padding: 24px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 8px 32px rgba(194,81,106,0.25);
-    }
-
-    .countdown-left .label {
-      font-family: 'Cinzel', serif;
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      color: var(--rosa-claro);
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .countdown-left .title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 22px;
-      font-style: italic;
-      color: #fff;
-      font-weight: 300;
-    }
-
-    .countdown-blocks {
-      display: flex;
-      gap: 10px;
-    }
-
-    .countdown-block {
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(8px);
-      border: 0.5px solid rgba(255,255,255,0.2);
-      border-radius: 12px;
-      padding: 12px 16px;
-      text-align: center;
-      min-width: 64px;
-    }
-
-    .countdown-block .num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 32px;
-      font-weight: 500;
-      color: #fff;
-      line-height: 1;
-      display: block;
-    }
-
-    .countdown-block .unit {
-      font-family: 'Cinzel', serif;
-      font-size: 8px;
-      letter-spacing: 0.1em;
-      color: var(--rosa-claro);
-      text-transform: uppercase;
-      margin-top: 4px;
-      display: block;
-    }
-
-    /* ── GRID ── */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-
-    /* ── CARD ── */
-    .card {
-      background: var(--branco);
-      border-radius: 16px;
-      border: 0.5px solid #EED8C8;
-      overflow: hidden;
-    }
-
-    .card-header {
-      padding: 14px 18px 10px;
-      border-bottom: 0.5px solid #F5EDE4;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .card-title {
-      font-family: 'Cinzel', serif;
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      color: var(--taupe);
-      text-transform: uppercase;
-    }
-
-    .card-body { padding: 18px; }
-
-    /* ── FINANCEIRO ── */
-    .privacy-toggle {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--taupe);
-      cursor: pointer;
-      user-select: none;
-      padding: 4px 10px;
-      border-radius: 99px;
-      background: #FAE8EC;
-      border: 0.5px solid var(--rosa-claro);
-      transition: all 0.15s;
-    }
-
-    .privacy-toggle:hover { background: var(--rosa-claro); color: var(--rosa-escuro); }
-    .privacy-toggle i { font-size: 13px; }
-
-    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-
-    .stat-item {
-      background: var(--creme);
-      border-radius: 12px;
-      border: 0.5px solid #EED8C8;
-      padding: 14px 16px;
-    }
-
-    .stat-item .stat-label {
-      font-size: 11px;
-      color: var(--taupe);
-      margin-bottom: 6px;
-    }
-
-    .stat-item .stat-value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 26px;
-      font-weight: 500;
-      color: var(--rosa-escuro);
-      transition: filter 0.3s;
-    }
-
-    .stat-item .stat-value.blurred { filter: blur(8px); }
-
-    .stat-item .stat-sub {
-      font-size: 10px;
-      color: var(--verde-m);
-      margin-top: 3px;
-    }
-
-    /* ── ALERTAS ── */
-    .alert-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 0.5px solid #F5EDE4;
-    }
-
-    .alert-item:last-child { border-bottom: none; }
-
-    .alert-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .alert-dot.urgente { background: var(--laranja); }
-    .alert-dot.hoje { background: var(--rosa); }
-
-    .alert-info { flex: 1; }
-    .alert-fornecedor { font-size: 13px; font-weight: 600; color: #3E3530; }
-    .alert-parcela { font-size: 11px; color: var(--taupe); margin-top: 1px; }
-
-    .alert-badge {
-      font-size: 10px;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 99px;
-    }
-
-    .alert-badge.hoje { background: #FAE8EC; color: var(--rosa); border: 0.5px solid var(--rosa-claro); }
-    .alert-badge.amanha { background: var(--pessego); color: #8B4000; border: 0.5px solid var(--laranja-s); }
-
-    /* ── LOGÍSTICA ── */
-    .logistica-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 0;
-      border-bottom: 0.5px solid #F5EDE4;
-    }
-
-    .logistica-item:last-child { border-bottom: none; }
-
-    .log-icon {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      background: #FAE8EC;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .log-icon i { font-size: 17px; color: var(--rosa); }
-    .log-label { font-size: 11px; color: var(--taupe); }
-    .log-value { font-size: 13px; font-weight: 600; color: #3E3530; margin-top: 1px; }
-    .log-link { font-size: 11px; color: var(--rosa); text-decoration: none; display: flex; align-items: center; gap: 3px; margin-top: 2px; }
-    .log-link:hover { text-decoration: underline; }
-
-    /* ── ATALHOS ── */
-    .shortcuts-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-    }
-
-    .shortcut {
-      background: var(--branco);
-      border-radius: 14px;
-      border: 0.5px solid #EED8C8;
-      padding: 16px 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.15s;
-    }
-
-    .shortcut:hover {
-      border-color: var(--rosa-claro);
-      background: #FAE8EC;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(194,81,106,0.12);
-    }
-
-    .shortcut i { font-size: 22px; color: var(--rosa); }
-    .shortcut span { font-size: 11px; color: var(--taupe); text-align: center; font-weight: 500; }
-
-    /* ── PROGRESSO GERAL ── */
-    .progress-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 0.5px solid #F5EDE4;
-    }
-
-    .progress-row:last-child { border-bottom: none; }
-    .progress-label { font-size: 12px; color: #3E3530; flex: 1; }
-    .progress-bar-wrap { width: 100px; }
-    .progress-bar { height: 5px; background: #FAE8EC; border-radius: 99px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--rosa); border-radius: 99px; }
-    .progress-pct { font-size: 11px; font-weight: 600; color: var(--rosa-escuro); width: 36px; text-align: right; }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .content > * {
-      animation: fadeInUp 0.4s ease both;
-    }
-
-    .content > *:nth-child(1) { animation-delay: 0.05s; }
-    .content > *:nth-child(2) { animation-delay: 0.1s; }
-    .content > *:nth-child(3) { animation-delay: 0.15s; }
-    .content > *:nth-child(4) { animation-delay: 0.2s; }
-    .content > *:nth-child(5) { animation-delay: 0.25s; }
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .content>*{animation:fadeInUp .4s ease both}
+    .content>*:nth-child(1){animation-delay:.05s}
+    .content>*:nth-child(2){animation-delay:.1s}
+    .content>*:nth-child(3){animation-delay:.15s}
+    .content>*:nth-child(4){animation-delay:.2s}
+    .content>*:nth-child(5){animation-delay:.25s}
   </style>
 </head>
 <body>
@@ -461,14 +172,13 @@
   <nav class="sidebar">
     <div class="sidebar-logo">
       <div class="initials">💍 J & E</div>
-      <div class="names">João & Ester</div>
-      <div class="date">20 de junho de 2027</div>
+      <div class="names" id="sidebar-names">João & Ester</div>
+      <div class="date" id="sidebar-date">20 de junho de 2027</div>
     </div>
-
     <div class="nav-section">
       <div class="nav-label">Menu</div>
-      <a href="#" class="nav-item active"><i class="ti ti-home"></i> Dashboard</a>
-      <a href="#" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="index.html" class="nav-item active"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
       <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
       <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
       <a href="musicas.html" class="nav-item"><i class="ti ti-music"></i> Músicas</a>
@@ -478,8 +188,7 @@
       <a href="reunioes.html" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
       <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
     </div>
-
-    <div class="nav-section" style="margin-top:auto;">
+    <div class="nav-section" style="margin-top:auto">
       <a href="configuracoes.html" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
     </div>
   </nav>
@@ -489,12 +198,13 @@
 
     <!-- BANNER -->
     <div class="banner">
-      <img src="foto-casal.jpg" alt="João e Ester" />
+      <img src="foto-casal.jpg" alt="João e Ester" id="banner-img" />
       <div class="banner-overlay"></div>
+      <button class="btn-edit-banner" onclick="abrirModal('evento')"><i class="ti ti-pencil"></i> Editar informações</button>
       <div class="banner-content">
         <div class="pre-title">O Caminho para o Sim</div>
-        <div class="title">João & Ester</div>
-        <div class="subtitle">20 de Junho de 2027 &nbsp;·&nbsp; 16h00 &nbsp;·&nbsp; Brasília, DF</div>
+        <div class="title" id="banner-names">João & Ester</div>
+        <div class="subtitle" id="banner-subtitle">20 de Junho de 2027 &nbsp;·&nbsp; 16h00 &nbsp;·&nbsp; Brasília, DF</div>
       </div>
     </div>
 
@@ -505,25 +215,18 @@
       <div class="countdown-card">
         <div class="countdown-left">
           <div class="label">Contagem regressiva</div>
-          <div class="title">Falta pouco para o grande dia! 🌸</div>
+          <div class="cd-title">Falta pouco para o grande dia! 🌸</div>
+          <div class="cd-date" id="cd-date-display">
+            <i class="ti ti-calendar" style="font-size:12px;"></i>
+            <span id="cd-date-text">20/06/2027 · 16h00</span>
+            <button class="edit-btn" style="color:rgba(255,255,255,.7);" onclick="abrirModal('evento')"><i class="ti ti-pencil"></i></button>
+          </div>
         </div>
         <div class="countdown-blocks">
-          <div class="countdown-block">
-            <span class="num" id="dias">--</span>
-            <span class="unit">Dias</span>
-          </div>
-          <div class="countdown-block">
-            <span class="num" id="horas">--</span>
-            <span class="unit">Horas</span>
-          </div>
-          <div class="countdown-block">
-            <span class="num" id="minutos">--</span>
-            <span class="unit">Min</span>
-          </div>
-          <div class="countdown-block">
-            <span class="num" id="segundos">--</span>
-            <span class="unit">Seg</span>
-          </div>
+          <div class="countdown-block"><span class="num" id="dias">--</span><span class="unit">Dias</span></div>
+          <div class="countdown-block"><span class="num" id="horas">--</span><span class="unit">Horas</span></div>
+          <div class="countdown-block"><span class="num" id="minutos">--</span><span class="unit">Min</span></div>
+          <div class="countdown-block"><span class="num" id="segundos">--</span><span class="unit">Seg</span></div>
         </div>
       </div>
 
@@ -534,26 +237,29 @@
         <div class="card">
           <div class="card-header">
             <span class="card-title">Resumo Financeiro</span>
-            <div class="privacy-toggle" onclick="togglePrivacy()" id="privacy-btn">
-              <i class="ti ti-eye" id="privacy-icon"></i>
-              <span id="privacy-text">Ocultar valores</span>
+            <div class="card-header-right">
+              <button class="edit-btn" onclick="abrirModal('financeiro')"><i class="ti ti-pencil"></i> Editar</button>
+              <div class="privacy-toggle" onclick="togglePrivacy()" id="privacy-btn">
+                <i class="ti ti-eye" id="privacy-icon"></i>
+                <span id="privacy-text">Ocultar</span>
+              </div>
             </div>
           </div>
           <div class="card-body">
             <div class="stat-grid">
               <div class="stat-item">
                 <div class="stat-label">Investimento total</div>
-                <div class="stat-value blurred" id="val-total">R$ 85.000</div>
-                <div class="stat-sub">orçado</div>
+                <div class="stat-value blurred" id="val-total">R$ 0</div>
+                <div class="stat-sub" id="sub-total">orçado</div>
               </div>
               <div class="stat-item">
                 <div class="stat-label">Valor pago</div>
-                <div class="stat-value blurred" id="val-pago">R$ 32.000</div>
-                <div class="stat-sub">38% quitado</div>
+                <div class="stat-value blurred" id="val-pago">R$ 0</div>
+                <div class="stat-sub" id="sub-pago">0% quitado</div>
               </div>
               <div class="stat-item">
                 <div class="stat-label">Saldo pendente</div>
-                <div class="stat-value blurred" id="val-pendente">R$ 53.000</div>
+                <div class="stat-value blurred" id="val-pendente">R$ 0</div>
                 <div class="stat-sub">a pagar</div>
               </div>
             </div>
@@ -564,32 +270,10 @@
         <div class="card">
           <div class="card-header">
             <span class="card-title">⚠️ Parcelas Vencendo em 48h</span>
+            <button class="edit-btn" onclick="abrirModal('alertas')"><i class="ti ti-pencil"></i> Editar</button>
           </div>
-          <div class="card-body">
-            <div class="alert-item">
-              <div class="alert-dot hoje"></div>
-              <div class="alert-info">
-                <div class="alert-fornecedor">Ateliê da Noiva</div>
-                <div class="alert-parcela">2ª parcela · R$ 2.200</div>
-              </div>
-              <span class="alert-badge hoje">Hoje</span>
-            </div>
-            <div class="alert-item">
-              <div class="alert-dot urgente"></div>
-              <div class="alert-info">
-                <div class="alert-fornecedor">Buffet Requinte</div>
-                <div class="alert-parcela">1ª parcela · R$ 4.500</div>
-              </div>
-              <span class="alert-badge amanha">Amanhã</span>
-            </div>
-            <div class="alert-item">
-              <div class="alert-dot urgente"></div>
-              <div class="alert-info">
-                <div class="alert-fornecedor">Studio J Fotografia</div>
-                <div class="alert-parcela">3ª parcela · R$ 3.000</div>
-              </div>
-              <span class="alert-badge amanha">Amanhã</span>
-            </div>
+          <div class="card-body" id="alertas-body">
+            <div style="font-size:12px;color:var(--taupe);text-align:center;padding:16px 0;">Nenhum alerta cadastrado.</div>
           </div>
         </div>
       </div>
@@ -601,132 +285,65 @@
         <div class="card">
           <div class="card-header">
             <span class="card-title">Logística do Evento</span>
+            <button class="edit-btn" onclick="abrirModal('logistica')"><i class="ti ti-pencil"></i> Editar</button>
           </div>
-          <div class="card-body">
+          <div class="card-body" id="logistica-body">
             <div class="logistica-item">
               <div class="log-icon"><i class="ti ti-map-pin"></i></div>
-              <div>
+              <div class="logistica-row-inner">
                 <div class="log-label">Local</div>
-                <div class="log-value">A definir</div>
-                <div style="font-size:11px; color:var(--taupe);">Atualize nas Configurações</div>
+                <div class="log-value" id="log-local">A definir</div>
               </div>
             </div>
             <div class="logistica-item">
               <div class="log-icon"><i class="ti ti-clock"></i></div>
-              <div>
+              <div class="logistica-row-inner">
                 <div class="log-label">Horário da cerimônia</div>
-                <div class="log-value">16h00</div>
+                <div class="log-value" id="log-hora">16h00</div>
               </div>
             </div>
             <div class="logistica-item">
               <div class="log-icon"><i class="ti ti-sun"></i></div>
-              <div>
+              <div class="logistica-row-inner">
                 <div class="log-label">Pôr do sol estimado</div>
-                <div class="log-value">17h52 · Brasília</div>
+                <div class="log-value" id="log-sol">17h52 · Brasília</div>
               </div>
             </div>
             <div class="logistica-item">
               <div class="log-icon"><i class="ti ti-navigation"></i></div>
-              <div>
+              <div class="logistica-row-inner">
                 <div class="log-label">Como chegar</div>
-                <a href="#" class="log-link"><i class="ti ti-brand-google-maps" style="font-size:13px;"></i> Google Maps</a>
+                <a href="#" class="log-link" id="log-maps"><i class="ti ti-brand-google-maps" style="font-size:13px;"></i> Google Maps</a>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- PROGRESSO GERAL -->
+        <!-- PROGRESSO -->
         <div class="card">
           <div class="card-header">
             <span class="card-title">Progresso Geral</span>
+            <button class="edit-btn" onclick="abrirModal('progresso')"><i class="ti ti-pencil"></i> Editar</button>
           </div>
-          <div class="card-body">
-            <div class="progress-row">
-              <div class="progress-label">Checklist</div>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar"><div class="progress-fill" style="width:34%"></div></div>
-              </div>
-              <div class="progress-pct">34%</div>
-            </div>
-            <div class="progress-row">
-              <div class="progress-label">Convidados confirmados</div>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar"><div class="progress-fill" style="width:48%"></div></div>
-              </div>
-              <div class="progress-pct">48%</div>
-            </div>
-            <div class="progress-row">
-              <div class="progress-label">Fornecedores fechados</div>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
-              </div>
-              <div class="progress-pct">60%</div>
-            </div>
-            <div class="progress-row">
-              <div class="progress-label">Documentos da Igreja</div>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar"><div class="progress-fill" style="width:57%"></div></div>
-              </div>
-              <div class="progress-pct">57%</div>
-            </div>
-            <div class="progress-row">
-              <div class="progress-label">Cortejo confirmado</div>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar"><div class="progress-fill" style="width:67%"></div></div>
-              </div>
-              <div class="progress-pct">67%</div>
-            </div>
-          </div>
+          <div class="card-body" id="progresso-body"></div>
         </div>
       </div>
 
       <!-- ATALHOS -->
       <div class="card">
-        <div class="card-header">
-          <span class="card-title">Acesso Rápido</span>
-        </div>
+        <div class="card-header"><span class="card-title">Acesso Rápido</span></div>
         <div class="card-body">
           <div class="shortcuts-grid">
-            <a href="#" class="shortcut">
-              <i class="ti ti-building-store"></i>
-              <span>Fornecedores</span>
-            </a>
-            <a href="#" class="shortcut">
-              <i class="ti ti-users"></i>
-              <span>Convidados</span>
-            </a>
-            <a href="#" class="shortcut">
-              <i class="ti ti-heart"></i>
-              <span>Cortejo</span>
-            </a>
-            <a href="#" class="shortcut">
-              <i class="ti ti-checkbox"></i>
-              <span>Checklist</span>
-            </a>
-            <a href="#" class="shortcut">
-              <i class="ti ti-bulb"></i>
-              <span>Banco de Ideias</span>
-            </a>
-            <a href="#" class="shortcut">
-              <i class="ti ti-music"></i>
-              <span>Músicas</span>
-            </a>
-            <a href="#" class="shortcut">
-              <i class="ti ti-building-church"></i>
-              <span>Igreja</span>
-            </a>
-            <a href="#" class="shortcut">
-              <i class="ti ti-calendar"></i>
-              <span>Reuniões</span>
-            </a>
-            <a href="#" class="shortcut">
-              <i class="ti ti-file-text"></i>
-              <span>Papelaria</span>
-            </a>
-            <a href="#" class="shortcut">
-              <i class="ti ti-settings"></i>
-              <span>Configurações</span>
-            </a>
+            <a href="fornecedores.html" class="shortcut"><i class="ti ti-building-store"></i><span>Fornecedores</span></a>
+            <a href="convidados.html" class="shortcut"><i class="ti ti-users"></i><span>Convidados</span></a>
+            <a href="cortejo.html" class="shortcut"><i class="ti ti-heart"></i><span>Cortejo</span></a>
+            <a href="checklist.html" class="shortcut"><i class="ti ti-checkbox"></i><span>Checklist</span></a>
+            <a href="ideias.html" class="shortcut"><i class="ti ti-bulb"></i><span>Banco de Ideias</span></a>
+            <a href="musicas.html" class="shortcut"><i class="ti ti-music"></i><span>Músicas</span></a>
+            <a href="igreja.html" class="shortcut"><i class="ti ti-building-church"></i><span>Igreja</span></a>
+            <a href="reunioes.html" class="shortcut"><i class="ti ti-calendar"></i><span>Reuniões</span></a>
+            <a href="papelaria.html" class="shortcut"><i class="ti ti-file-text"></i><span>Papelaria</span></a>
+            <a href="configuracoes.html" class="shortcut"><i class="ti ti-settings"></i><span>Configurações</span></a>
           </div>
         </div>
       </div>
@@ -734,63 +351,392 @@
     </div>
   </main>
 
+  <!-- MODAL EVENTO -->
+  <div class="modal-overlay" id="modal-evento">
+    <div class="modal">
+      <div class="modal-title">Dados do Evento</div>
+      <div class="modal-sub">Edite as informações exibidas no banner e no contador.</div>
+      <div class="form-group"><label class="form-label">Nome dos noivos</label><input class="form-input" id="ev-nomes" placeholder="Ex: João & Ester"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Data do casamento</label><input class="form-input" id="ev-data" type="date"/></div>
+        <div class="form-group"><label class="form-label">Horário</label><input class="form-input" id="ev-hora" type="time"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Cidade / Local</label><input class="form-input" id="ev-cidade" placeholder="Ex: Brasília, DF"/></div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal('evento')">Cancelar</button>
+        <button class="btn-salvar" onclick="pedirConfirmacao('evento')">Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL FINANCEIRO -->
+  <div class="modal-overlay" id="modal-financeiro">
+    <div class="modal">
+      <div class="modal-title">Resumo Financeiro</div>
+      <div class="modal-sub">Atualize os valores financeiros do casamento.</div>
+      <div class="form-group"><label class="form-label">Investimento total (R$)</label><input class="form-input" id="fin-total" type="number" placeholder="0"/></div>
+      <div class="form-group"><label class="form-label">Valor já pago (R$)</label><input class="form-input" id="fin-pago" type="number" placeholder="0"/></div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal('financeiro')">Cancelar</button>
+        <button class="btn-salvar" onclick="pedirConfirmacao('financeiro')">Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ALERTAS -->
+  <div class="modal-overlay" id="modal-alertas">
+    <div class="modal">
+      <div class="modal-title">Parcelas Vencendo</div>
+      <div class="modal-sub">Adicione alertas de parcelas vencendo em até 48h.</div>
+      <div id="alertas-form-lista"></div>
+      <button onclick="adicionarAlertaForm()" style="background:none;border:none;cursor:pointer;color:var(--rosa);font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px;margin-top:8px;font-family:'Nunito',sans-serif;"><i class="ti ti-plus"></i> Adicionar alerta</button>
+      <div class="modal-actions" style="margin-top:16px;">
+        <button class="btn-cancelar" onclick="fecharModal('alertas')">Cancelar</button>
+        <button class="btn-salvar" onclick="pedirConfirmacao('alertas')">Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LOGÍSTICA -->
+  <div class="modal-overlay" id="modal-logistica">
+    <div class="modal">
+      <div class="modal-title">Logística do Evento</div>
+      <div class="modal-sub">Edite as informações de local e horários.</div>
+      <div class="form-group"><label class="form-label">Local do evento</label><input class="form-input" id="log-local-inp" placeholder="Ex: Casa Cavo, Brasília"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Horário da cerimônia</label><input class="form-input" id="log-hora-inp" type="time"/></div>
+        <div class="form-group"><label class="form-label">Pôr do sol</label><input class="form-input" id="log-sol-inp" placeholder="Ex: 17h52"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Link Google Maps</label><input class="form-input" id="log-maps-inp" placeholder="https://maps.google.com/..."/></div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal('logistica')">Cancelar</button>
+        <button class="btn-salvar" onclick="pedirConfirmacao('logistica')">Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PROGRESSO -->
+  <div class="modal-overlay" id="modal-progresso">
+    <div class="modal">
+      <div class="modal-title">Progresso Geral</div>
+      <div class="modal-sub">Atualize as porcentagens de progresso.</div>
+      <div id="progresso-form"></div>
+      <div class="modal-actions" style="margin-top:16px;">
+        <button class="btn-cancelar" onclick="fecharModal('progresso')">Cancelar</button>
+        <button class="btn-salvar" onclick="pedirConfirmacao('progresso')">Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMAÇÃO -->
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-modal">
+      <div class="confirm-icon"><i class="ti ti-check"></i></div>
+      <div class="confirm-title">Confirmar alteração?</div>
+      <div class="confirm-sub" id="confirm-msg">Tem certeza que deseja salvar as alterações?</div>
+      <div class="confirm-actions">
+        <button class="btn-cancelar-confirm" onclick="cancelarConfirmacao()">Cancelar</button>
+        <button class="btn-confirmar" onclick="confirmarEdicao()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // ── COUNTDOWN ──
-    function updateCountdown() {
-      const target = new Date('2027-06-20T16:00:00-03:00');
-      const now = new Date();
-      const diff = target - now;
+    // ── ESTADO ──
+    let dadosPendentes = null;
+    let modalPendente = null;
 
-      if (diff <= 0) {
-        document.getElementById('dias').textContent = '0';
-        document.getElementById('horas').textContent = '0';
-        document.getElementById('minutos').textContent = '0';
-        document.getElementById('segundos').textContent = '0';
-        return;
-      }
+    const defaultState = {
+      evento: { nomes:'João & Ester', data:'2027-06-20', hora:'16:00', cidade:'Brasília, DF' },
+      financeiro: { total:0, pago:0 },
+      alertas: [],
+      logistica: { local:'A definir', hora:'16h00', sol:'17h52 · Brasília', maps:'' },
+      progresso: [
+        { label:'Checklist', pct:0 },
+        { label:'Convidados confirmados', pct:0 },
+        { label:'Fornecedores fechados', pct:0 },
+        { label:'Documentos da Igreja', pct:0 },
+        { label:'Cortejo confirmado', pct:0 },
+      ]
+    };
 
-      const days = Math.floor(diff / 86400000);
-      const hours = Math.floor((diff % 86400000) / 3600000);
-      const mins = Math.floor((diff % 3600000) / 60000);
-      const secs = Math.floor((diff % 60000) / 1000);
+    let state = JSON.parse(localStorage.getItem('dash-state') || JSON.stringify(defaultState));
 
-      document.getElementById('dias').textContent = days;
-      document.getElementById('horas').textContent = String(hours).padStart(2, '0');
-      document.getElementById('minutos').textContent = String(mins).padStart(2, '0');
-      document.getElementById('segundos').textContent = String(secs).padStart(2, '0');
+    function salvarState() { localStorage.setItem('dash-state', JSON.stringify(state)); }
+
+    // ── MODAIS ──
+    function abrirModal(tipo) {
+      preencherModal(tipo);
+      document.getElementById('modal-' + tipo).classList.add('open');
     }
 
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
+    function fecharModal(tipo) {
+      document.getElementById('modal-' + tipo).classList.remove('open');
+    }
 
-    // ── PRIVACY TOGGLE ──
-    let isBlurred = true;
+    function preencherModal(tipo) {
+      if (tipo === 'evento') {
+        document.getElementById('ev-nomes').value = state.evento.nomes;
+        document.getElementById('ev-data').value = state.evento.data;
+        document.getElementById('ev-hora').value = state.evento.hora;
+        document.getElementById('ev-cidade').value = state.evento.cidade;
+      } else if (tipo === 'financeiro') {
+        document.getElementById('fin-total').value = state.financeiro.total;
+        document.getElementById('fin-pago').value = state.financeiro.pago;
+      } else if (tipo === 'alertas') {
+        renderAlertasForm();
+      } else if (tipo === 'logistica') {
+        document.getElementById('log-local-inp').value = state.logistica.local;
+        document.getElementById('log-hora-inp').value = state.logistica.hora.replace('h',':').padEnd(5,'0');
+        document.getElementById('log-sol-inp').value = state.logistica.sol;
+        document.getElementById('log-maps-inp').value = state.logistica.maps;
+      } else if (tipo === 'progresso') {
+        renderProgressoForm();
+      }
+    }
+
+    // ── COLETA DOS DADOS DO MODAL ──
+    function coletarDados(tipo) {
+      if (tipo === 'evento') {
+        return {
+          nomes: document.getElementById('ev-nomes').value.trim() || 'João & Ester',
+          data: document.getElementById('ev-data').value || '2027-06-20',
+          hora: document.getElementById('ev-hora').value || '16:00',
+          cidade: document.getElementById('ev-cidade').value.trim() || 'Brasília, DF'
+        };
+      } else if (tipo === 'financeiro') {
+        return {
+          total: parseFloat(document.getElementById('fin-total').value) || 0,
+          pago: parseFloat(document.getElementById('fin-pago').value) || 0,
+        };
+      } else if (tipo === 'alertas') {
+        const items = document.querySelectorAll('.alerta-form-item');
+        const alertas = [];
+        items.forEach(item => {
+          const nome = item.querySelector('.alerta-nome').value.trim();
+          const parcela = item.querySelector('.alerta-parcela').value.trim();
+          const tipo = item.querySelector('.alerta-tipo').value;
+          if (nome) alertas.push({ nome, parcela, tipo });
+        });
+        return alertas;
+      } else if (tipo === 'logistica') {
+        const horaRaw = document.getElementById('log-hora-inp').value;
+        const horaFormatada = horaRaw ? horaRaw.replace(':', 'h') : '16h00';
+        return {
+          local: document.getElementById('log-local-inp').value.trim() || 'A definir',
+          hora: horaFormatada,
+          sol: document.getElementById('log-sol-inp').value.trim() || '17h52',
+          maps: document.getElementById('log-maps-inp').value.trim(),
+        };
+      } else if (tipo === 'progresso') {
+        const items = document.querySelectorAll('.prog-form-item');
+        return Array.from(items).map(item => ({
+          label: item.querySelector('.prog-label-inp').value.trim(),
+          pct: parseInt(item.querySelector('.prog-pct-inp').value) || 0,
+        }));
+      }
+    }
+
+    // ── CONFIRMAÇÃO ──
+    function pedirConfirmacao(tipo) {
+      dadosPendentes = coletarDados(tipo);
+      modalPendente = tipo;
+      const msgs = {
+        evento: 'Salvar as novas informações do evento (data, nome, horário e cidade)?',
+        financeiro: 'Salvar os novos valores financeiros do casamento?',
+        alertas: 'Salvar as alterações nos alertas de parcelas?',
+        logistica: 'Salvar as informações de logística do evento?',
+        progresso: 'Salvar as novas porcentagens de progresso?',
+      };
+      document.getElementById('confirm-msg').textContent = msgs[tipo] || 'Confirmar as alterações?';
+      document.getElementById('confirm-overlay').classList.add('open');
+    }
+
+    function cancelarConfirmacao() {
+      document.getElementById('confirm-overlay').classList.remove('open');
+      dadosPendentes = null;
+      modalPendente = null;
+    }
+
+    function confirmarEdicao() {
+      if (!modalPendente || !dadosPendentes) return;
+      state[modalPendente === 'alertas' ? 'alertas' : modalPendente === 'progresso' ? 'progresso' : modalPendente] = dadosPendentes;
+      salvarState();
+      fecharModal(modalPendente);
+      cancelarConfirmacao();
+      renderizar();
+    }
+
+    // ── ALERTAS FORM ──
+    function renderAlertasForm() {
+      const container = document.getElementById('alertas-form-lista');
+      container.innerHTML = '';
+      (state.alertas || []).forEach((a, i) => adicionarAlertaFormItem(a));
+    }
+
+    function adicionarAlertaForm() {
+      adicionarAlertaFormItem({ nome:'', parcela:'', tipo:'hoje' });
+    }
+
+    function adicionarAlertaFormItem(a) {
+      const container = document.getElementById('alertas-form-lista');
+      const div = document.createElement('div');
+      div.className = 'alerta-form-item';
+      div.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;margin-bottom:10px;align-items:center;';
+      div.innerHTML = `
+        <input class="form-input alerta-nome" placeholder="Fornecedor" value="${a.nome||''}" style="font-size:12px;padding:8px 10px;"/>
+        <input class="form-input alerta-parcela" placeholder="Ex: 2ª parcela · R$ 2.200" value="${a.parcela||''}" style="font-size:12px;padding:8px 10px;"/>
+        <select class="form-select alerta-tipo" style="font-size:12px;padding:8px 10px;width:100px;">
+          <option value="hoje" ${a.tipo==='hoje'?'selected':''}>Hoje</option>
+          <option value="amanha" ${a.tipo==='amanha'?'selected':''}>Amanhã</option>
+        </select>
+        <button onclick="this.parentElement.remove()" style="background:#FCEBEB;border:.5px solid #E24B4A;border-radius:8px;width:32px;height:32px;cursor:pointer;color:#A32D2D;display:flex;align-items:center;justify-content:center;"><i class="ti ti-trash" style="font-size:14px;"></i></button>
+      `;
+      container.appendChild(div);
+    }
+
+    // ── PROGRESSO FORM ──
+    function renderProgressoForm() {
+      const container = document.getElementById('progresso-form');
+      container.innerHTML = '';
+      state.progresso.forEach((p, i) => {
+        const div = document.createElement('div');
+        div.className = 'prog-form-item';
+        div.style.cssText = 'display:grid;grid-template-columns:1fr 100px;gap:8px;margin-bottom:10px;';
+        div.innerHTML = `
+          <input class="form-input prog-label-inp" value="${p.label}" placeholder="Label" style="font-size:12px;padding:8px 10px;"/>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <input class="form-input prog-pct-inp" type="number" min="0" max="100" value="${p.pct}" style="font-size:12px;padding:8px 10px;width:70px;"/>
+            <span style="font-size:12px;color:var(--taupe);">%</span>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // ── RENDER ──
+    function renderizar() {
+      const ev = state.evento;
+
+      // Banner e sidebar
+      document.getElementById('banner-names').textContent = ev.nomes;
+      document.getElementById('sidebar-names').textContent = ev.nomes;
+      const [y, m, d] = ev.data.split('-');
+      const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      const dataFmt = `${d} de ${meses[parseInt(m)-1]} de ${y}`;
+      document.getElementById('banner-subtitle').textContent = `${dataFmt} · ${ev.hora.replace(':','h')} · ${ev.cidade}`;
+      document.getElementById('sidebar-date').textContent = `${d} de ${meses[parseInt(m)-1].toLowerCase().substring(0,3)} de ${y}`;
+      document.getElementById('cd-date-text').textContent = `${d}/${m}/${y} · ${ev.hora.replace(':','h')}`;
+
+      // Financeiro
+      const fin = state.financeiro;
+      const fmt = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
+      document.getElementById('val-total').textContent = fmt(fin.total);
+      document.getElementById('val-pago').textContent = fmt(fin.pago);
+      document.getElementById('val-pendente').textContent = fmt(fin.total - fin.pago);
+      const pctPago = fin.total > 0 ? Math.round(fin.pago / fin.total * 100) : 0;
+      document.getElementById('sub-pago').textContent = `${pctPago}% quitado`;
+
+      // Alertas
+      const alertasBody = document.getElementById('alertas-body');
+      if (!state.alertas || state.alertas.length === 0) {
+        alertasBody.innerHTML = '<div style="font-size:12px;color:var(--taupe);text-align:center;padding:16px 0;">Nenhum alerta cadastrado. Clique em Editar para adicionar.</div>';
+      } else {
+        alertasBody.innerHTML = '';
+        state.alertas.forEach(a => {
+          const div = document.createElement('div');
+          div.className = 'alert-item';
+          div.innerHTML = `
+            <div class="alert-dot ${a.tipo}"></div>
+            <div class="alert-info">
+              <div class="alert-fornecedor">${a.nome}</div>
+              <div class="alert-parcela">${a.parcela}</div>
+            </div>
+            <span class="alert-badge ${a.tipo}">${a.tipo === 'hoje' ? 'Hoje' : 'Amanhã'}</span>
+          `;
+          alertasBody.appendChild(div);
+        });
+      }
+
+      // Logística
+      const log = state.logistica;
+      document.getElementById('log-local').textContent = log.local || 'A definir';
+      document.getElementById('log-hora').textContent = log.hora || '16h00';
+      document.getElementById('log-sol').textContent = log.sol || '17h52 · Brasília';
+      const mapsEl = document.getElementById('log-maps');
+      if (log.maps) {
+        mapsEl.href = log.maps;
+        mapsEl.style.display = 'flex';
+      } else {
+        mapsEl.href = '#';
+      }
+
+      // Progresso
+      const progBody = document.getElementById('progresso-body');
+      progBody.innerHTML = '';
+      state.progresso.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'progress-row';
+        div.innerHTML = `
+          <div class="progress-label">${p.label}</div>
+          <div class="progress-bar-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${p.pct}%"></div></div></div>
+          <div class="progress-pct">${p.pct}%</div>
+        `;
+        progBody.appendChild(div);
+      });
+
+      // Aplicar blur state
+      const isBlurred = localStorage.getItem('privacy') !== 'visible';
+      document.querySelectorAll('.stat-value').forEach(v => {
+        isBlurred ? v.classList.add('blurred') : v.classList.remove('blurred');
+      });
+    }
+
+    // ── COUNTDOWN ──
+    function updateCountdown() {
+      const ev = state.evento;
+      const [h, min] = ev.hora.split(':');
+      const target = new Date(`${ev.data}T${ev.hora}:00-03:00`);
+      const now = new Date();
+      const diff = target - now;
+      if (diff <= 0) {
+        ['dias','horas','minutos','segundos'].forEach(id => document.getElementById(id).textContent = '0');
+        return;
+      }
+      document.getElementById('dias').textContent = Math.floor(diff / 86400000);
+      document.getElementById('horas').textContent = String(Math.floor((diff % 86400000) / 3600000)).padStart(2,'0');
+      document.getElementById('minutos').textContent = String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0');
+      document.getElementById('segundos').textContent = String(Math.floor((diff % 60000) / 1000)).padStart(2,'0');
+    }
+
+    // ── PRIVACY ──
+    let isBlurred = localStorage.getItem('privacy') !== 'visible';
 
     function togglePrivacy() {
       isBlurred = !isBlurred;
-      const vals = document.querySelectorAll('.stat-value');
-      const icon = document.getElementById('privacy-icon');
-      const text = document.getElementById('privacy-text');
-
-      vals.forEach(v => {
-        if (isBlurred) v.classList.add('blurred');
-        else v.classList.remove('blurred');
+      document.querySelectorAll('.stat-value').forEach(v => {
+        isBlurred ? v.classList.add('blurred') : v.classList.remove('blurred');
       });
-
-      if (isBlurred) {
-        icon.className = 'ti ti-eye';
-        text.textContent = 'Ocultar valores';
-      } else {
-        icon.className = 'ti ti-eye-off';
-        text.textContent = 'Revelar valores';
-      }
-
+      document.getElementById('privacy-icon').className = isBlurred ? 'ti ti-eye' : 'ti ti-eye-off';
+      document.getElementById('privacy-text').textContent = isBlurred ? 'Ocultar' : 'Revelar';
       localStorage.setItem('privacy', isBlurred ? 'blurred' : 'visible');
     }
 
-    // Restaurar estado do toggle
-    const saved = localStorage.getItem('privacy');
-    if (saved === 'visible') togglePrivacy();
+    // Fechar modal ao clicar fora
+    ['evento','financeiro','alertas','logistica','progresso'].forEach(tipo => {
+      document.getElementById('modal-' + tipo).addEventListener('click', function(e) {
+        if (e.target === this) fecharModal(tipo);
+      });
+    });
+    document.getElementById('confirm-overlay').addEventListener('click', function(e) {
+      if (e.target === this) cancelarConfirmacao();
+    });
+
+    // ── INIT ──
+    renderizar();
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+    if (!isBlurred) togglePrivacy();
   </script>
 
 </body>
