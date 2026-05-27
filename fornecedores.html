@@ -323,20 +323,6 @@
       fornecedores.push(novo);
       salvar();
       fecharModal();
-  
-    // ── SYNC SUPABASE ──
-    async function syncFromSupabase() {
-      if (typeof db === 'undefined') return;
-      const dados = await db.getMany(['fornecedores']);
-            if (dados['fornecedores'] !== null) localStorage.setItem('fornecedores', JSON.stringify(dados['fornecedores']));
-      
-    }
-
-    async function saveToSupabase(key, value) {
-      if (typeof db !== 'undefined') await db.set(key, value);
-    }
-
-    syncFromSupabase().then(() => {
     renderizar();
     });
     }
@@ -439,9 +425,20 @@
 
     document.getElementById('modal').addEventListener('click', function(e) {
       if (e.target === this) fecharModal();
-    });
 
-    renderizar();
+    // Inicialização com Supabase
+    async function initApp() {
+      if (typeof db !== 'undefined') {
+        const dados = await db.get('fornecedores');
+        if (dados !== null) {
+          fornecedores = dados;
+          localStorage.setItem('fornecedores', JSON.stringify(dados));
+        }
+      }
+      renderizar();
+    }
+
+    initApp();
   </script>
 
   <!-- MODAL EDITAR FORNECEDOR -->
