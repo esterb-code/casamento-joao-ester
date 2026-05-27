@@ -621,8 +621,20 @@
     });
     document.getElementById('confirm-overlay').addEventListener('click', function(e) { if (e.target === this) cancelarConfirmacao(); });
 
-    renderizar();
-    updateCountdown();
+
+    async function initApp() {
+      if (typeof db !== 'undefined') {
+        const dados = await db.get('dash-state');
+        if (dados !== null) {
+          state = Object.assign({}, defaultState, dados);
+          localStorage.setItem('dash-state', JSON.stringify(state));
+        }
+      }
+      renderizar();
+      updateCountdown();
+    }
+    initApp();
+
     setInterval(updateCountdown, 1000);
   </script>
 </body>
