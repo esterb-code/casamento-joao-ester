@@ -74,6 +74,7 @@
     .btn-salvar{flex:1;background:var(--rosa);color:white;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif}
     .btn-cancelar{padding:11px 20px;background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif}
   </style>
+  <script src="supabase.js"></script>
 </head>
 <body>
   <nav class="sidebar">
@@ -85,6 +86,7 @@
     <div class="nav-section">
       <div class="nav-label">Menu</div>
       <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
       <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
       <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
       <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
@@ -93,7 +95,6 @@
       <a href="ideias.html" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
       <a href="checklist.html" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
       <a href="reunioes.html" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
-      <a href="igreja.html" class="nav-item active"><i class="ti ti-building-church"></i> Igreja</a>
     </div>
     <div class="nav-section" style="margin-top:auto">
       <a href="configuracoes.html" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
@@ -168,7 +169,7 @@
       {id:6,nome:'Certificado do curso de noivos',status:'separacao'},
       {id:7,nome:'Dispensa de proclamas',status:'separacao'},
     ]));
-    function salvarDocs(){localStorage.setItem('igreja-docs',JSON.stringify(docs))}
+    function salvarDocs(){localStorage.setItem('igreja-docs',JSON.stringify(docs));if(typeof db!=='undefined')db.set('igreja-docs',docs);}
     function abrirModal(){
       if(dados){
         ['ig-nome','ig-endereco','ig-padre','ig-whatsapp','ig-obs','ig-ensaio-data','ig-ensaio-hora','ig-docs-data','ig-docs-hora'].forEach(id=>{
@@ -191,7 +192,7 @@
         docsData:document.getElementById('ig-docs-data').value,
         docsHora:document.getElementById('ig-docs-hora').value,
       };
-      localStorage.setItem('igreja-dados',JSON.stringify(dados));
+      localStorage.setItem('igreja-dados',JSON.stringify(dados));if(typeof db!=='undefined')db.set('igreja-dados',dados);
       fecharModal();renderizar()
     }
     function formatarData(d){if(!d)return'—';const[y,m,dia]=d.split('-');return`${dia}/${m}/${y}`}
@@ -242,7 +243,24 @@
       })
     }
     document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)fecharModal()});
+
+    // ── SYNC SUPABASE ──
+    async function syncFromSupabase() {
+      if (typeof db === 'undefined') return;
+      const dados = await db.getMany(['igreja-dados', 'igreja-docs']);
+            if (dados['igreja-dados'] !== null) localStorage.setItem('igreja-dados', JSON.stringify(dados['igreja-dados']));
+      
+      if (dados['igreja-docs'] !== null) localStorage.setItem('igreja-docs', JSON.stringify(dados['igreja-docs']));
+      
+    }
+
+    async function saveToSupabase(key, value) {
+      if (typeof db !== 'undefined') await db.set(key, value);
+    }
+
+    syncFromSupabase().then(() => {
     renderizar()
-  </script>
+
+    });  </script>
 </body>
 </html>
