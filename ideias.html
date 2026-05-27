@@ -96,13 +96,14 @@
     .file-input { display: none; }
   </style>
   <script src="supabase.js"></script>
+  <script src="config.js"></script>
 </head>
 <body>
   <nav class="sidebar">
     <div class="sidebar-logo">
       <div class="initials">💍 J & E</div>
-      <div class="names">João & Ester</div>
-      <div class="date">20 de junho de 2027</div>
+      <div class="names" id="sidebar-names">João & Ester</div>
+      <div class="date" id="sidebar-date">20 de junho de 2027</div>
     </div>
     <div class="nav-section">
       <div class="nav-label">Menu</div>
@@ -156,7 +157,7 @@
     <div class="modal-galeria">
       <div class="galeria-header">
         <div>
-          <button class="btn-voltar" onclick="fecharGaleria()"><i class="ti ti-arrow-left"></i> Voltar</button>
+          <button class="btn-voltar" onclick="fecharGaleria()"><i class="ti ti-arrow-left"></i> Voltar às categorias</button>
           <div class="galeria-title" id="galeria-title" style="margin-top:4px;"></div>
         </div>
         <button class="btn-upload" onclick="triggerUpload()"><i class="ti ti-upload"></i> Adicionar imagem</button>
@@ -386,6 +387,6 @@
     }
 
     renderCats();
-  </script>
+</script>
 </body>
 </html>
