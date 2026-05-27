@@ -105,6 +105,7 @@
     .btn-salvar:hover { background: var(--rosa-escuro); }
     .btn-cancelar { padding: 11px 20px; background: var(--creme); color: var(--taupe); border: 0.5px solid #EED8C8; border-radius: 10px; font-size: 13px; cursor: pointer; font-family: 'Nunito', sans-serif; }
   </style>
+  <script src="supabase.js"></script>
 </head>
 <body>
   <nav class="sidebar">
@@ -116,6 +117,7 @@
     <div class="nav-section">
       <div class="nav-label">Menu</div>
       <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
       <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
       <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
       <a href="cortejo.html" class="nav-item active"><i class="ti ti-heart"></i> Cortejo</a>
@@ -124,7 +126,6 @@
       <a href="ideias.html" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
       <a href="checklist.html" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
       <a href="reunioes.html" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
-      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
     </div>
     <div class="nav-section" style="margin-top:auto">
       <a href="configuracoes.html" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
@@ -205,7 +206,7 @@
     let membros = JSON.parse(localStorage.getItem('cortejo') || '[]');
     let grupoAtivo = GRUPOS[0];
 
-    function salvar() { localStorage.setItem('cortejo', JSON.stringify(membros)); }
+    function salvar() { localStorage.setItem('cortejo', JSON.stringify(membros)); ;if(typeof db!=='undefined')db.set('cortejo',membros);}
     function abrirModal() { document.getElementById('modal').classList.add('open'); }
     function fecharModal() {
       document.getElementById('modal').classList.remove('open');
@@ -228,7 +229,22 @@
       });
       salvar();
       fecharModal();
-      renderizar();
+  
+    // ── SYNC SUPABASE ──
+    async function syncFromSupabase() {
+      if (typeof db === 'undefined') return;
+      const dados = await db.getMany(['cortejo']);
+            if (dados['cortejo'] !== null) localStorage.setItem('cortejo', JSON.stringify(dados['cortejo']));
+      
+    }
+
+    async function saveToSupabase(key, value) {
+      if (typeof db !== 'undefined') await db.set(key, value);
+    }
+
+    syncFromSupabase().then(() => {
+    renderizar();
+    });
     }
 
     function excluir(id) {
@@ -354,6 +370,7 @@
             <i class="ti ti-gift"></i> ${m.presente ? 'Entregue' : 'Pendente'}
           </div>
           <span class="status-badge ${STATUS_CLASSES[m.status]}" onclick="avancarStatus(${m.id})" title="Clique para avançar">${STATUS_LABELS[m.status]}</span>
+          <button onclick="editarMembro(${m.id})" style="background:#FAE8EC;border:.5px solid var(--rosa-claro);border-radius:6px;width:28px;height:28px;cursor:pointer;color:var(--rosa);display:flex;align-items:center;justify-content:center;" title="Editar"><i class="ti ti-pencil" style="font-size:13px;"></i></button>
           <button class="btn-del" onclick="excluir(${m.id})"><i class="ti ti-trash"></i></button>
         </div>
       `;
@@ -363,5 +380,75 @@
     document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
     renderizar();
   </script>
-</body>
+
+  <div class="modal-overlay" id="modal-editar-membro" style="z-index:250;">
+    <div class="modal">
+      <div class="modal-title">Editar Membro do Cortejo</div>
+      <div class="form-group"><label class="form-label">Grupo</label><select class="form-select" id="em-grupo">
+        <option>Pais</option><option>Padrinhos & Madrinhas</option><option>Pajens & Daminhas</option>
+        <option>Primeira Leitura</option><option>Segunda Leitura</option><option>Padre</option>
+      </select></div>
+      <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" id="em-nome"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Função</label><input class="form-input" id="em-funcao" placeholder="Ex: Padrinho"/></div>
+        <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" id="em-whatsapp"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="em-status">
+          <option value="convidado">Convidado</option><option value="aguardando">Aguardando resposta</option>
+          <option value="confirmado">Confirmado</option><option value="recusado">Recusado</option>
+        </select></div>
+        <div class="form-group"><label class="form-label">Par / Casal com</label><input class="form-input" id="em-par" placeholder="Nome do par"/></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="document.getElementById('modal-editar-membro').classList.remove('open')">Cancelar</button>
+        <button class="btn-salvar" onclick="confirmarEdicaoMembro()">Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="confirm-membro" style="z-index:300;">
+    <div style="background:var(--branco);border-radius:20px;padding:28px;width:360px;text-align:center;box-shadow:0 20px 60px rgba(139,34,64,.2);">
+      <div style="width:52px;height:52px;border-radius:50%;background:#FAE8EC;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;"><i class="ti ti-pencil" style="font-size:22px;color:var(--rosa);"></i></div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--rosa-escuro);margin-bottom:6px;">Confirmar edição?</div>
+      <div style="font-size:12px;color:var(--taupe);margin-bottom:20px;">Deseja salvar as alterações neste membro?</div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-cancelar" style="flex:1;" onclick="document.getElementById('confirm-membro').classList.remove('open')">Cancelar</button>
+        <button class="btn-salvar" style="flex:1;" onclick="salvarEdicaoMembro()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+<script>
+    let editandoMembroId = null;
+    function editarMembro(id) {
+      const m = membros.find(m => m.id === id);
+      if (!m) return;
+      editandoMembroId = id;
+      document.getElementById('em-grupo').value = m.grupo;
+      document.getElementById('em-nome').value = m.nome;
+      document.getElementById('em-funcao').value = m.funcao || '';
+      document.getElementById('em-whatsapp').value = m.whatsapp || '';
+      document.getElementById('em-status').value = m.status;
+      document.getElementById('em-par').value = m.par || '';
+      document.getElementById('modal-editar-membro').classList.add('open');
+    }
+    function confirmarEdicaoMembro() {
+      document.getElementById('modal-editar-membro').classList.remove('open');
+      document.getElementById('confirm-membro').classList.add('open');
+    }
+    function salvarEdicaoMembro() {
+      const m = membros.find(m => m.id === editandoMembroId);
+      if (!m) return;
+      m.grupo = document.getElementById('em-grupo').value;
+      m.nome = document.getElementById('em-nome').value;
+      m.funcao = document.getElementById('em-funcao').value;
+      m.whatsapp = document.getElementById('em-whatsapp').value;
+      m.status = document.getElementById('em-status').value;
+      m.par = document.getElementById('em-par').value;
+      grupoAtivo = m.grupo;
+      salvar(); document.getElementById('confirm-membro').classList.remove('open'); renderizar();
+    }
+    ['modal-editar-membro','confirm-membro'].forEach(id => {
+      document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
+    });
+</script></body>
 </html>
