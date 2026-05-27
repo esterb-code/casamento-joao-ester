@@ -84,13 +84,14 @@
     .file-input{display:none}
   </style>
   <script src="supabase.js"></script>
+  <script src="config.js"></script>
 </head>
 <body>
   <nav class="sidebar">
     <div class="sidebar-logo">
       <div class="initials">💍 J & E</div>
-      <div class="names">João & Ester</div>
-      <div class="date">20 de junho de 2027</div>
+      <div class="names" id="sidebar-names">João & Ester</div>
+      <div class="date" id="sidebar-date">20 de junho de 2027</div>
     </div>
     <div class="nav-section">
       <div class="nav-label">Menu</div>
@@ -288,6 +289,6 @@
       renderColabs();
     }
     initApp();
-  </script>
+</script>
 </body>
 </html>
