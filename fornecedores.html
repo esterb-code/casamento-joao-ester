@@ -120,6 +120,7 @@
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     .categoria-section { animation: fadeInUp 0.3s ease both; }
   </style>
+  <script src="supabase.js"></script>
 </head>
 <body>
 
@@ -133,6 +134,7 @@
     <div class="nav-section">
       <div class="nav-label">Menu</div>
       <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
       <a href="fornecedores.html" class="nav-item active"><i class="ti ti-building-store"></i> Fornecedores</a>
       <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
       <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
@@ -141,7 +143,6 @@
       <a href="ideias.html" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
       <a href="checklist.html" class="nav-item"><i class="ti ti-checkbox"></i> Checklist</a>
       <a href="reunioes.html" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
-      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
     </div>
     <div class="nav-section" style="margin-top:auto">
       <a href="configuracoes.html" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
@@ -294,7 +295,7 @@
     let fornecedores = JSON.parse(localStorage.getItem('fornecedores') || '[]');
     let filtroAtivo = 'todos';
 
-    function salvar() { localStorage.setItem('fornecedores', JSON.stringify(fornecedores)); }
+    function salvar() { localStorage.setItem('fornecedores', JSON.stringify(fornecedores)); ;if(typeof db!=='undefined')db.set('fornecedores',fornecedores);}
 
     function formatarMoeda(v) {
       return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
@@ -322,7 +323,22 @@
       fornecedores.push(novo);
       salvar();
       fecharModal();
-      renderizar();
+  
+    // ── SYNC SUPABASE ──
+    async function syncFromSupabase() {
+      if (typeof db === 'undefined') return;
+      const dados = await db.getMany(['fornecedores']);
+            if (dados['fornecedores'] !== null) localStorage.setItem('fornecedores', JSON.stringify(dados['fornecedores']));
+      
+    }
+
+    async function saveToSupabase(key, value) {
+      if (typeof db !== 'undefined') await db.set(key, value);
+    }
+
+    syncFromSupabase().then(() => {
+    renderizar();
+    });
     }
 
     function excluirFornecedor(id) {
@@ -388,7 +404,10 @@
               </div>
               <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
                 <span class="status-badge ${STATUS_CLASSES[f.status]}">${STATUS_LABELS[f.status]}</span>
-                <button onclick="excluirFornecedor(${f.id})" style="background:none;border:none;cursor:pointer;color:var(--taupe);font-size:13px;" title="Remover"><i class="ti ti-trash"></i></button>
+                <div style="display:flex;flex-direction:column;gap:4px;align-items:center;">
+              <button onclick="editarFornecedor(${f.id})" style="background:#FAE8EC;border:.5px solid var(--rosa-claro);border-radius:6px;width:28px;height:28px;cursor:pointer;color:var(--rosa);display:flex;align-items:center;justify-content:center;" title="Editar"><i class="ti ti-pencil" style="font-size:13px;"></i></button>
+              <button onclick="excluirFornecedor(${f.id})" style="background:#FCEBEB;border:.5px solid #E24B4A;border-radius:6px;width:28px;height:28px;cursor:pointer;color:#A32D2D;display:flex;align-items:center;justify-content:center;" title="Remover"><i class="ti ti-trash" style="font-size:13px;"></i></button>
+            </div>
               </div>
             </div>
             <div class="vendor-valor">${formatarMoeda(f.valor)}</div>
@@ -424,5 +443,80 @@
 
     renderizar();
   </script>
-</body>
+
+  <!-- MODAL EDITAR FORNECEDOR -->
+  <div class="modal-overlay" id="modal-editar-forn" style="z-index:250;">
+    <div class="modal">
+      <div class="modal-title">Editar Fornecedor</div>
+      <div class="form-group"><label class="form-label">Categoria</label><select class="form-select" id="ef-categoria">
+        <option>Igreja</option><option>Local da recepção</option><option>Buffet</option><option>Decoração</option>
+        <option>Fotografia</option><option>Vídeo</option><option>Banda da Igreja</option><option>Banda da recepção</option>
+        <option>DJ</option><option>Cerimônia (Padre)</option><option>Papelaria</option><option>Noiva</option><option>Noivo</option><option>Outros</option>
+      </select></div>
+      <div class="form-group"><label class="form-label">Nome do fornecedor</label><input class="form-input" id="ef-nome" /></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" id="ef-whatsapp" /></div>
+        <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="ef-status">
+          <option value="orcado">Orçado</option><option value="negociacao">Em negociação</option>
+          <option value="contratado">Contratado</option><option value="pago">Pago</option><option value="cancelado">Cancelado</option>
+        </select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Valor total (R$)</label><input class="form-input" id="ef-valor" type="number" /></div>
+        <div class="form-group"><label class="form-label">Valor pago (R$)</label><input class="form-input" id="ef-pago" type="number" /></div>
+      </div>
+      <div class="form-group"><label class="form-label">Observações</label><input class="form-input" id="ef-obs" /></div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="document.getElementById('modal-editar-forn').classList.remove('open')">Cancelar</button>
+        <button class="btn-salvar" onclick="confirmarEdicaoForn()">Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+  <!-- CONFIRMAÇÃO EDIÇÃO FORNECEDOR -->
+  <div class="modal-overlay" id="confirm-forn" style="z-index:300;">
+    <div style="background:var(--branco);border-radius:20px;padding:28px;width:360px;text-align:center;box-shadow:0 20px 60px rgba(139,34,64,.2);">
+      <div style="width:52px;height:52px;border-radius:50%;background:#FAE8EC;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;"><i class="ti ti-pencil" style="font-size:22px;color:var(--rosa);"></i></div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--rosa-escuro);margin-bottom:6px;">Confirmar edição?</div>
+      <div style="font-size:12px;color:var(--taupe);margin-bottom:20px;">Deseja salvar as alterações neste fornecedor?</div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-cancelar" style="flex:1;" onclick="document.getElementById('confirm-forn').classList.remove('open')">Cancelar</button>
+        <button class="btn-salvar" style="flex:1;" onclick="salvarEdicaoForn()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+<script>
+    let editandoFornId = null;
+    function editarFornecedor(id) {
+      const f = fornecedores.find(f => f.id === id);
+      if (!f) return;
+      editandoFornId = id;
+      document.getElementById('ef-categoria').value = f.categoria;
+      document.getElementById('ef-nome').value = f.nome;
+      document.getElementById('ef-whatsapp').value = f.whatsapp || '';
+      document.getElementById('ef-status').value = f.status;
+      document.getElementById('ef-valor').value = f.valor || 0;
+      document.getElementById('ef-pago').value = f.pago || 0;
+      document.getElementById('ef-obs').value = f.obs || '';
+      document.getElementById('modal-editar-forn').classList.add('open');
+    }
+    function confirmarEdicaoForn() {
+      document.getElementById('modal-editar-forn').classList.remove('open');
+      document.getElementById('confirm-forn').classList.add('open');
+    }
+    function salvarEdicaoForn() {
+      const f = fornecedores.find(f => f.id === editandoFornId);
+      if (!f) return;
+      f.categoria = document.getElementById('ef-categoria').value;
+      f.nome = document.getElementById('ef-nome').value;
+      f.whatsapp = document.getElementById('ef-whatsapp').value;
+      f.status = document.getElementById('ef-status').value;
+      f.valor = parseFloat(document.getElementById('ef-valor').value) || 0;
+      f.pago = parseFloat(document.getElementById('ef-pago').value) || 0;
+      f.obs = document.getElementById('ef-obs').value;
+      salvar(); document.getElementById('confirm-forn').classList.remove('open'); renderizar();
+    }
+    ['modal-editar-forn','confirm-forn'].forEach(id => {
+      document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
+    });
+</script></body>
 </html>
