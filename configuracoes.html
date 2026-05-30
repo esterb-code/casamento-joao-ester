@@ -85,6 +85,7 @@
   </style>
   <script src="supabase.js"></script>
   <script src="config.js"></script>
+  <script src="auth.js"></script>
 </head>
 <body>
   <nav class="sidebar">
@@ -171,6 +172,28 @@
         <div class="section-body">
           <div id="colab-lista"></div>
           <button class="btn-convidar" onclick="abrirModal()"><i class="ti ti-plus"></i> Convidar colaborador</button>
+        </div>
+      </div>
+
+      <!-- SENHA -->
+      <div class="section-card">
+        <div class="section-header"><i class="ti ti-lock"></i><span class="section-title">Senha de acesso</span></div>
+        <div class="section-body">
+          <div class="field-row">
+            <span class="field-label">Senha atual</span>
+            <input class="form-input" id="senha-atual" type="password" placeholder="••••••••"/>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Nova senha</span>
+            <input class="form-input" id="senha-nova" type="password" placeholder="••••••••"/>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Confirmar nova senha</span>
+            <input class="form-input" id="senha-confirmar" type="password" placeholder="••••••••"/>
+          </div>
+          <div style="margin-top:14px;">
+            <button class="btn-convidar" onclick="trocarSenha()"><i class="ti ti-lock-check"></i> Alterar senha</button>
+          </div>
         </div>
       </div>
 
@@ -315,6 +338,19 @@
       mostrarToast('✓ Salvo com sucesso!');
     }
 
+    function trocarSenha() {
+      const atual = document.getElementById('senha-atual').value;
+      const nova = document.getElementById('senha-nova').value.trim();
+      const confirmar = document.getElementById('senha-confirmar').value.trim();
+      if (atual !== AppAuth.getSenha()) { mostrarToast('❌ Senha atual incorreta'); return; }
+      if (!nova || nova.length < 4) { mostrarToast('❌ Nova senha muito curta'); return; }
+      if (nova !== confirmar) { mostrarToast('❌ As senhas não coincidem'); return; }
+      AppAuth.setSenha(nova);
+      ['senha-atual','senha-nova','senha-confirmar'].forEach(id => document.getElementById(id).value = '');
+      mostrarToast('✓ Senha alterada com sucesso!');
+    }
+
+    AppAuth.verificarPagina();
     carregarEvento();
 
     document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)fecharModal()});

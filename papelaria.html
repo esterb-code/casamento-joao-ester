@@ -108,6 +108,7 @@
   </style>
   <script src="supabase.js"></script>
   <script src="config.js"></script>
+  <script src="auth.js"></script>
 </head>
 <body>
   <nav class="sidebar">
@@ -357,7 +358,7 @@
         const addCard = document.createElement('div');
         addCard.className = 'add-arte';
         addCard.innerHTML = '<i class="ti ti-upload"></i> Adicionar arte';
-        addCard.onclick = () => abrirModal(cat.id);
+        addCard.onclick = () => AppAuth.verificar(() => abrirModal(cat.id));
         grid.appendChild(addCard);
       });
     }

@@ -107,6 +107,7 @@
   </style>
   <script src="supabase.js"></script>
   <script src="config.js"></script>
+  <script src="auth.js"></script>
 </head>
 <body>
   <nav class="sidebar">
@@ -139,7 +140,7 @@
         <h1>Cortejo</h1>
         <p>Gerencie os membros do cortejo do casamento</p>
       </div>
-      <button class="btn-add" onclick="abrirModal()"><i class="ti ti-plus"></i> Novo membro</button>
+      <button class="btn-add" onclick="AppAuth.verificar(() => abrirModal())"><i class="ti ti-plus"></i> Novo membro</button>
     </div>
 
     <div class="content">
