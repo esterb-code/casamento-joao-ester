@@ -2,7 +2,7 @@
 const AppAuth = {
   KEY: 'app-senha',
   SESSION_KEY: 'auth-session',
-  DEFAULT: 'casamento2027',
+  DEFAULT: 'joter2027',
 
   getSenha() {
     return localStorage.getItem(this.KEY) || this.DEFAULT;
@@ -70,6 +70,7 @@ const AppAuth = {
         <input id="auth-page-input" type="password" placeholder="Senha" style="width:100%;border:.5px solid #EED8C8;border-radius:10px;padding:11px 14px;font-size:14px;font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;outline:none;margin-bottom:10px;text-align:center;letter-spacing:.1em;"/>
         <div id="auth-page-erro" style="display:none;font-size:11px;color:#A32D2D;margin-bottom:10px;">Senha incorreta. Tente novamente.</div>
         <button onclick="AppAuth._confirmarPagina()" style="width:100%;background:var(--rosa);color:white;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif;">Entrar</button>
+        <button onclick="history.back()" style="width:100%;background:none;border:none;padding:10px;font-size:12px;color:var(--taupe);cursor:pointer;font-family:'Nunito',sans-serif;margin-top:4px;">← Voltar</button>
       </div>`;
     document.body.appendChild(div);
     setTimeout(() => document.getElementById('auth-page-input').focus(), 50);
