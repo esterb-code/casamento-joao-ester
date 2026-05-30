@@ -424,48 +424,62 @@
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        const text = e.target.result.replace(/^﻿/, ''); // remove BOM
-        const linhas = text.split('\n').map(l => l.trim()).filter(l => l);
+        // Remove BOM (UTF-8 e UTF-16)
+        const text = e.target.result.replace(/^﻿/, '').replace(/^\xEF\xBB\xBF/, '');
+        const linhas = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
 
-        // Encontrar linha de cabeçalho (Nome, WhatsApp, ...)
         const STATUS_MAP = {
           'convidado': 'convidado', 'aguardando resposta': 'aguardando',
           'confirmado': 'confirmado', 'recusado': 'recusado', 'lista de espera': 'espera'
         };
 
-        let headerIdx = -1;
-        for (let i = 0; i < linhas.length; i++) {
-          if (linhas[i].toLowerCase().includes('nome') && linhas[i].toLowerCase().includes('whatsapp')) {
-            headerIdx = i;
-            break;
-          }
-        }
-        if (headerIdx === -1) { alert('Formato de CSV inválido — cabeçalho não encontrado.'); return; }
+        // Detectar separador: vírgula ou ponto-e-vírgula
+        const separador = linhas[0] && linhas[0].includes(';') ? ';' : ',';
 
-        const parseCSVLine = line => {
+        const parseCSVLine = (line, sep) => {
           const result = [];
           let cur = '', inQ = false;
           for (let c of line) {
             if (c === '"') { inQ = !inQ; }
-            else if (c === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+            else if (c === sep && !inQ) { result.push(cur.trim()); cur = ''; }
             else { cur += c; }
           }
           result.push(cur.trim());
           return result;
         };
 
-        const headers = parseCSVLine(linhas[headerIdx]).map(h => h.replace(/"/g,'').toLowerCase());
-        const iNome = headers.indexOf('nome');
-        const iWa = headers.indexOf('whatsapp');
-        const iStatus = headers.indexOf('status');
-        const iFuncao = headers.findIndex(h => h.includes('cortejo') || h === 'função no cortejo');
+        // Normaliza texto: minúsculas, sem acentos, sem aspas
+        const norm = s => s.replace(/"/g,'').toLowerCase()
+          .normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+
+        // Encontrar linha de cabeçalho — procura linha com coluna "nome"
+        let headerIdx = -1;
+        for (let i = 0; i < Math.min(linhas.length, 10); i++) {
+          const cols = parseCSVLine(linhas[i], separador).map(norm);
+          if (cols.some(c => c === 'nome' || c === 'name')) {
+            headerIdx = i;
+            break;
+          }
+        }
+        if (headerIdx === -1) {
+          // Última tentativa: primeira linha não vazia como cabeçalho
+          headerIdx = 0;
+        }
+
+        const headers = parseCSVLine(linhas[headerIdx], separador).map(norm);
+        const iNome    = headers.findIndex(h => h === 'nome' || h === 'name');
+        const iWa      = headers.findIndex(h => h.includes('whatsapp') || h.includes('telefone') || h.includes('celular') || h.includes('fone'));
+        const iStatus  = headers.findIndex(h => h === 'status');
+        const iFuncao  = headers.findIndex(h => h.includes('cortejo') || h.includes('funcao') || h.includes('funcão'));
         const iCrianca = headers.findIndex(h => h.includes('crian'));
-        const iIdade = headers.indexOf('idade');
-        const iFamilia = headers.findIndex(h => h.includes('família') || h.includes('familia') || h.includes('ester') || h.includes('joão') || h.includes('joao'));
+        const iIdade   = headers.findIndex(h => h === 'idade');
+        const iFamilia = headers.findIndex(h => h.includes('famil') || h.includes('ester') || h.includes('joao'));
+
+        if (iNome === -1) { alert(`Coluna "Nome" não encontrada.\nColunas detectadas: ${headers.join(', ')}`); return; }
 
         const novos = [];
         for (let i = headerIdx + 1; i < linhas.length; i++) {
-          const cols = parseCSVLine(linhas[i]).map(c => c.replace(/^"|"$/g,'').trim());
+          const cols = parseCSVLine(linhas[i], separador).map(c => c.replace(/^"|"$/g,'').trim());
           const nome = iNome >= 0 ? cols[iNome] : '';
           if (!nome) continue;
           const statusRaw = (iStatus >= 0 ? cols[iStatus] : '').toLowerCase();
