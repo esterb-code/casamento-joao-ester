@@ -134,7 +134,11 @@
   </main>
   <div class="modal-overlay" id="modal">
     <div class="modal">
-      <div class="modal-title">Dados da Igreja</div>
+      <div class="modal-title">Dados da Igreja e Horários</div>
+
+      <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:var(--rosa);text-transform:uppercase;margin-bottom:12px;padding-bottom:6px;border-bottom:.5px solid #EED8C8;">
+        <i class="ti ti-building-church" style="font-size:12px;"></i> Dados da Igreja
+      </div>
       <div class="form-group"><label class="form-label">Nome da Igreja</label><input class="form-input" id="ig-nome" placeholder="Ex: Paróquia Nossa Senhora de Fátima"/></div>
       <div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="ig-endereco" placeholder="Ex: SGAS 913, Brasília, DF"/></div>
       <div class="form-row">
@@ -142,6 +146,14 @@
         <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" id="ig-whatsapp" placeholder="+55 61 9 XXXX-XXXX"/></div>
       </div>
       <div class="form-group"><label class="form-label">Observações</label><input class="form-input" id="ig-obs" placeholder="Informações importantes..."/></div>
+
+      <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:var(--rosa);text-transform:uppercase;margin:18px 0 12px;padding-bottom:6px;border-bottom:.5px solid #EED8C8;">
+        <i class="ti ti-clock" style="font-size:12px;"></i> Horários
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Data da cerimônia</label><input class="form-input" id="ig-cerimonia-data" type="date"/></div>
+        <div class="form-group"><label class="form-label">Horário da cerimônia</label><input class="form-input" id="ig-cerimonia-hora" type="time"/></div>
+      </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Data do ensaio</label><input class="form-input" id="ig-ensaio-data" type="date"/></div>
         <div class="form-group"><label class="form-label">Horário do ensaio</label><input class="form-input" id="ig-ensaio-hora" type="time"/></div>
@@ -150,6 +162,7 @@
         <div class="form-group"><label class="form-label">Data entrega docs</label><input class="form-input" id="ig-docs-data" type="date"/></div>
         <div class="form-group"><label class="form-label">Horário entrega</label><input class="form-input" id="ig-docs-hora" type="time"/></div>
       </div>
+
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
         <button class="btn-salvar" onclick="salvarDados()">Salvar</button>
@@ -173,8 +186,8 @@
     function salvarDocs(){localStorage.setItem('igreja-docs',JSON.stringify(docs));if(typeof db!=='undefined')db.set('igreja-docs',docs);}
     function abrirModal(){
       if(dados){
-        ['ig-nome','ig-endereco','ig-padre','ig-whatsapp','ig-obs','ig-ensaio-data','ig-ensaio-hora','ig-docs-data','ig-docs-hora'].forEach(id=>{
-          const map={['ig-nome']:'nome',['ig-endereco']:'endereco',['ig-padre']:'padre',['ig-whatsapp']:'whatsapp',['ig-obs']:'obs',['ig-ensaio-data']:'ensaioData',['ig-ensaio-hora']:'ensaioHora',['ig-docs-data']:'docsData',['ig-docs-hora']:'docsHora'};
+        const map={'ig-nome':'nome','ig-endereco':'endereco','ig-padre':'padre','ig-whatsapp':'whatsapp','ig-obs':'obs','ig-cerimonia-data':'cerimoniaData','ig-cerimonia-hora':'cerimoniaHora','ig-ensaio-data':'ensaioData','ig-ensaio-hora':'ensaioHora','ig-docs-data':'docsData','ig-docs-hora':'docsHora'};
+        Object.keys(map).forEach(id=>{
           const el=document.getElementById(id);if(el&&dados[map[id]])el.value=dados[map[id]]
         })
       }
@@ -188,6 +201,8 @@
         padre:document.getElementById('ig-padre').value,
         whatsapp:document.getElementById('ig-whatsapp').value,
         obs:document.getElementById('ig-obs').value,
+        cerimoniaData:document.getElementById('ig-cerimonia-data').value,
+        cerimoniaHora:document.getElementById('ig-cerimonia-hora').value,
         ensaioData:document.getElementById('ig-ensaio-data').value,
         ensaioHora:document.getElementById('ig-ensaio-hora').value,
         docsData:document.getElementById('ig-docs-data').value,
@@ -224,9 +239,9 @@
       const horariosEl=document.getElementById('horarios-section');
       if(dados&&dados.nome){
         horariosEl.innerHTML=`
-          ${dados.ensaioData?`<div class="horario-row"><div class="horario-icon"><i class="ti ti-music"></i></div><div><div class="horario-nome">Ensaio pré-nupcial</div><div class="horario-hora">${formatarData(dados.ensaioData)}${dados.ensaioHora?' · '+dados.ensaioHora:''}</div></div></div>`:''}
-          <div class="horario-row"><div class="horario-icon"><i class="ti ti-heart"></i></div><div><div class="horario-nome">Cerimônia</div><div class="horario-hora">20 de Junho de 2027 · 16h00</div></div></div>
-          ${dados.docsData?`<div class="horario-row"><div class="horario-icon"><i class="ti ti-file-check"></i></div><div><div class="horario-nome">Entrega de documentação</div><div class="horario-hora">${formatarData(dados.docsData)}${dados.docsHora?' · '+dados.docsHora:''}</div></div></div>`:''}
+          ${dados.ensaioData?`<div class="horario-row"><div class="horario-icon"><i class="ti ti-music"></i></div><div><div class="horario-nome">Ensaio pré-nupcial</div><div class="horario-hora">${formatarData(dados.ensaioData)}${dados.ensaioHora?' · '+dados.ensaioHora.replace(':','h'):''}</div></div></div>`:''}
+          <div class="horario-row"><div class="horario-icon"><i class="ti ti-heart"></i></div><div><div class="horario-nome">Cerimônia</div><div class="horario-hora">${dados.cerimoniaData?formatarData(dados.cerimoniaData):'20/06/2027'}${dados.cerimoniaHora?' · '+dados.cerimoniaHora.replace(':','h'):' · 16h00'}</div></div></div>
+          ${dados.docsData?`<div class="horario-row"><div class="horario-icon"><i class="ti ti-file-check"></i></div><div><div class="horario-nome">Entrega de documentação</div><div class="horario-hora">${formatarData(dados.docsData)}${dados.docsHora?' · '+dados.docsHora.replace(':','h'):''}</div></div></div>`:''}
         `
       }
       // Docs
