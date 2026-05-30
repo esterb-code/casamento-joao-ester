@@ -120,6 +120,7 @@
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     .categoria-section { animation: fadeInUp 0.3s ease both; }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="supabase.js"></script>
   <script src="config.js"></script>
   <script src="auth.js"></script>
@@ -213,6 +214,25 @@
   <div class="modal-overlay" id="modal">
     <div class="modal">
       <div class="modal-title">Novo Fornecedor</div>
+
+      <!-- PROPOSTA PDF -->
+      <div class="form-group">
+        <label class="form-label">Proposta (PDF) — opcional</label>
+        <div id="proposta-drop"
+          style="border:1.5px dashed #EED8C8;border-radius:12px;padding:18px 14px;text-align:center;cursor:pointer;background:var(--creme);transition:all .15s;"
+          onclick="document.getElementById('proposta-input').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--rosa)';this.style.background='#FAE8EC';"
+          ondragleave="this.style.borderColor='#EED8C8';this.style.background='var(--creme)';"
+          ondrop="handlePropostaDrop(event)">
+          <i id="proposta-icon" class="ti ti-file-upload" style="font-size:26px;color:var(--rosa-claro);display:block;margin-bottom:6px;"></i>
+          <div id="proposta-label" style="font-size:12px;color:var(--taupe);">Arraste o PDF ou <span style="color:var(--rosa);font-weight:600;">clique para selecionar</span></div>
+          <div style="font-size:10px;color:var(--taupe);margin-top:3px;">O site lê a proposta e preenche os campos automaticamente</div>
+        </div>
+        <input type="file" id="proposta-input" accept=".pdf" style="display:none" onchange="lerProposta(event)" />
+        <div id="proposta-status" style="font-size:11px;margin-top:8px;min-height:16px;display:flex;align-items:center;gap:6px;"></div>
+        <input type="hidden" id="f-proposta-nome" />
+      </div>
+
       <div class="form-group">
         <label class="form-label">Categoria</label>
         <select class="form-select" id="f-categoria">
@@ -316,7 +336,14 @@
     function abrirModal() { document.getElementById('modal').classList.add('open'); }
     function fecharModal() {
       document.getElementById('modal').classList.remove('open');
-      ['f-nome','f-whatsapp','f-valor','f-pago','f-obs','f-vencimento','f-parcela-desc'].forEach(id => document.getElementById(id).value = '');
+      ['f-nome','f-whatsapp','f-valor','f-pago','f-obs','f-vencimento','f-parcela-desc','f-proposta-nome'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('proposta-input').value = '';
+      document.getElementById('proposta-status').innerHTML = '';
+      document.getElementById('proposta-icon').className = 'ti ti-file-upload';
+      document.getElementById('proposta-icon').style.color = 'var(--rosa-claro)';
+      document.getElementById('proposta-label').innerHTML = 'Arraste o PDF ou <span style="color:var(--rosa);font-weight:600;">clique para selecionar</span>';
+      document.getElementById('proposta-drop').style.borderColor = '#EED8C8';
+      document.getElementById('proposta-drop').style.background = 'var(--creme)';
     }
 
     function salvarFornecedor() {
@@ -333,6 +360,7 @@
         obs: document.getElementById('f-obs').value,
         vencimento: document.getElementById('f-vencimento').value || '',
         parcelaDesc: document.getElementById('f-parcela-desc').value.trim(),
+        propostaNome: document.getElementById('f-proposta-nome').value || '',
       };
       fornecedores.push(novo);
       salvar();
@@ -439,6 +467,142 @@
     document.getElementById('modal').addEventListener('click', function(e) {
       if (e.target === this) fecharModal();
     });
+
+    // ── PDF PROPOSTA ──────────────────────────────────────────────────────────
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    function handlePropostaDrop(event) {
+      event.preventDefault();
+      document.getElementById('proposta-drop').style.borderColor = '#EED8C8';
+      document.getElementById('proposta-drop').style.background = 'var(--creme)';
+      const file = event.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') processarPDF(file);
+      else alert('Por favor, envie um arquivo PDF.');
+    }
+
+    function lerProposta(event) {
+      const file = event.target.files[0];
+      if (file) processarPDF(file);
+    }
+
+    async function processarPDF(file) {
+      const drop = document.getElementById('proposta-drop');
+      const status = document.getElementById('proposta-status');
+      const icon = document.getElementById('proposta-icon');
+      const label = document.getElementById('proposta-label');
+
+      drop.style.borderColor = 'var(--rosa-claro)';
+      drop.style.background = '#FAE8EC';
+      icon.className = 'ti ti-loader-2';
+      icon.style.color = 'var(--rosa)';
+      label.textContent = file.name;
+      status.innerHTML = '<span style="color:var(--taupe);">Lendo proposta...</span>';
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+        let texto = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          texto += content.items.map(it => it.str).join(' ') + '\n';
+        }
+
+        const preenchidos = extrairDadosPDF(texto);
+
+        icon.className = 'ti ti-circle-check';
+        icon.style.color = 'var(--verde-m)';
+        document.getElementById('f-proposta-nome').value = file.name;
+
+        if (preenchidos.length) {
+          status.innerHTML = `<span style="color:var(--verde);font-weight:600;"><i class="ti ti-check"></i> Preenchido automaticamente:</span> <span style="color:var(--taupe);">${preenchidos.join(' · ')}</span>`;
+        } else {
+          status.innerHTML = '<span style="color:var(--taupe);">PDF lido. Nenhum dado detectado automaticamente — preencha os campos manualmente.</span>';
+        }
+      } catch(e) {
+        icon.className = 'ti ti-alert-circle';
+        icon.style.color = '#A32D2D';
+        status.innerHTML = '<span style="color:#A32D2D;">Erro ao ler o PDF. Preencha os campos manualmente.</span>';
+      }
+    }
+
+    function extrairDadosPDF(texto) {
+      const preenchidos = [];
+
+      // Nome: linha próxima a CNPJ ou primeira linha com texto substancial
+      if (!document.getElementById('f-nome').value) {
+        const cnpjMatch = texto.match(/(\d{2}[\.\s]?\d{3}[\.\s]?\d{3}[\/\s]?\d{4}[-\s]?\d{2})/);
+        let nomeEncontrado = '';
+        if (cnpjMatch) {
+          const idx = texto.indexOf(cnpjMatch[0]);
+          const antes = texto.substring(Math.max(0, idx - 150), idx);
+          const linhasAntes = antes.split(/[\n\r]/).map(l => l.trim()).filter(l => l.length > 4 && l.length < 80 && !/^\d/.test(l));
+          if (linhasAntes.length) nomeEncontrado = linhasAntes[linhasAntes.length - 1];
+        }
+        if (!nomeEncontrado) {
+          // Primeira linha com 5–70 chars que não seja só número/data
+          const linhas = texto.split(/[\n\r]/).map(l => l.trim());
+          nomeEncontrado = linhas.find(l => l.length >= 5 && l.length <= 70 && !/^[\d\s\.\-\/\(\)R\$]+$/.test(l)) || '';
+        }
+        if (nomeEncontrado) {
+          document.getElementById('f-nome').value = nomeEncontrado.trim();
+          preenchidos.push('Nome');
+        }
+      }
+
+      // WhatsApp / Telefone
+      if (!document.getElementById('f-whatsapp').value) {
+        const telMatch = texto.match(/(?:\+?55\s?)?(?:\(?\d{2}\)?\s?)?\d{4,5}[\s\-]?\d{4}/);
+        if (telMatch) {
+          document.getElementById('f-whatsapp').value = telMatch[0].trim();
+          preenchidos.push('WhatsApp');
+        }
+      }
+
+      // Valor total: maior valor R$ encontrado
+      if (!document.getElementById('f-valor').value) {
+        const valoresMatch = [...texto.matchAll(/R\$\s*([\d.,]+)/g)];
+        if (valoresMatch.length) {
+          const valores = valoresMatch.map(m => parseFloat(m[1].replace(/\./g,'').replace(',','.'))).filter(v => !isNaN(v) && v > 0);
+          if (valores.length) {
+            document.getElementById('f-valor').value = Math.max(...valores);
+            preenchidos.push('Valor total');
+          }
+        }
+      }
+
+      // Vencimento / data de pagamento
+      if (!document.getElementById('f-vencimento').value) {
+        // Procura data perto de palavras como "vencimento", "pagamento", "prazo"
+        const proxVenc = texto.match(/(?:vencimento|pagamento|prazo|validade)[^\d]*(\d{2})\/(\d{2})\/(\d{4})/i);
+        const qualquerData = texto.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+        const m = proxVenc || qualquerData;
+        if (m) {
+          const [, d, mo, y] = m.slice(proxVenc ? 1 : 1);
+          // Garantir que a data seja futura (não preencher data já passada)
+          const dataEncontrada = new Date(`${y}-${mo}-${d}`);
+          if (dataEncontrada >= new Date()) {
+            document.getElementById('f-vencimento').value = `${y}-${mo}-${d}`;
+            preenchidos.push('Vencimento');
+          }
+        }
+      }
+
+      // Observações: resumo do texto
+      if (!document.getElementById('f-obs').value) {
+        const linhas = texto.split(/[\n\r]/).map(l => l.trim()).filter(l => l.length > 10);
+        const resumo = linhas.slice(0, 4).join(' · ').substring(0, 220);
+        if (resumo) {
+          document.getElementById('f-obs').value = resumo;
+          preenchidos.push('Observações');
+        }
+      }
+
+      return preenchidos;
+    }
 
     // Inicialização com Supabase
     async function initApp() {
