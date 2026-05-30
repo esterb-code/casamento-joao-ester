@@ -193,6 +193,14 @@
         </div>
       </div>
       <div class="form-group">
+        <label class="form-label">Família</label>
+        <select class="form-select" id="g-familia">
+          <option value="">Não especificado</option>
+          <option value="ester">Convidado da Ester</option>
+          <option value="joao">Convidado do João</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label class="form-label">Função no cortejo (opcional)</label>
         <select class="form-select" id="g-funcao">
           <option value="">Nenhuma</option>
@@ -232,6 +240,7 @@
     function fecharModal() {
       document.getElementById('modal').classList.remove('open');
       ['g-nome','g-whatsapp','g-idade'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('g-familia').value = '';
       document.getElementById('g-crianca').checked = false;
       document.getElementById('g-funcao').value = '';
       document.getElementById('g-status').value = 'espera';
@@ -253,6 +262,7 @@
         whatsapp: document.getElementById('g-whatsapp').value,
         status: document.getElementById('g-status').value,
         funcao: document.getElementById('g-funcao').value,
+        familia: document.getElementById('g-familia').value,
         crianca: isCrianca,
         idade: isCrianca ? idade : null,
       });
@@ -345,6 +355,8 @@
             </div>
             <div class="guest-tags">
               ${g.funcao ? `<span class="tag tag-funcao">${g.funcao}</span>` : ''}
+              ${g.familia === 'ester' ? `<span class="tag" style="background:#FAE8EC;color:var(--rosa-escuro);border:.5px solid #EED8C8;">Ester</span>` : ''}
+              ${g.familia === 'joao' ? `<span class="tag" style="background:#E6F1FB;color:#185FA5;border:.5px solid #378ADD;">João</span>` : ''}
               ${g.crianca ? `<span class="tag tag-crianca">Criança</span>` : ''}
             </div>
             <span class="status-badge ${STATUS_CLASSES[g.status]}" onclick="alterarStatus(${g.id})" title="Clique para avançar status">${STATUS_LABELS[g.status]}</span>
@@ -449,6 +461,7 @@
         const iFuncao = headers.findIndex(h => h.includes('cortejo') || h === 'função no cortejo');
         const iCrianca = headers.findIndex(h => h.includes('crian'));
         const iIdade = headers.indexOf('idade');
+        const iFamilia = headers.findIndex(h => h.includes('família') || h.includes('familia') || h.includes('ester') || h.includes('joão') || h.includes('joao'));
 
         const novos = [];
         for (let i = headerIdx + 1; i < linhas.length; i++) {
@@ -463,6 +476,7 @@
             whatsapp: iWa >= 0 ? cols[iWa] : '',
             status: STATUS_MAP[statusRaw] || 'convidado',
             funcao: iFuncao >= 0 ? cols[iFuncao] : '',
+            familia: iFamilia >= 0 ? (() => { const v = cols[iFamilia].toLowerCase(); return v.includes('ester') ? 'ester' : v.includes('jo') ? 'joao' : ''; })() : '',
             crianca: criancaRaw === 'sim' || criancaRaw === 'true',
             idade: iIdade >= 0 ? (parseInt(cols[iIdade]) || '') : ''
           });
@@ -522,6 +536,9 @@
           <option value="aguardando">Aguardando resposta</option><option value="confirmado">Confirmado</option><option value="recusado">Recusado</option>
         </select></div>
       </div>
+      <div class="form-group"><label class="form-label">Família</label><select class="form-select" id="ec-familia">
+        <option value="">Não especificado</option><option value="ester">Convidado da Ester</option><option value="joao">Convidado do João</option>
+      </select></div>
       <div class="form-group"><label class="form-label">Função no cortejo</label><select class="form-select" id="ec-funcao">
         <option value="">Nenhuma</option><option value="Padrinho">Padrinho</option><option value="Madrinha">Madrinha</option>
         <option value="Pajem">Pajem</option><option value="Daminha">Daminha</option>
@@ -553,6 +570,7 @@
       document.getElementById('ec-whatsapp').value = g.whatsapp || '';
       document.getElementById('ec-status').value = g.status;
       document.getElementById('ec-funcao').value = g.funcao || '';
+      document.getElementById('ec-familia').value = g.familia || '';
       document.getElementById('modal-editar-conv').classList.add('open');
     }
     function confirmarEdicaoConv() {
@@ -566,6 +584,7 @@
       g.whatsapp = document.getElementById('ec-whatsapp').value;
       g.status = document.getElementById('ec-status').value;
       g.funcao = document.getElementById('ec-funcao').value;
+      g.familia = document.getElementById('ec-familia').value;
       salvar(); document.getElementById('confirm-conv').classList.remove('open'); renderizar();
     }
     ['modal-editar-conv','confirm-conv'].forEach(id => {
