@@ -185,7 +185,7 @@
         <div class="resumo-item">
           <div class="resumo-label">Investimento Total</div>
           <div class="resumo-value" id="total-geral">R$ 0</div>
-          <div class="resumo-sub">orçado</div>
+          <div class="resumo-sub">contratado</div>
         </div>
         <div class="resumo-item">
           <div class="resumo-label">Valor Pago</div>
@@ -392,14 +392,17 @@
 
       let totalGeral = 0, totalPago = 0, totalAtivos = 0;
 
+      // Resumo financeiro vinculado apenas a fornecedores contratados
+      const contratados = fornecedores.filter(f => f.status === 'contratado');
+      totalGeral = contratados.reduce((s, f) => s + (f.valor || 0), 0);
+      totalPago = contratados.reduce((s, f) => s + (f.pago || 0), 0);
+
       CATEGORIAS.forEach(cat => {
         let lista = fornecedores.filter(f => f.categoria === cat.nome);
         if (filtroAtivo !== 'todos') lista = lista.filter(f => f.status === filtroAtivo);
         if (busca) lista = lista.filter(f => f.nome.toLowerCase().includes(busca));
 
-        const totalCat = lista.reduce((s, f) => s + (f.status !== 'cancelado' ? f.valor : 0), 0);
-        totalGeral += totalCat;
-        totalPago += lista.reduce((s, f) => s + f.pago, 0);
+        const totalCat = lista.filter(f => f.status === 'contratado').reduce((s, f) => s + (f.valor || 0), 0);
         totalAtivos += lista.length;
 
         if (lista.length === 0 && filtroAtivo !== 'todos') return;
