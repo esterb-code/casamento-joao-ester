@@ -261,6 +261,16 @@
           <input class="form-input" id="f-pago" type="number" placeholder="0,00" />
         </div>
       </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Próxima parcela (data)</label>
+          <input class="form-input" id="f-vencimento" type="date" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descrição da parcela</label>
+          <input class="form-input" id="f-parcela-desc" placeholder="Ex: 2ª parcela · R$ 2.200" />
+        </div>
+      </div>
       <div class="form-group">
         <label class="form-label">Observações</label>
         <input class="form-input" id="f-obs" placeholder="Anotações importantes..." />
@@ -305,7 +315,7 @@
     function abrirModal() { document.getElementById('modal').classList.add('open'); }
     function fecharModal() {
       document.getElementById('modal').classList.remove('open');
-      ['f-nome','f-whatsapp','f-valor','f-pago','f-obs'].forEach(id => document.getElementById(id).value = '');
+      ['f-nome','f-whatsapp','f-valor','f-pago','f-obs','f-vencimento','f-parcela-desc'].forEach(id => document.getElementById(id).value = '');
     }
 
     function salvarFornecedor() {
@@ -320,12 +330,13 @@
         valor: parseFloat(document.getElementById('f-valor').value) || 0,
         pago: parseFloat(document.getElementById('f-pago').value) || 0,
         obs: document.getElementById('f-obs').value,
+        vencimento: document.getElementById('f-vencimento').value || '',
+        parcelaDesc: document.getElementById('f-parcela-desc').value.trim(),
       };
       fornecedores.push(novo);
       salvar();
       fecharModal();
-    renderizar();
-    });
+      renderizar();
     }
 
     function excluirFornecedor(id) {
@@ -426,6 +437,7 @@
 
     document.getElementById('modal').addEventListener('click', function(e) {
       if (e.target === this) fecharModal();
+    });
 
     // Inicialização com Supabase
     async function initApp() {
@@ -463,6 +475,10 @@
         <div class="form-group"><label class="form-label">Valor total (R$)</label><input class="form-input" id="ef-valor" type="number" /></div>
         <div class="form-group"><label class="form-label">Valor pago (R$)</label><input class="form-input" id="ef-pago" type="number" /></div>
       </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Próxima parcela (data)</label><input class="form-input" id="ef-vencimento" type="date" /></div>
+        <div class="form-group"><label class="form-label">Descrição da parcela</label><input class="form-input" id="ef-parcela-desc" placeholder="Ex: 2ª parcela · R$ 2.200" /></div>
+      </div>
       <div class="form-group"><label class="form-label">Observações</label><input class="form-input" id="ef-obs" /></div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="document.getElementById('modal-editar-forn').classList.remove('open')">Cancelar</button>
@@ -495,6 +511,8 @@
       document.getElementById('ef-valor').value = f.valor || 0;
       document.getElementById('ef-pago').value = f.pago || 0;
       document.getElementById('ef-obs').value = f.obs || '';
+      document.getElementById('ef-vencimento').value = f.vencimento || '';
+      document.getElementById('ef-parcela-desc').value = f.parcelaDesc || '';
       document.getElementById('modal-editar-forn').classList.add('open');
     }
     function confirmarEdicaoForn() {
@@ -511,6 +529,8 @@
       f.valor = parseFloat(document.getElementById('ef-valor').value) || 0;
       f.pago = parseFloat(document.getElementById('ef-pago').value) || 0;
       f.obs = document.getElementById('ef-obs').value;
+      f.vencimento = document.getElementById('ef-vencimento').value || '';
+      f.parcelaDesc = document.getElementById('ef-parcela-desc').value.trim();
       salvar(); document.getElementById('confirm-forn').classList.remove('open'); renderizar();
     }
     ['modal-editar-forn','confirm-forn'].forEach(id => {

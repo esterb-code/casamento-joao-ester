@@ -125,18 +125,23 @@
           </div>
           <input type="file" id="banner-input" class="file-input" accept="image/*" onchange="trocarBanner(event)"/>
           <div class="field-row">
+            <span class="field-label">Nomes do casal</span>
+            <input class="form-input" id="ev-nomes" placeholder="João & Ester"/>
+          </div>
+          <div class="field-row">
             <span class="field-label">Data do casamento</span>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <input type="date" class="form-input" id="ev-data" value="2027-06-20" onchange="salvarEvento()"/>
-            </div>
+            <input type="date" class="form-input" id="ev-data" value="2027-06-20"/>
           </div>
           <div class="field-row">
             <span class="field-label">Horário</span>
-            <input type="time" class="form-input" id="ev-hora" value="16:00" onchange="salvarEvento()"/>
+            <input type="time" class="form-input" id="ev-hora" value="16:00"/>
           </div>
           <div class="field-row">
-            <span class="field-label">Local</span>
-            <input class="form-input" id="ev-local" placeholder="A definir" onchange="salvarEvento()"/>
+            <span class="field-label">Cidade</span>
+            <input class="form-input" id="ev-cidade" placeholder="Brasília, DF"/>
+          </div>
+          <div style="margin-top:14px;">
+            <button class="btn-convidar" onclick="salvarEvento()"><i class="ti ti-device-floppy"></i> Salvar alterações</button>
           </div>
         </div>
       </div>
@@ -266,19 +271,51 @@
       reader.readAsDataURL(file)
     }
 
-    // Evento
-    const evSalvo=JSON.parse(localStorage.getItem('evento-config')||'{}');
-    if(evSalvo.data)document.getElementById('ev-data').value=evSalvo.data;
-    if(evSalvo.hora)document.getElementById('ev-hora').value=evSalvo.hora;
-    if(evSalvo.local)document.getElementById('ev-local').value=evSalvo.local;
-
-    function salvarEvento(){if(typeof db!=='undefined')db.set('evento-config',{data:document.getElementById('ev-data').value,hora:document.getElementById('ev-hora').value,local:document.getElementById('ev-local').value});
-      localStorage.setItem('evento-config',JSON.stringify({
-        data:document.getElementById('ev-data').value,
-        hora:document.getElementById('ev-hora').value,
-        local:document.getElementById('ev-local').value,
-      }))
+    // Toast de feedback
+    function mostrarToast(msg='Salvo!'){
+      let t=document.getElementById('toast-cfg');
+      if(!t){t=document.createElement('div');t.id='toast-cfg';t.style.cssText='position:fixed;bottom:28px;right:28px;background:var(--rosa-escuro);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;';document.body.appendChild(t);}
+      t.textContent=msg;t.style.opacity='1';clearTimeout(t._timer);t._timer=setTimeout(()=>t.style.opacity='0',2000);
     }
+
+    // Evento — carrega de dash-state.evento (fonte única do site)
+    const DEFAULT_EV={nomes:'João & Ester',data:'2027-06-20',hora:'16:00',cidade:'Brasília, DF'};
+    async function carregarEvento(){
+      let ev=DEFAULT_EV;
+      if(typeof db!=='undefined'){
+        const s=await db.get('dash-state');
+        if(s&&s.evento)ev={...DEFAULT_EV,...s.evento};
+      }else{
+        const s=JSON.parse(localStorage.getItem('dash-state')||'{}');
+        if(s.evento)ev={...DEFAULT_EV,...s.evento};
+      }
+      document.getElementById('ev-nomes').value=ev.nomes||DEFAULT_EV.nomes;
+      document.getElementById('ev-data').value=ev.data||DEFAULT_EV.data;
+      document.getElementById('ev-hora').value=ev.hora||DEFAULT_EV.hora;
+      document.getElementById('ev-cidade').value=ev.cidade||DEFAULT_EV.cidade;
+    }
+
+    async function salvarEvento(){
+      const ev={
+        nomes:document.getElementById('ev-nomes').value.trim()||DEFAULT_EV.nomes,
+        data:document.getElementById('ev-data').value||DEFAULT_EV.data,
+        hora:document.getElementById('ev-hora').value||DEFAULT_EV.hora,
+        cidade:document.getElementById('ev-cidade').value.trim()||DEFAULT_EV.cidade,
+      };
+      // Lê o dash-state atual e atualiza só o bloco evento
+      const s=JSON.parse(localStorage.getItem('dash-state')||'{}');
+      s.evento=ev;
+      localStorage.setItem('dash-state',JSON.stringify(s));
+      if(typeof db!=='undefined') await db.set('dash-state',s);
+      // Atualiza sidebar imediatamente
+      const sn=document.getElementById('sidebar-names');
+      const sd=document.getElementById('sidebar-date');
+      if(sn)sn.textContent=ev.nomes;
+      if(sd){const[y,m,d]=ev.data.split('-');const ms=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];sd.textContent=`${d} de ${ms[parseInt(m)-1]} de ${y}`;}
+      mostrarToast('✓ Salvo com sucesso!');
+    }
+
+    carregarEvento();
 
     document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)fecharModal()});
     async function initApp() {

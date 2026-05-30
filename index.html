@@ -208,7 +208,7 @@
         <div class="card">
           <div class="card-header">
             <span class="card-title">⚠️ Parcelas Vencendo em 48h</span>
-            <button class="edit-btn" onclick="abrirModal('alertas')"><i class="ti ti-pencil"></i> Editar</button>
+            <a href="fornecedores.html" class="edit-btn"><i class="ti ti-building-store"></i> Fornecedores</a>
           </div>
           <div class="card-body" id="alertas-body">
             <div style="font-size:12px;color:var(--taupe);text-align:center;padding:16px 0;">Nenhum alerta. Clique em Editar para adicionar.</div>
@@ -488,13 +488,26 @@
       const pctPago = fin.total > 0 ? Math.round(fin.pago / fin.total * 100) : 0;
       document.getElementById('sub-pago').textContent = `${pctPago}% quitado`;
 
-      // Alertas
+      // Alertas — calculado automaticamente dos fornecedores
       const alertasBody = document.getElementById('alertas-body');
-      if (!state.alertas || state.alertas.length === 0) {
-        alertasBody.innerHTML = '<div style="font-size:12px;color:var(--taupe);text-align:center;padding:16px 0;">Nenhum alerta. Clique em Editar para adicionar.</div>';
+      const fornecedores = JSON.parse(localStorage.getItem('fornecedores') || '[]');
+      const hoje = new Date(); hoje.setHours(0,0,0,0);
+      const amanha = new Date(hoje); amanha.setDate(amanha.getDate() + 1);
+      const limite = new Date(hoje); limite.setDate(limite.getDate() + 2);
+      const alertasAuto = fornecedores.filter(f => f.vencimento && f.status !== 'cancelado' && f.status !== 'pago').map(f => {
+        const venc = new Date(f.vencimento + 'T00:00:00');
+        if (venc >= hoje && venc < limite) {
+          const tipo = venc.getTime() === hoje.getTime() ? 'hoje' : 'amanha';
+          return { nome: f.nome, parcela: f.parcelaDesc || f.vencimento, tipo };
+        }
+        return null;
+      }).filter(Boolean);
+
+      if (alertasAuto.length === 0) {
+        alertasBody.innerHTML = '<div style="font-size:12px;color:var(--taupe);text-align:center;padding:16px 0;">Nenhuma parcela vencendo nas próximas 48h.</div>';
       } else {
         alertasBody.innerHTML = '';
-        state.alertas.forEach(a => {
+        alertasAuto.forEach(a => {
           const div = document.createElement('div');
           div.className = 'alert-item';
           div.innerHTML = `
