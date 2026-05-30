@@ -257,8 +257,7 @@
       });
       salvar();
       fecharModal();
-    renderizar();
-    });
+      renderizar();
     }
 
     function excluir(id) {
@@ -392,8 +391,7 @@
         ...rows
       ];
 
-      const csvContent = resumo.map(r => r.join(',')).join('
-');
+      const csvContent = resumo.map(r => r.join(',')).join('\n');
       const BOM = '﻿'; // UTF-8 BOM para abrir corretamente no Excel
       const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
