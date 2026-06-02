@@ -84,9 +84,11 @@
     .btn-upload { background: var(--rosa); color: white; border: none; border-radius: 10px; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; display: flex; align-items: center; gap: 6px; }
     .fotos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .foto-item { border-radius: 12px; overflow: hidden; aspect-ratio: 1; position: relative; background: #FAE8EC; }
-    .foto-item img { width: 100%; height: 100%; object-fit: cover; }
+    .foto-item img, .foto-item video { width: 100%; height: 100%; object-fit: cover; }
     .foto-del { position: absolute; top: 6px; right: 6px; background: rgba(139,34,64,0.8); border: none; border-radius: 99px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 12px; opacity: 0; transition: opacity 0.15s; }
     .foto-item:hover .foto-del { opacity: 1; }
+    .video-play-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .video-play-icon i { font-size: 32px; color: white; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5)); }
     .add-foto { border: 0.5px dashed var(--rosa-claro); border-radius: 12px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: var(--rosa); font-size: 11px; font-weight: 600; transition: all 0.15s; }
     .add-foto:hover { background: #FAE8EC; }
     .add-foto i { font-size: 24px; }
@@ -160,11 +162,11 @@
           <button class="btn-voltar" onclick="fecharGaleria()"><i class="ti ti-arrow-left"></i> Voltar às categorias</button>
           <div class="galeria-title" id="galeria-title" style="margin-top:4px;"></div>
         </div>
-        <button class="btn-upload" onclick="triggerUpload()"><i class="ti ti-upload"></i> Adicionar imagem</button>
+        <button class="btn-upload" onclick="triggerUpload()"><i class="ti ti-upload"></i> Adicionar mídia</button>
       </div>
       <div class="subcats-galeria" id="subcats-galeria"></div>
       <div class="fotos-grid" id="fotos-grid"></div>
-      <input type="file" id="foto-input" class="file-input" accept="image/*" multiple />
+      <input type="file" id="foto-input" class="file-input" accept="image/*,video/*" multiple />
     </div>
   </div>
 
@@ -188,7 +190,14 @@
     let subcatAtiva = 'todas';
     let fotos = JSON.parse(localStorage.getItem('ideias-fotos') || '{}');
 
-    function salvar() { localStorage.setItem('ideias-fotos', JSON.stringify(fotos)); if(typeof db!=='undefined') db.set('ideias-fotos', fotos); }
+    function salvar() {
+      localStorage.setItem('ideias-fotos', JSON.stringify(fotos));
+      if (typeof db !== 'undefined') db.set('ideias-fotos', fotos);
+    }
+
+    function isVideo(src) {
+      return src && src.startsWith('data:video');
+    }
 
     function renderCats() {
       const grid = document.getElementById('cats-grid');
@@ -206,7 +215,7 @@
           </div>
           <div class="cat-info">
             <div class="cat-nome">${cat.protegida ? `<i class="ti ti-lock" style="font-size:12px;color:var(--rosa);"></i>` : ''} ${cat.nome}</div>
-            <div class="cat-count">${total} imagem${total !== 1 ? 'ns' : ''}</div>
+            <div class="cat-count">${total} item${total !== 1 ? 'ns' : ''}</div>
             ${cat.subcats ? `<div class="subcats">${cat.subcats.map(s=>`<span class="subcat">${s}</span>`).join('')}</div>` : ''}
           </div>
         `;
@@ -259,37 +268,13 @@
     function fecharGaleria() {
       document.getElementById('modal-galeria').classList.remove('open');
       catAberta = null;
-      // Upload robusto
+    }
+
     function triggerUpload() {
       const inp = document.getElementById('foto-input');
       inp.value = '';
-      inp.onchange = function() { adicionarFotos(inp.files); };
+      inp.onchange = function() { adicionarMidias(inp.files); };
       inp.click();
-    }
-
-
-    // ── SYNC SUPABASE ──
-    async function syncFromSupabase() {
-      if (typeof db === 'undefined') return;
-      const dados = await db.getMany(['ideias-fotos']);
-            if (dados['ideias-fotos'] !== null) localStorage.setItem('ideias-fotos', JSON.stringify(dados['ideias-fotos']));
-      
-    }
-
-    async function saveToSupabase(key, value) {
-      if (typeof db !== 'undefined') await db.set(key, value);
-    }
-
-    syncFromSupabase().then(() => {
-    async function initApp() {
-      if (typeof db !== 'undefined') {
-        const dados = await db.get('ideias-fotos');
-        if (dados !== null) { fotos = dados; localStorage.setItem('ideias-fotos', JSON.stringify(dados)); }
-      }
-      renderCats();
-    }
-    initApp();
-    });
     }
 
     function renderGaleria() {
@@ -317,31 +302,40 @@
       const grid = document.getElementById('fotos-grid');
       grid.innerHTML = '';
 
-      let listaFotos = [];
-      if (subcatAtiva === 'todas') {
-        listaFotos = Object.values(catFotos).flat();
-      } else {
-        listaFotos = catFotos[subcatAtiva] || [];
-      }
-
-      listaFotos.forEach((src, idx) => {
-        const item = document.createElement('div');
-        item.className = 'foto-item';
-        item.innerHTML = `
-          <img src="${src}" alt="Inspiração" />
-          <button class="foto-del" onclick="excluirFoto(${idx})"><i class="ti ti-x"></i></button>
-        `;
-        grid.appendChild(item);
-      });
-
+      // + Adicionar sempre primeiro
       const addCard = document.createElement('div');
       addCard.className = 'add-foto';
       addCard.innerHTML = '<i class="ti ti-plus"></i> Adicionar';
       addCard.onclick = () => triggerUpload();
       grid.appendChild(addCard);
+
+      let listaMidias = [];
+      if (subcatAtiva === 'todas') {
+        listaMidias = Object.values(catFotos).flat();
+      } else {
+        listaMidias = catFotos[subcatAtiva] || [];
+      }
+
+      listaMidias.forEach((src, idx) => {
+        const item = document.createElement('div');
+        item.className = 'foto-item';
+        if (isVideo(src)) {
+          item.innerHTML = `
+            <video src="${src}" muted playsinline preload="metadata"></video>
+            <div class="video-play-icon"><i class="ti ti-player-play-filled"></i></div>
+            <button class="foto-del" onclick="excluirMidia(${idx})"><i class="ti ti-x"></i></button>
+          `;
+        } else {
+          item.innerHTML = `
+            <img src="${src}" alt="Inspiração" />
+            <button class="foto-del" onclick="excluirMidia(${idx})"><i class="ti ti-x"></i></button>
+          `;
+        }
+        grid.appendChild(item);
+      });
     }
 
-    function adicionarFotos(files) {
+    function adicionarMidias(files) {
       if (!catAberta || !files || files.length === 0) return;
       const chave = subcatAtiva === 'todas' ? '_geral' : subcatAtiva;
       if (!fotos[catAberta.id]) fotos[catAberta.id] = {};
@@ -354,39 +348,51 @@
         reader.onload = function(ev) {
           fotos[catAberta.id][chave].push(ev.target.result);
           lidos++;
-          if (lidos === filesArr.length) {
-            salvar();
-            renderGaleria();
-          }
+          if (lidos === filesArr.length) { salvar(); renderCats(); renderGaleria(); }
         };
-        reader.onerror = function() { lidos++; if (lidos === filesArr.length) { salvar(); renderGaleria(); } };
+        reader.onerror = function() {
+          lidos++;
+          if (lidos === filesArr.length) { salvar(); renderCats(); renderGaleria(); }
+        };
         reader.readAsDataURL(file);
       });
       document.getElementById('foto-input').value = '';
     }
 
-    function excluirFoto(idx) {
-      if (!confirm('Remover esta imagem?')) return;
-      const chave = subcatAtiva === 'todas' ? '_geral' : subcatAtiva;
+    function excluirMidia(idx) {
+      if (!confirm('Remover este item?')) return;
       if (subcatAtiva === 'todas') {
-        const todas = Object.values(fotos[catAberta.id] || {}).flat();
-        todas.splice(idx, 1);
+        // Acha em qual subchave está o item pelo índice global
+        let count = 0;
+        const catFotos = fotos[catAberta.id] || {};
+        for (const chave of Object.keys(catFotos)) {
+          const arr = catFotos[chave];
+          if (idx < count + arr.length) {
+            arr.splice(idx - count, 1);
+            break;
+          }
+          count += arr.length;
+        }
       } else {
-        fotos[catAberta.id][chave].splice(idx, 1);
+        const chave = subcatAtiva;
+        if (fotos[catAberta.id] && fotos[catAberta.id][chave]) {
+          fotos[catAberta.id][chave].splice(idx, 1);
+        }
       }
       salvar();
+      renderCats();
       renderGaleria();
     }
 
-    // Upload robusto
-    function triggerUpload() {
-      const inp = document.getElementById('foto-input');
-      inp.value = '';
-      inp.onchange = function() { adicionarFotos(inp.files); };
-      inp.click();
+    async function initApp() {
+      if (typeof db !== 'undefined') {
+        const dados = await db.get('ideias-fotos');
+        if (dados !== null) { fotos = dados; localStorage.setItem('ideias-fotos', JSON.stringify(dados)); }
+      }
+      renderCats();
     }
 
-    renderCats();
-</script>
+    initApp();
+  </script>
 </body>
 </html>
