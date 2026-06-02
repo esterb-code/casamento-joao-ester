@@ -5,7 +5,7 @@ const AppConfig = {
   // Valores padrão
   defaults: {
     nomes: 'João & Ester',
-    data: '2027-06-20',
+    data: '2027-06-13',
     hora: '16:00',
     cidade: 'Brasília, DF',
   },
@@ -41,13 +41,35 @@ const AppConfig = {
     return horaStr.replace(':', 'h');
   },
 
+  // Lê localStorage de forma síncrona (sem piscar)
+  carregarSync() {
+    try {
+      const local = localStorage.getItem('dash-state');
+      if (local) {
+        const state = JSON.parse(local);
+        if (state && state.evento) return state.evento;
+      }
+    } catch(e) {}
+    return this.defaults;
+  },
+
   // Atualiza a sidebar em qualquer página
   async atualizarSidebar() {
-    const ev = await this.carregar();
+    // 1. Aplica imediatamente do localStorage (síncrono) — sem piscar
+    const evSync = this.carregarSync();
     const elNomes = document.getElementById('sidebar-names');
     const elData = document.getElementById('sidebar-date');
-    if (elNomes) elNomes.textContent = ev.nomes || this.defaults.nomes;
-    if (elData) elData.textContent = this.formatarData(ev.data, 'curto');
+    if (elNomes) elNomes.textContent = evSync.nomes || this.defaults.nomes;
+    if (elData) elData.textContent = this.formatarData(evSync.data, 'curto');
+
+    // 2. Se Supabase tiver dado mais recente, atualiza silenciosamente
+    if (typeof db !== 'undefined') {
+      const state = await db.get('dash-state');
+      if (state && state.evento) {
+        if (elNomes) elNomes.textContent = state.evento.nomes || this.defaults.nomes;
+        if (elData) elData.textContent = this.formatarData(state.evento.data, 'curto');
+      }
+    }
   },
 
   // Atualiza o banner (só no dashboard)

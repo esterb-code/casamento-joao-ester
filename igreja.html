@@ -82,7 +82,7 @@
     <div class="sidebar-logo">
       <div class="initials">💍 J & E</div>
       <div class="names" id="sidebar-names">João & Ester</div>
-      <div class="date" id="sidebar-date">20 de junho de 2027</div>
+      <div class="date" id="sidebar-date">13 de junho de 2027</div>
     </div>
     <div class="nav-section">
       <div class="nav-label">Menu</div>
@@ -240,7 +240,7 @@
       if(dados&&dados.nome){
         horariosEl.innerHTML=`
           ${dados.ensaioData?`<div class="horario-row"><div class="horario-icon"><i class="ti ti-music"></i></div><div><div class="horario-nome">Ensaio pré-nupcial</div><div class="horario-hora">${formatarData(dados.ensaioData)}${dados.ensaioHora?' · '+dados.ensaioHora.replace(':','h'):''}</div></div></div>`:''}
-          <div class="horario-row"><div class="horario-icon"><i class="ti ti-heart"></i></div><div><div class="horario-nome">Cerimônia</div><div class="horario-hora">${dados.cerimoniaData?formatarData(dados.cerimoniaData):'20/06/2027'}${dados.cerimoniaHora?' · '+dados.cerimoniaHora.replace(':','h'):' · 16h00'}</div></div></div>
+          <div class="horario-row"><div class="horario-icon"><i class="ti ti-heart"></i></div><div><div class="horario-nome">Cerimônia</div><div class="horario-hora">${dados.cerimoniaData?formatarData(dados.cerimoniaData):'13/06/2027'}${dados.cerimoniaHora?' · '+dados.cerimoniaHora.replace(':','h'):' · 16h00'}</div></div></div>
           ${dados.docsData?`<div class="horario-row"><div class="horario-icon"><i class="ti ti-file-check"></i></div><div><div class="horario-nome">Entrega de documentação</div><div class="horario-hora">${formatarData(dados.docsData)}${dados.docsHora?' · '+dados.docsHora.replace(':','h'):''}</div></div></div>`:''}
         `
       }

@@ -90,6 +90,19 @@
     .empty-state { text-align: center; padding: 48px; color: var(--taupe); font-size: 13px; }
     .empty-state i { font-size: 32px; display: block; margin-bottom: 8px; opacity: 0.4; }
 
+    /* SELEÇÃO EM MASSA */
+    .sel-checkbox { width: 17px; height: 17px; accent-color: var(--rosa); cursor: pointer; flex-shrink: 0; margin-right: 4px; }
+    .guest-row.selecionado { background: #FAE8EC; border-color: var(--rosa-claro); }
+    .barra-selecao { display: none; align-items: center; gap: 12px; padding: 10px 18px; background: var(--rosa-escuro); border-radius: 12px; margin-bottom: 14px; }
+    .barra-selecao.visivel { display: flex; }
+    .barra-selecao-texto { font-size: 13px; font-weight: 600; color: #fff; flex: 1; }
+    .btn-apagar-sel { background: #FCEBEB; color: #A32D2D; border: .5px solid #E24B4A; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; display: flex; align-items: center; gap: 5px; }
+    .btn-apagar-sel:hover { background: #E24B4A; color: #fff; }
+    .btn-cancelar-sel { background: rgba(255,255,255,.15); color: #fff; border: .5px solid rgba(255,255,255,.3); border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; }
+    .btn-cancelar-sel:hover { background: rgba(255,255,255,.25); }
+    .sel-todos-wrap { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--taupe); margin-bottom: 10px; cursor: pointer; width: fit-content; }
+    .sel-todos-wrap input { accent-color: var(--rosa); width: 15px; height: 15px; cursor: pointer; }
+
     /* MODAL */
     .modal-overlay { position: fixed; inset: 0; background: rgba(139,34,64,0.3); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; }
     .modal-overlay.open { display: flex; }
@@ -116,7 +129,7 @@
     <div class="sidebar-logo">
       <div class="initials">💍 J & E</div>
       <div class="names" id="sidebar-names">João & Ester</div>
-      <div class="date" id="sidebar-date">20 de junho de 2027</div>
+      <div class="date" id="sidebar-date">13 de junho de 2027</div>
     </div>
     <div class="nav-section">
       <div class="nav-label">Menu</div>
@@ -165,6 +178,20 @@
         <span class="filter-pill f-recusado" onclick="setFiltro('recusado', this)">Recusado</span>
         <span class="filter-pill f-espera" onclick="setFiltro('espera', this)">Lista de espera</span>
       </div>
+
+      <!-- BARRA DE SELEÇÃO -->
+      <div class="barra-selecao" id="barra-selecao">
+        <span class="barra-selecao-texto" id="barra-sel-texto">0 selecionados</span>
+        <button class="btn-apagar-sel" onclick="apagarSelecionados()"><i class="ti ti-trash"></i> Apagar selecionados</button>
+        <button class="btn-cancelar-sel" onclick="limparSelecao()"><i class="ti ti-x"></i> Cancelar</button>
+      </div>
+
+      <!-- SELECIONAR TODOS -->
+      <label class="sel-todos-wrap" id="sel-todos-wrap" style="display:none;">
+        <input type="checkbox" id="chk-todos" onchange="selecionarTodos(this.checked)" />
+        Selecionar todos
+      </label>
+
       <div id="lista-container"></div>
     </div>
   </main>
@@ -234,6 +261,53 @@
 
     let convidados = JSON.parse(localStorage.getItem('convidados') || '[]');
     let filtroAtivo = 'todos';
+    let selecionados = new Set();
+
+    function toggleSelecionar(id, chk) {
+      if (chk.checked) selecionados.add(id);
+      else selecionados.delete(id);
+      atualizarBarraSelecao();
+      renderizar();
+    }
+
+    function selecionarTodos(checked) {
+      if (checked) {
+        let lista = [...convidados];
+        if (filtroAtivo !== 'todos') lista = lista.filter(g => g.status === filtroAtivo);
+        lista.forEach(g => selecionados.add(g.id));
+      } else {
+        selecionados.clear();
+      }
+      atualizarBarraSelecao();
+      renderizar();
+    }
+
+    function limparSelecao() {
+      selecionados.clear();
+      atualizarBarraSelecao();
+      renderizar();
+    }
+
+    function atualizarBarraSelecao() {
+      const barra = document.getElementById('barra-selecao');
+      const texto = document.getElementById('barra-sel-texto');
+      if (selecionados.size > 0) {
+        barra.classList.add('visivel');
+        texto.textContent = `${selecionados.size} selecionado${selecionados.size > 1 ? 's' : ''}`;
+      } else {
+        barra.classList.remove('visivel');
+      }
+    }
+
+    function apagarSelecionados() {
+      if (selecionados.size === 0) return;
+      if (!confirm(`Deseja apagar ${selecionados.size} convidado${selecionados.size > 1 ? 's' : ''}? Esta ação não pode ser desfeita.`)) return;
+      convidados = convidados.filter(g => !selecionados.has(g.id));
+      selecionados.clear();
+      salvar();
+      atualizarBarraSelecao();
+      renderizar();
+    }
 
     function salvar() { localStorage.setItem('convidados', JSON.stringify(convidados)); ;if(typeof db!=='undefined')db.set('convidados',convidados);}
     function abrirModal() { document.getElementById('modal').classList.add('open'); }
@@ -346,8 +420,9 @@
 
         grupos[letra].forEach(g => {
           const row = document.createElement('div');
-          row.className = 'guest-row';
+          row.className = 'guest-row' + (selecionados.has(g.id) ? ' selecionado' : '');
           row.innerHTML = `
+            <input type="checkbox" class="sel-checkbox" ${selecionados.has(g.id) ? 'checked' : ''} onchange="toggleSelecionar(${g.id}, this)" onclick="event.stopPropagation()" />
             <div class="guest-avatar">${iniciais(g.nome)}</div>
             <div class="guest-info">
               <div class="guest-nome">${g.nome}</div>
@@ -368,6 +443,13 @@
       });
 
       container.appendChild(wrap);
+
+      // Mostrar "selecionar todos" quando há convidados
+      document.getElementById('sel-todos-wrap').style.display = lista.length > 0 ? 'flex' : 'none';
+      // Atualiza estado do checkbox "todos"
+      const chkTodos = document.getElementById('chk-todos');
+      if (lista.length > 0 && selecionados.size === lista.length) chkTodos.checked = true;
+      else chkTodos.checked = false;
     }
 
     document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
@@ -396,7 +478,7 @@
 
       const resumo = [
         ['"LISTA DE CONVIDADOS — JOÃO & ESTER"','','','','',''],
-        ['"20 de Junho de 2027 · Brasília, DF"','','','','',''],
+        ['"13 de junho de 2027 · Brasília, DF"','','','','',''],
         ['','','','','',''],
         [`"Total geral: ${total}"`,`"Adultos: ${adultos}"`,`"Crianças (+5 anos): ${criancas}"`,`"Confirmados: ${confirmados}"`,`"Aguardando: ${aguardando}"`,''],
         ['','','','','',''],
