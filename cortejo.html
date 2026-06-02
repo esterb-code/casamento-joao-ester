@@ -42,8 +42,9 @@
     .content { padding: 24px 36px; }
 
     /* TABS */
-    .grupos-tabs { display: flex; gap: 0; background: var(--branco); border-radius: 14px; border: 0.5px solid #EED8C8; overflow: hidden; margin-bottom: 24px; }
-    .grupo-tab { flex: 1; text-align: center; padding: 12px 8px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.08em; color: var(--taupe); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; text-transform: uppercase; }
+    .grupos-tabs { display: flex; gap: 0; background: var(--branco); border-radius: 14px; border: 0.5px solid #EED8C8; overflow-x: auto; margin-bottom: 24px; scrollbar-width: none; }
+    .grupos-tabs::-webkit-scrollbar { display: none; }
+    .grupo-tab { flex-shrink: 0; text-align: center; padding: 12px 16px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.08em; color: var(--taupe); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; text-transform: uppercase; white-space: nowrap; }
     .grupo-tab:hover { color: var(--rosa); background: #FAE8EC; }
     .grupo-tab.active { color: var(--rosa-escuro); border-bottom-color: var(--rosa); font-weight: 600; background: #FAE8EC; }
 
@@ -157,10 +158,11 @@
         <label class="form-label">Grupo</label>
         <select class="form-select" id="m-grupo">
           <option>Pais</option>
+          <option>Avós</option>
           <option>Padrinhos & Madrinhas</option>
           <option>Pajens & Daminhas</option>
-          <option>Primeira Leitura</option>
-          <option>Segunda Leitura</option>
+          <option>1ª Leitura</option>
+          <option>2ª Leitura</option>
           <option>Padre</option>
         </select>
       </div>
@@ -201,7 +203,7 @@
   </div>
 
   <script>
-    const GRUPOS = ['Pais', 'Padrinhos & Madrinhas', 'Pajens & Daminhas', 'Primeira Leitura', 'Segunda Leitura', 'Padre'];
+    const GRUPOS = ['Pais', 'Avós', 'Padrinhos & Madrinhas', 'Pajens & Daminhas', '1ª Leitura', '2ª Leitura', 'Padre'];
     const STATUS_LABELS = { convidado:'Convidado', aguardando:'Aguardando resposta', confirmado:'Confirmado', recusado:'Recusado' };
     const STATUS_CLASSES = { convidado:'s-convidado', aguardando:'s-aguardando', confirmado:'s-confirmado', recusado:'s-recusado' };
 
@@ -231,8 +233,7 @@
       });
       salvar();
       fecharModal();
-    renderizar();
-    });
+      renderizar();
     }
 
     function excluir(id) {
@@ -386,8 +387,8 @@
     <div class="modal">
       <div class="modal-title">Editar Membro do Cortejo</div>
       <div class="form-group"><label class="form-label">Grupo</label><select class="form-select" id="em-grupo">
-        <option>Pais</option><option>Padrinhos & Madrinhas</option><option>Pajens & Daminhas</option>
-        <option>Primeira Leitura</option><option>Segunda Leitura</option><option>Padre</option>
+        <option>Pais</option><option>Avós</option><option>Padrinhos & Madrinhas</option><option>Pajens & Daminhas</option>
+        <option>1ª Leitura</option><option>2ª Leitura</option><option>Padre</option>
       </select></div>
       <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" id="em-nome"/></div>
       <div class="form-row">
