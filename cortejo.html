@@ -141,7 +141,12 @@
         <h1>Cortejo</h1>
         <p>Gerencie os membros do cortejo do casamento</p>
       </div>
-      <button class="btn-add" onclick="AppAuth.verificar(() => abrirModal())"><i class="ti ti-plus"></i> Novo membro</button>
+      <div style="display:flex;gap:10px;">
+        <button onclick="sincronizarTodosCortejo()" style="background:#E6F1FB;color:#185FA5;border:.5px solid #378ADD;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;transition:background .15s;" onmouseover="this.style.background='#378ADD';this.style.color='white'" onmouseout="this.style.background='#E6F1FB';this.style.color='#185FA5'">
+          <i class="ti ti-refresh"></i> Sincronizar Cortejo
+        </button>
+        <button class="btn-add" onclick="AppAuth.verificar(() => abrirModal())"><i class="ti ti-plus"></i> Novo membro</button>
+      </div>
     </div>
 
     <div class="content">
@@ -220,6 +225,28 @@
 
     let membros = JSON.parse(localStorage.getItem('cortejo') || '[]');
     let grupoAtivo = GRUPOS[0];
+
+    function sincronizarTodosCortejo() {
+      const FUNCAO_GRUPO = { 'Padrinho':'Padrinhos & Madrinhas','Madrinha':'Padrinhos & Madrinhas','Pajem':'Pajens & Daminhas','Daminha':'Pajens & Daminhas','Pais dos Noivos':'Pais','Avós dos Noivos':'Avós','1ª Leitura':'1ª Leitura','2ª Leitura':'2ª Leitura','Padre':'Padre' };
+      const convidados = JSON.parse(localStorage.getItem('convidados') || '[]');
+      let sincronizados = 0;
+      convidados.forEach(g => {
+        if (!g.funcao || g.status === 'recusado') return;
+        const idx = membros.findIndex(m => m.convidadoId === g.id || m.nome === g.nome);
+        const grupo = FUNCAO_GRUPO[g.funcao] || 'Padrinhos & Madrinhas';
+        if (idx !== -1) {
+          membros[idx].funcao = g.funcao;
+          membros[idx].grupo = grupo;
+          membros[idx].convidadoId = g.id;
+        } else {
+          membros.push({ id: Date.now() + Math.random(), grupo, nome: g.nome, funcao: g.funcao, whatsapp: g.whatsapp || '', status: g.status || 'convidado', par: '', presente: false, convidadoId: g.id });
+        }
+        sincronizados++;
+      });
+      salvar();
+      renderizar();
+      alert(`✅ ${sincronizados} convidado(s) sincronizados com o Cortejo!`);
+    }
 
     function sincronizarConvidadoDeCortejo(m) {
       const convidados = JSON.parse(localStorage.getItem('convidados') || '[]');
