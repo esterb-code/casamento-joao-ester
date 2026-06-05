@@ -210,6 +210,31 @@
     let membros = JSON.parse(localStorage.getItem('cortejo') || '[]');
     let grupoAtivo = GRUPOS[0];
 
+    function sincronizarConvidadoDeCortejo(m) {
+      const convidados = JSON.parse(localStorage.getItem('convidados') || '[]');
+      const idx = m.convidadoId
+        ? convidados.findIndex(g => g.id === m.convidadoId)
+        : convidados.findIndex(g => g.nome === m.nome);
+      if (idx !== -1) {
+        convidados[idx].funcao = m.funcao || '';
+        convidados[idx].status = m.status;
+        localStorage.setItem('convidados', JSON.stringify(convidados));
+        if (typeof db !== 'undefined') db.set('convidados', convidados);
+      }
+    }
+
+    function limparConvidadoDoCortejo(m) {
+      const convidados = JSON.parse(localStorage.getItem('convidados') || '[]');
+      const idx = m.convidadoId
+        ? convidados.findIndex(g => g.id === m.convidadoId)
+        : convidados.findIndex(g => g.nome === m.nome);
+      if (idx !== -1) {
+        convidados[idx].funcao = '';
+        localStorage.setItem('convidados', JSON.stringify(convidados));
+        if (typeof db !== 'undefined') db.set('convidados', convidados);
+      }
+    }
+
     function salvar() { localStorage.setItem('cortejo', JSON.stringify(membros)); ;if(typeof db!=='undefined')db.set('cortejo',membros);}
     function abrirModal() { document.getElementById('modal').classList.add('open'); }
     function fecharModal() {
@@ -231,13 +256,17 @@
         par: document.getElementById('m-par').value.trim(),
         presente: false,
       });
+      const novoMembro = membros[membros.length - 1];
       salvar();
+      sincronizarConvidadoDeCortejo(novoMembro);
       fecharModal();
       renderizar();
     }
 
     function excluir(id) {
       if (!confirm('Remover este membro?')) return;
+      const m = membros.find(m => m.id === id);
+      if (m) limparConvidadoDoCortejo(m);
       membros = membros.filter(m => m.id !== id);
       salvar();
       renderizar();
@@ -254,6 +283,7 @@
       if (!m) return;
       m.status = ordem[(ordem.indexOf(m.status) + 1) % ordem.length];
       salvar();
+      sincronizarConvidadoDeCortejo(m);
       renderizar();
     }
 
@@ -447,7 +477,9 @@
       m.status = document.getElementById('em-status').value;
       m.par = document.getElementById('em-par').value;
       grupoAtivo = m.grupo;
-      salvar(); document.getElementById('confirm-membro').classList.remove('open'); renderizar();
+      salvar();
+      sincronizarConvidadoDeCortejo(m);
+      document.getElementById('confirm-membro').classList.remove('open'); renderizar();
     }
     ['modal-editar-membro','confirm-membro'].forEach(id => {
       document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });

@@ -173,13 +173,24 @@
 
     <div class="content">
       <div class="totais-row" id="totais-row"></div>
-      <div class="filters">
-        <span class="filter-pill f-todos" onclick="setFiltro('todos', this)">Todos</span>
-        <span class="filter-pill f-convidado" onclick="setFiltro('convidado', this)">Convidado</span>
-        <span class="filter-pill f-aguardando" onclick="setFiltro('aguardando', this)">Aguardando resposta</span>
-        <span class="filter-pill f-confirmado" onclick="setFiltro('confirmado', this)">Confirmado</span>
-        <span class="filter-pill f-recusado" onclick="setFiltro('recusado', this)">Recusado</span>
-        <span class="filter-pill f-espera" onclick="setFiltro('espera', this)">Lista de espera</span>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--taupe);text-transform:uppercase;">Família</span>
+        <div class="filters" style="margin-bottom:0;">
+          <span class="filter-pill filter-familia f-todos" onclick="setFiltroFamilia('todos', this)">Todos</span>
+          <span class="filter-pill filter-familia" style="background:#FAE8EC;color:var(--rosa-escuro);border:.5px solid var(--rosa-claro);opacity:.55;" onclick="setFiltroFamilia('ester', this)">💐 Ester</span>
+          <span class="filter-pill filter-familia" style="background:#E6F1FB;color:#185FA5;border:.5px solid #378ADD;opacity:.55;" onclick="setFiltroFamilia('joao', this)">🤵 João</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px;">
+        <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--taupe);text-transform:uppercase;">Status</span>
+        <div class="filters" style="margin-bottom:0;">
+          <span class="filter-pill f-todos" onclick="setFiltro('todos', this)">Todos</span>
+          <span class="filter-pill f-convidado" onclick="setFiltro('convidado', this)">Convidado</span>
+          <span class="filter-pill f-aguardando" onclick="setFiltro('aguardando', this)">Aguardando resposta</span>
+          <span class="filter-pill f-confirmado" onclick="setFiltro('confirmado', this)">Confirmado</span>
+          <span class="filter-pill f-recusado" onclick="setFiltro('recusado', this)">Recusado</span>
+          <span class="filter-pill f-espera" onclick="setFiltro('espera', this)">Lista de espera</span>
+        </div>
       </div>
 
       <!-- BARRA DE SELEÇÃO -->
@@ -264,7 +275,43 @@
 
     let convidados = JSON.parse(localStorage.getItem('convidados') || '[]');
     let filtroAtivo = 'todos';
+    let filtroFamilia = 'todos';
     let selecionados = new Set();
+
+    const FUNCAO_GRUPO = {
+      'Padrinho': 'Padrinhos & Madrinhas',
+      'Madrinha': 'Padrinhos & Madrinhas',
+      'Pajem': 'Pajens & Daminhas',
+      'Daminha': 'Pajens & Daminhas',
+    };
+
+    function sincronizarCortejoDeConvidado(g) {
+      const cortejo = JSON.parse(localStorage.getItem('cortejo') || '[]');
+      const idx = cortejo.findIndex(m => m.convidadoId === g.id || m.nome === g.nome);
+      if (g.status === 'recusado' || !g.funcao) {
+        if (idx !== -1) cortejo.splice(idx, 1);
+      } else {
+        const grupo = FUNCAO_GRUPO[g.funcao] || 'Padrinhos & Madrinhas';
+        if (idx !== -1) {
+          cortejo[idx].funcao = g.funcao;
+          cortejo[idx].grupo = grupo;
+          cortejo[idx].status = g.status || 'convidado';
+          cortejo[idx].convidadoId = g.id;
+          cortejo[idx].nome = g.nome;
+        } else {
+          cortejo.push({ id: Date.now() + Math.random(), grupo, nome: g.nome, funcao: g.funcao, whatsapp: g.whatsapp || '', status: g.status || 'convidado', par: '', presente: false, convidadoId: g.id });
+        }
+      }
+      localStorage.setItem('cortejo', JSON.stringify(cortejo));
+      if (typeof db !== 'undefined') db.set('cortejo', cortejo);
+    }
+
+    function setFiltroFamilia(f, el) {
+      filtroFamilia = f;
+      document.querySelectorAll('.filter-familia').forEach(p => p.style.opacity = '0.55');
+      el.style.opacity = '1';
+      renderizar();
+    }
 
     function toggleSelecionar(id, chk) {
       if (chk.checked) selecionados.add(id);
@@ -333,7 +380,7 @@
       if (!nome) { alert('Informe o nome do convidado.'); return; }
       const isCrianca = document.getElementById('g-crianca').checked;
       const idade = parseInt(document.getElementById('g-idade').value) || 0;
-      convidados.push({
+      const novoConv = {
         id: Date.now(),
         nome,
         whatsapp: document.getElementById('g-whatsapp').value,
@@ -342,8 +389,10 @@
         familia: document.getElementById('g-familia').value,
         crianca: isCrianca,
         idade: isCrianca ? idade : null,
-      });
+      };
+      convidados.push(novoConv);
       salvar();
+      sincronizarCortejoDeConvidado(novoConv);
       fecharModal();
       renderizar();
     }
@@ -362,6 +411,7 @@
       const idx = ordem.indexOf(g.status);
       g.status = ordem[(idx + 1) % ordem.length];
       salvar();
+      sincronizarCortejoDeConvidado(g);
       renderizar();
     }
 
@@ -379,6 +429,7 @@
     function renderizar(busca = '') {
       let lista = [...convidados];
       if (filtroAtivo !== 'todos') lista = lista.filter(g => g.status === filtroAtivo);
+      if (filtroFamilia !== 'todos') lista = lista.filter(g => g.familia === filtroFamilia);
       if (busca) lista = lista.filter(g => g.nome.toLowerCase().includes(busca));
       lista.sort((a,b) => a.nome.localeCompare(b.nome));
 
@@ -748,7 +799,9 @@
       g.status = document.getElementById('ec-status').value;
       g.funcao = document.getElementById('ec-funcao').value;
       g.familia = document.getElementById('ec-familia').value;
-      salvar(); document.getElementById('confirm-conv').classList.remove('open'); renderizar();
+      salvar();
+      sincronizarCortejoDeConvidado(g);
+      document.getElementById('confirm-conv').classList.remove('open'); renderizar();
     }
     ['modal-editar-conv','confirm-conv'].forEach(id => {
       document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
