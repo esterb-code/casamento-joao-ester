@@ -161,6 +161,9 @@
           <input class="search-input" placeholder="Buscar convidado..." oninput="renderizar(this.value.toLowerCase())" />
         </div>
         <input type="file" id="import-input" accept=".csv" style="display:none" onchange="importarPlanilha(event)"/>
+        <button onclick="migrarFamilia()" style="background:#FDE8CC;color:#8B4000;border:.5px solid #E8760A;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;transition:background .15s;" onmouseover="this.style.background='#E8760A';this.style.color='white'" onmouseout="this.style.background='#FDE8CC';this.style.color='#8B4000'">
+          <i class="ti ti-wand"></i> Corrigir família
+        </button>
         <button onclick="document.getElementById('import-input').click()" style="background:#C8E8CE;color:#2C6E3A;border:.5px solid #5FA870;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;transition:background .15s;" onmouseover="this.style.background='#5FA870';this.style.color='white'" onmouseout="this.style.background='#C8E8CE';this.style.color='#2C6E3A'">
           <i class="ti ti-file-import"></i> Importar planilha
         </button>
@@ -454,14 +457,78 @@
 
     document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
 
+    function migrarFamilia() {
+      const CSV_FAMILIA = [
+        {nome:'Walcilene',familia:'ester'},{nome:'Maurino',familia:'ester'},{nome:'Artur',familia:'ester'},
+        {nome:'Clésio',familia:'ester'},{nome:'Fernanda',familia:'ester'},{nome:'Vovô Oelcio',familia:'ester'},
+        {nome:'Vovó Dita',familia:'ester'},{nome:'Tia Carla',familia:'ester'},{nome:'Tio Demir',familia:'ester'},
+        {nome:'Emanuelle',familia:'ester'},{nome:'Tia Vanusa',familia:'ester'},{nome:'Tio Waldir',familia:'ester'},
+        {nome:'Gislaine',familia:'ester'},{nome:'Tia Jislaine',familia:'ester'},{nome:'Tio Deri',familia:'ester'},
+        {nome:'Tio Walmir',familia:'ester'},{nome:'Tia Elmanda',familia:'ester'},{nome:'Rebeca',familia:'ester'},
+        {nome:'Tia Cristina',familia:'ester'},{nome:'Tio Everton',familia:'ester'},{nome:'Raquel',familia:'ester'},
+        {nome:'Everton Filho',familia:'ester'},{nome:'Bianca',familia:'ester'},{nome:'Rafael',familia:'ester'},
+        {nome:'Mariana',familia:'ester'},{nome:'Isabela Oliveira',familia:'ester'},{nome:'Mayra',familia:'ester'},
+        {nome:'Lameque',familia:'ester'},{nome:'Ellys Rebeca',familia:'ester'},{nome:'Oziel',familia:'ester'},
+        {nome:'Ronaldo',familia:'ester'},{nome:'Atania',familia:'ester'},{nome:'Jordana',familia:'ester'},
+        {nome:'Izadora',familia:'ester'},{nome:'Wagner',familia:'ester'},{nome:'Cris (esposa do Wagner)',familia:'ester'},
+        {nome:'Tio Cleyton',familia:'ester'},{nome:'Tia Viviane',familia:'ester'},{nome:'Isabela',familia:'ester'},
+        {nome:'Ana Luiza',familia:'ester'},{nome:'Tia Edna',familia:'ester'},{nome:'João',familia:'ester'},
+        {nome:'Bruno',familia:'ester'},{nome:'Ana',familia:'ester'},{nome:'Lyandra',familia:'ester'},
+        {nome:'Mateus',familia:'ester'},{nome:'Crislaine',familia:'ester'},{nome:'João',familia:'ester'},
+        {nome:'Tia Débora',familia:'ester'},{nome:'Aitana',familia:'ester'},{nome:'Matheus',familia:'ester'},
+        {nome:'Lara',familia:'ester'},{nome:'João',familia:'ester'},
+        {nome:'Irma',familia:'joao'},{nome:'Fernando',familia:'joao'},{nome:'Gustavo',familia:'joao'},
+        {nome:'Gabi',familia:'joao'},{nome:'Thomas',familia:'joao'},{nome:'Elisa',familia:'joao'},
+        {nome:'Isabel',familia:'joao'},{nome:'Darcy',familia:'joao'},{nome:'Jacinta',familia:'joao'},
+        {nome:'Alice',familia:'joao'},{nome:'Marcelo',familia:'joao'},{nome:'Bia',familia:'joao'},
+        {nome:'Clarice',familia:'joao'},{nome:'Cecília',familia:'joao'},{nome:'Dudu',familia:'joao'},
+        {nome:'Lidiane',familia:'joao'},{nome:'Arthur',familia:'joao'},{nome:'Caio',familia:'joao'},
+        {nome:'Lucas',familia:'joao'},{nome:'Márcio',familia:'joao'},{nome:'Ricardo',familia:'joao'},
+        {nome:'Cris',familia:'joao'},{nome:'Pedro',familia:'joao'},{nome:'Natália',familia:'joao'},
+        {nome:'Vitinho',familia:'joao'},{nome:'Aninha',familia:'joao'},{nome:'Zeno',familia:'joao'},
+        {nome:'Dica',familia:'joao'},{nome:'Esmende',familia:'joao'},{nome:'Ricardo',familia:'joao'},
+        {nome:'Ester',familia:'joao'},{nome:'Gabriel',familia:'joao'},{nome:'Cris - Noiva Gabriel',familia:'joao'},
+        {nome:'Cláudia',familia:'joao'},{nome:'João',familia:'joao'},{nome:'Pedro',familia:'joao'},
+        {nome:'Camila',familia:'joao'},{nome:'João Vitor',familia:'joao'},{nome:'Guilherme',familia:'joao'},
+        {nome:'Luana',familia:'joao'},{nome:'Artur',familia:'joao'},{nome:'Johnny',familia:'joao'},
+        {nome:'Thais',familia:'joao'},{nome:'Diogo',familia:'joao'},{nome:'Sofia',familia:'joao'},
+        {nome:'Railda',familia:'joao'},{nome:'Edson',familia:'joao'},{nome:'Kelly',familia:'joao'},
+        {nome:'Miguel',familia:'joao'},{nome:'Joana',familia:'joao'},{nome:'Hiury',familia:'joao'},
+        {nome:'Daniela',familia:'joao'}
+      ];
+
+      const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim().replace(/\/$/, '').replace(/\s+/g,' ');
+      const pool = [...CSV_FAMILIA];
+      let atualizados = 0, naoEncontrados = [];
+
+      convidados.forEach(g => {
+        const gNorm = norm(g.nome);
+        const idx = pool.findIndex(p => norm(p.nome) === gNorm);
+        if (idx !== -1) {
+          g.familia = pool[idx].familia;
+          pool.splice(idx, 1);
+          atualizados++;
+        } else if (!g.familia) {
+          naoEncontrados.push(g.nome);
+        }
+      });
+
+      salvar();
+      renderizar();
+      let msg = `✅ ${atualizados} convidado(s) atualizados com família!`;
+      if (naoEncontrados.length) msg += `\n\n⚠️ Não encontrados (verifique manualmente):\n${naoEncontrados.join(', ')}`;
+      alert(msg);
+    }
+
     function exportarPlanilha() {
       const STATUS_LABELS_EXP = { convidado:'Convidado', aguardando:'Aguardando resposta', confirmado:'Confirmado', recusado:'Recusado', espera:'Lista de espera' };
       const lista = [...convidados].sort((a,b) => a.nome.localeCompare(b.nome));
 
       // Montar CSV
       const headers = ['Nome','WhatsApp','Status','Função no Cortejo','Criança','Idade'];
+      const FAMILIA_LABELS = { ester: 'Convidado da Ester', joao: 'Convidado do João' };
       const rows = lista.map(g => [
-        `"${g.nome || ''}"`,
+        `"${g.nome || ''}${g.familia && FAMILIA_LABELS[g.familia] ? ' (' + FAMILIA_LABELS[g.familia] + ')' : ''}"`,
         `"${g.whatsapp || ''}"`,
         `"${STATUS_LABELS_EXP[g.status] || g.status}"`,
         `"${g.funcao || ''}"`,
@@ -555,7 +622,7 @@
         const iFuncao  = headers.findIndex(h => h.includes('cortejo') || h.includes('funcao') || h.includes('funcão'));
         const iCrianca = headers.findIndex(h => h.includes('crian'));
         const iIdade   = headers.findIndex(h => h === 'idade');
-        const iFamilia = headers.findIndex(h => h.includes('famil') || h.includes('ester') || h.includes('joao'));
+        const iFamilia = headers.findIndex(h => h.includes('famil') || h.includes('ester') || h.includes('joao') || h === 'convidado');
 
         if (iNome === -1) { alert(`Coluna "Nome" não encontrada.\nColunas detectadas: ${headers.join(', ')}`); return; }
 
