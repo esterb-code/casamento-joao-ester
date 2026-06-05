@@ -161,6 +161,9 @@
           <input class="search-input" placeholder="Buscar convidado..." oninput="renderizar(this.value.toLowerCase())" />
         </div>
         <input type="file" id="import-input" accept=".csv" style="display:none" onchange="importarPlanilha(event)"/>
+        <button onclick="sincronizarTodosCortejo()" style="background:#E6F1FB;color:#185FA5;border:.5px solid #378ADD;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;transition:background .15s;" onmouseover="this.style.background='#378ADD';this.style.color='white'" onmouseout="this.style.background='#E6F1FB';this.style.color='#185FA5'">
+          <i class="ti ti-refresh"></i> Sincronizar Cortejo
+        </button>
         <button onclick="migrarFamilia()" style="background:#FDE8CC;color:#8B4000;border:.5px solid #E8760A;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;transition:background .15s;" onmouseover="this.style.background='#E8760A';this.style.color='white'" onmouseout="this.style.background='#FDE8CC';this.style.color='#8B4000'">
           <i class="ti ti-wand"></i> Corrigir família
         </button>
@@ -517,6 +520,17 @@
     }
 
     document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
+
+    function sincronizarTodosCortejo() {
+      let sincronizados = 0;
+      convidados.forEach(g => {
+        if (g.funcao && g.status !== 'recusado') {
+          sincronizarCortejoDeConvidado(g);
+          sincronizados++;
+        }
+      });
+      alert(`✅ ${sincronizados} convidado(s) sincronizados com o Cortejo!`);
+    }
 
     function migrarFamilia() {
       const CSV_FAMILIA = [
