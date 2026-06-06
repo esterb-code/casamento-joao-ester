@@ -122,6 +122,41 @@
     .btn-confirmar{flex:1;background:var(--rosa);color:white;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif}
     .btn-confirmar:hover{background:var(--rosa-escuro)}
     .btn-cancelar-confirm{flex:1;background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:10px;padding:11px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif}
+    /* SININHO */
+    .bell-btn{position:fixed;top:18px;right:24px;z-index:150;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border:.5px solid rgba(255,255,255,.3);border-radius:12px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;color:#fff}
+    .bell-btn:hover{background:rgba(255,255,255,.25)}
+    .bell-badge{position:absolute;top:-5px;right:-5px;background:#E24B4A;color:#fff;font-size:9px;font-weight:700;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--branco)}
+    .notif-panel{position:fixed;top:68px;right:24px;z-index:149;background:var(--branco);border-radius:16px;border:.5px solid #EED8C8;box-shadow:0 12px 40px rgba(139,34,64,.18);width:320px;max-height:480px;overflow-y:auto;display:none}
+    .notif-panel.open{display:block}
+    .notif-header{padding:14px 16px 10px;border-bottom:.5px solid #F5EDE4;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--taupe);text-transform:uppercase}
+    .notif-section{padding:10px 16px 4px;font-size:10px;font-weight:700;color:var(--taupe);text-transform:uppercase;letter-spacing:.08em}
+    .notif-item{display:flex;align-items:flex-start;gap:10px;padding:8px 16px;border-bottom:.5px solid #F5EDE4;transition:background .1s}
+    .notif-item:hover{background:var(--creme)}
+    .notif-item:last-child{border-bottom:none}
+    .notif-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+    .notif-dot.red{background:#E24B4A}
+    .notif-dot.orange{background:var(--laranja)}
+    .notif-dot.blue{background:#378ADD}
+    .notif-nome{font-size:12px;font-weight:600;color:#3E3530}
+    .notif-sub{font-size:11px;color:var(--taupe);margin-top:1px}
+    .notif-empty{padding:20px 16px;font-size:12px;color:var(--taupe);text-align:center}
+    /* CHECKLIST CARD */
+    .check-resumo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+    .check-stat{border-radius:12px;padding:12px 14px;text-align:center}
+    .check-stat.vermelho{background:#FCEBEB;border:.5px solid #E24B4A}
+    .check-stat.laranja{background:var(--pessego);border:.5px solid var(--laranja-s)}
+    .check-stat.verde{background:var(--verde-menta);border:.5px solid var(--verde-m)}
+    .check-stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;line-height:1}
+    .check-stat.vermelho .check-stat-num{color:#A32D2D}
+    .check-stat.laranja .check-stat-num{color:#8B4000}
+    .check-stat.verde .check-stat-num{color:var(--verde)}
+    .check-stat-label{font-size:10px;font-weight:600;margin-top:3px}
+    .check-stat.vermelho .check-stat-label{color:#A32D2D}
+    .check-stat.laranja .check-stat-label{color:#8B4000}
+    .check-stat.verde .check-stat-label{color:var(--verde)}
+    .check-task-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:.5px solid #F5EDE4}
+    .check-task-item:last-child{border-bottom:none}
+    .check-task-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
     @keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
     .content>*{animation:fadeInUp .4s ease both}
     .content>*:nth-child(1){animation-delay:.05s}.content>*:nth-child(2){animation-delay:.1s}.content>*:nth-child(3){animation-delay:.15s}.content>*:nth-child(4){animation-delay:.2s}.content>*:nth-child(5){animation-delay:.25s}
@@ -153,6 +188,16 @@
       <a href="configuracoes.html" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
     </div>
   </nav>
+
+  <!-- SININHO -->
+  <button class="bell-btn" id="bell-btn" onclick="toggleNotif()">
+    <i class="ti ti-bell" style="font-size:18px;"></i>
+    <span class="bell-badge" id="bell-badge" style="display:none;">0</span>
+  </button>
+  <div class="notif-panel" id="notif-panel">
+    <div class="notif-header">🔔 Notificações</div>
+    <div id="notif-content"></div>
+  </div>
 
   <main class="main">
     <div class="banner">
@@ -235,6 +280,15 @@
           </div>
           <div class="card-body" id="progresso-body"></div>
         </div>
+      </div>
+
+      <!-- CHECKLIST RESUMO -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📋 Checklist — Tarefas Pendentes</span>
+          <a href="checklist.html" class="edit-btn"><i class="ti ti-checkbox"></i> Ver tudo</a>
+        </div>
+        <div class="card-body" id="checklist-resumo-body"></div>
       </div>
 
       <!-- ATALHOS -->
@@ -433,6 +487,92 @@
     });
     }
 
+    // ── CHECKLIST HELPERS ──
+    function statusTarefaDash(t) {
+      if (t.done || !t.data) return 'normal';
+      const [d,m,y] = t.data.split('/').map(Number);
+      const dt = new Date(y, m-1, d);
+      const hj = new Date(); hj.setHours(0,0,0,0);
+      const diff = (dt - hj) / 86400000;
+      if (diff < 0) return 'atrasada';
+      if (diff <= 30) return 'alerta';
+      return 'futura';
+    }
+    function diffDias(dataStr) {
+      const [d,m,y] = dataStr.split('/').map(Number);
+      const dt = new Date(y, m-1, d);
+      const hj = new Date(); hj.setHours(0,0,0,0);
+      return Math.round((dt - hj) / 86400000);
+    }
+
+    // ── SININHO ──
+    function toggleNotif() {
+      const panel = document.getElementById('notif-panel');
+      panel.classList.toggle('open');
+      if (panel.classList.contains('open')) renderNotif();
+    }
+    document.addEventListener('click', e => {
+      const panel = document.getElementById('notif-panel');
+      const btn = document.getElementById('bell-btn');
+      if (!panel.contains(e.target) && !btn.contains(e.target)) panel.classList.remove('open');
+    });
+
+    function renderNotif() {
+      const tarefas = JSON.parse(localStorage.getItem('checklist') || '[]');
+      const fornecedores = JSON.parse(localStorage.getItem('fornecedores') || '[]');
+      const hj = new Date(); hj.setHours(0,0,0,0);
+      const limite48 = new Date(hj); limite48.setDate(limite48.getDate() + 2);
+
+      const parcelas = fornecedores.filter(f => f.vencimento && f.status !== 'cancelado' && f.status !== 'pago').filter(f => {
+        const v = new Date(f.vencimento + 'T00:00:00');
+        return v >= hj && v < limite48;
+      });
+
+      const atrasadas = tarefas.filter(t => statusTarefaDash(t) === 'atrasada');
+      const alertas = tarefas.filter(t => statusTarefaDash(t) === 'alerta');
+
+      const total = parcelas.length + atrasadas.length + alertas.length;
+      const badge = document.getElementById('bell-badge');
+      badge.textContent = total;
+      badge.style.display = total > 0 ? 'flex' : 'none';
+
+      const content = document.getElementById('notif-content');
+      content.innerHTML = '';
+
+      if (total === 0) {
+        content.innerHTML = '<div class="notif-empty">✅ Tudo em dia! Nenhuma notificação.</div>';
+        return;
+      }
+
+      if (parcelas.length > 0) {
+        content.innerHTML += `<div class="notif-section">💳 Parcelas vencendo em 48h</div>`;
+        parcelas.forEach(f => {
+          const v = new Date(f.vencimento + 'T00:00:00');
+          const tipo = v.getTime() === hj.getTime() ? 'Hoje' : 'Amanhã';
+          content.innerHTML += `<div class="notif-item"><div class="notif-dot blue"></div><div><div class="notif-nome">${f.nome}</div><div class="notif-sub">${f.parcelaDesc || f.vencimento} · ${tipo}</div></div></div>`;
+        });
+      }
+
+      if (atrasadas.length > 0) {
+        content.innerHTML += `<div class="notif-section">🔴 Checklist em atraso</div>`;
+        atrasadas.slice(0,5).forEach(t => {
+          const d = Math.abs(diffDias(t.data));
+          content.innerHTML += `<div class="notif-item"><div class="notif-dot red"></div><div><div class="notif-nome">${t.nome}</div><div class="notif-sub">${d} dia${d>1?'s':''} em atraso · ${t.data}</div></div></div>`;
+        });
+        if (atrasadas.length > 5) content.innerHTML += `<div class="notif-item" style="justify-content:center;"><span style="font-size:11px;color:var(--taupe);">+${atrasadas.length-5} mais em atraso</span></div>`;
+      }
+
+      if (alertas.length > 0) {
+        content.innerHTML += `<div class="notif-section">🟠 Checklist — próximos 30 dias</div>`;
+        alertas.slice(0,5).forEach(t => {
+          const d = diffDias(t.data);
+          const label = d === 0 ? 'Hoje!' : `em ${d} dia${d>1?'s':''}`;
+          content.innerHTML += `<div class="notif-item"><div class="notif-dot orange"></div><div><div class="notif-nome">${t.nome}</div><div class="notif-sub">${label} · ${t.data}</div></div></div>`;
+        });
+        if (alertas.length > 5) content.innerHTML += `<div class="notif-item" style="justify-content:center;"><span style="font-size:11px;color:var(--taupe);">+${alertas.length-5} mais em alerta</span></div>`;
+      }
+    }
+
     // ── PROGRESSO AUTOMÁTICO ──
     function calcularProgresso() {
       const convidados = JSON.parse(localStorage.getItem('convidados') || '[]');
@@ -603,6 +743,41 @@
         `;
         progBody.appendChild(div);
       });
+
+      // Checklist resumo
+      const tarefas = JSON.parse(localStorage.getItem('checklist') || '[]');
+      const pendentes = tarefas.filter(t => !t.done);
+      const ckAtrasadas = pendentes.filter(t => statusTarefaDash(t) === 'atrasada');
+      const ckAlertas = pendentes.filter(t => statusTarefaDash(t) === 'alerta');
+      const ckFuturas = pendentes.filter(t => statusTarefaDash(t) === 'futura');
+      const ckBody = document.getElementById('checklist-resumo-body');
+      if (ckBody) {
+        let html = `<div class="check-resumo-grid">
+          <div class="check-stat vermelho"><div class="check-stat-num">${ckAtrasadas.length}</div><div class="check-stat-label">Em atraso</div></div>
+          <div class="check-stat laranja"><div class="check-stat-num">${ckAlertas.length}</div><div class="check-stat-label">Próx. 30 dias</div></div>
+          <div class="check-stat verde"><div class="check-stat-num">${ckFuturas.length}</div><div class="check-stat-label">Futuras</div></div>
+        </div>`;
+        const urgentes = [...ckAtrasadas, ...ckAlertas].slice(0, 5);
+        if (urgentes.length > 0) {
+          html += urgentes.map(t => {
+            const st = statusTarefaDash(t);
+            const cor = st === 'atrasada' ? '#E24B4A' : 'var(--laranja)';
+            const d = diffDias(t.data);
+            const label = d < 0 ? `${Math.abs(d)}d em atraso` : d === 0 ? 'Hoje!' : `em ${d}d`;
+            return `<div class="check-task-item">
+              <div class="check-task-dot" style="background:${cor};margin-top:4px;"></div>
+              <div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:#3E3530;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.nome}</div>
+              <div style="font-size:11px;color:var(--taupe);">${t.data} · ${label}</div></div>
+            </div>`;
+          }).join('');
+        } else {
+          html += `<div style="text-align:center;padding:12px 0;font-size:12px;color:var(--verde);"><i class="ti ti-circle-check" style="font-size:20px;display:block;margin-bottom:4px;"></i>Nenhuma tarefa urgente!</div>`;
+        }
+        ckBody.innerHTML = html;
+      }
+
+      // Atualiza badge do sininho
+      renderNotif();
 
       // Privacy
       const blurred = localStorage.getItem('privacy') !== 'visible';

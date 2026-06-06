@@ -67,6 +67,13 @@
     .btn-recusar{font-size:11px;padding:4px 12px;border-radius:99px;background:#FCEBEB;color:#A32D2D;border:.5px solid #E24B4A;cursor:pointer}
     .btn-del{background:none;border:none;cursor:pointer;color:var(--taupe);font-size:14px;opacity:.5}
     .btn-del:hover{opacity:1;color:#A32D2D}
+    .tarefa-card.atrasada{border-left:3px solid #E24B4A;background:#FFFAFA}
+    .tarefa-card.alerta{border-left:3px solid var(--laranja);background:#FFFCF8}
+    .tarefa-card.futura{border-left:3px solid var(--verde-m);background:#FAFDF8}
+    .prazo-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
+    .prazo-badge.atrasada{background:#FCEBEB;color:#A32D2D;border:.5px solid #E24B4A}
+    .prazo-badge.alerta{background:var(--pessego);color:#8B4000;border:.5px solid var(--laranja-s)}
+    .prazo-badge.futura{background:var(--verde-menta);color:var(--verde);border:.5px solid var(--verde-m)}
     .modal-overlay{position:fixed;inset:0;background:rgba(139,34,64,.3);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
     .modal-overlay.open{display:flex}
     .modal{background:var(--branco);border-radius:20px;border:.5px solid #EED8C8;padding:28px;width:460px;box-shadow:0 20px 60px rgba(139,34,64,.2)}
@@ -171,6 +178,27 @@
       tarefas.push({id:Date.now(),nome,mes:document.getElementById('t-mes').value,data:'',periodo:'',gasto:parseFloat(document.getElementById('t-gasto').value)||0,urgente:document.getElementById('t-urgente').checked,done:false,cerimonialista:false});
       salvar();fecharModal();renderizar()
     }
+    function statusTarefa(t) {
+      if (t.done || !t.data) return 'normal';
+      const [d,m,y] = t.data.split('/').map(Number);
+      const dt = new Date(y, m-1, d);
+      const hoje = new Date(); hoje.setHours(0,0,0,0);
+      const diff = (dt - hoje) / 86400000;
+      if (diff < 0) return 'atrasada';
+      if (diff <= 30) return 'alerta';
+      return 'futura';
+    }
+    function prazoLabel(t) {
+      if (t.done || !t.data) return '';
+      const [d,m,y] = t.data.split('/').map(Number);
+      const dt = new Date(y, m-1, d);
+      const hoje = new Date(); hoje.setHours(0,0,0,0);
+      const diff = Math.round((dt - hoje) / 86400000);
+      if (diff < 0) return `${Math.abs(diff)} dia${Math.abs(diff)>1?'s':''} em atraso`;
+      if (diff === 0) return 'Hoje!';
+      if (diff <= 30) return `em ${diff} dia${diff>1?'s':''}`;
+      return '';
+    }
     function toggleDone(id){const t=tarefas.find(t=>t.id===id);if(t){t.done=!t.done;salvar();renderizar()}}
     function excluir(id){if(!confirm('Remover esta tarefa?'))return;tarefas=tarefas.filter(t=>t.id!==id);salvar();renderizar()}
     function aceitarSugestao(id){const s=sugestoes.find(s=>s.id===id);if(!s)return;tarefas.push({id:Date.now(),nome:s.nome,mes:s.mes,gasto:0,urgente:false,done:false,cerimonialista:true});sugestoes=sugestoes.filter(s=>s.id!==id);localStorage.setItem('checklist-sugestoes',JSON.stringify(sugestoes));salvar();renderizar()}
@@ -203,13 +231,17 @@
         container.innerHTML+=`<div style="text-align:center;padding:40px;color:var(--taupe);font-size:13px;"><i class="ti ti-checkbox" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4;"></i>Nenhuma tarefa para este mês.</div>`;
       }
       lista.forEach(t=>{
-        const card=document.createElement('div');card.className='tarefa-card'+(t.done?' done':'');
+        const st = statusTarefa(t);
+        const label = prazoLabel(t);
+        const card=document.createElement('div');
+        card.className='tarefa-card'+(t.done?' done':' '+st);
         card.innerHTML=`
           <div class="check-box ${t.done?'checked':''}" onclick="toggleDone(${t.id})">${t.done?'<i class="ti ti-check"></i>':''}</div>
           <div class="tarefa-info">
             <div class="tarefa-nome ${t.done?'riscado':''}">${t.nome}</div>
             ${t.data?`<div style="font-size:11px;color:var(--taupe);margin-top:2px;display:flex;align-items:center;gap:4px;"><i class="ti ti-calendar" style="font-size:11px;"></i> ${t.data}${t.periodo?' · '+t.periodo:''}</div>`:''}
             <div class="tarefa-tags" style="margin-top:5px;">
+              ${!t.done && label?`<span class="prazo-badge ${st}">${label}</span>`:''}
               ${t.gasto>0?`<span class="tag tag-gasto">R$ ${t.gasto.toLocaleString('pt-BR')}</span>`:''}
               ${t.urgente?'<span class="tag tag-urgente">urgente</span>':''}
               ${t.cerimonialista?'<span class="tag tag-cerimonialista">sugerida pela cerimonialista</span>':''}
