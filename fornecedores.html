@@ -262,6 +262,12 @@
           <input class="form-input" id="f-whatsapp" placeholder="+55 61 9 XXXX-XXXX" />
         </div>
         <div class="form-group">
+          <label class="form-label">Instagram</label>
+          <input class="form-input" id="f-instagram" placeholder="@perfil ou link" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
           <label class="form-label">Status</label>
           <select class="form-select" id="f-status">
             <option value="orcado">Orçado</option>
@@ -336,7 +342,7 @@
     function abrirModal() { document.getElementById('modal').classList.add('open'); }
     function fecharModal() {
       document.getElementById('modal').classList.remove('open');
-      ['f-nome','f-whatsapp','f-valor','f-pago','f-obs','f-vencimento','f-parcela-desc','f-proposta-nome'].forEach(id => document.getElementById(id).value = '');
+      ['f-nome','f-whatsapp','f-instagram','f-valor','f-pago','f-obs','f-vencimento','f-parcela-desc','f-proposta-nome'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('proposta-input').value = '';
       document.getElementById('proposta-status').innerHTML = '';
       document.getElementById('proposta-icon').className = 'ti ti-file-upload';
@@ -354,6 +360,7 @@
         categoria: document.getElementById('f-categoria').value,
         nome,
         whatsapp: document.getElementById('f-whatsapp').value,
+        instagram: document.getElementById('f-instagram').value.trim(),
         status: document.getElementById('f-status').value,
         valor: parseFloat(document.getElementById('f-valor').value) || 0,
         pago: parseFloat(document.getElementById('f-pago').value) || 0,
@@ -431,6 +438,7 @@
               <div>
                 <div class="vendor-nome">${f.nome}</div>
                 <div class="vendor-contato">${f.whatsapp || '—'}</div>
+                ${f.instagram ? `<div class="vendor-contato"><a href="${f.instagram.startsWith('http') ? f.instagram : 'https://instagram.com/' + f.instagram.replace('@','')}" target="_blank" style="color:var(--rosa);text-decoration:none;display:flex;align-items:center;gap:3px;"><i class="ti ti-brand-instagram" style="font-size:12px;"></i> ${f.instagram}</a></div>` : ''}
               </div>
               <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
                 <span class="status-badge ${STATUS_CLASSES[f.status]}">${STATUS_LABELS[f.status]}</span>
@@ -634,6 +642,7 @@
       <div class="form-group"><label class="form-label">Nome do fornecedor</label><input class="form-input" id="ef-nome" /></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" id="ef-whatsapp" /></div>
+        <div class="form-group"><label class="form-label">Instagram</label><input class="form-input" id="ef-instagram" placeholder="@perfil ou link" /></div>
         <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="ef-status">
           <option value="orcado">Orçado</option><option value="negociacao">Em negociação</option>
           <option value="contratado">Contratado</option><option value="pago">Pago</option><option value="cancelado">Cancelado</option>
@@ -675,6 +684,7 @@
       document.getElementById('ef-categoria').value = f.categoria;
       document.getElementById('ef-nome').value = f.nome;
       document.getElementById('ef-whatsapp').value = f.whatsapp || '';
+      document.getElementById('ef-instagram').value = f.instagram || '';
       document.getElementById('ef-status').value = f.status;
       document.getElementById('ef-valor').value = f.valor || 0;
       document.getElementById('ef-pago').value = f.pago || 0;
@@ -693,6 +703,7 @@
       f.categoria = document.getElementById('ef-categoria').value;
       f.nome = document.getElementById('ef-nome').value;
       f.whatsapp = document.getElementById('ef-whatsapp').value;
+      f.instagram = document.getElementById('ef-instagram').value.trim();
       f.status = document.getElementById('ef-status').value;
       f.valor = parseFloat(document.getElementById('ef-valor').value) || 0;
       f.pago = parseFloat(document.getElementById('ef-pago').value) || 0;
