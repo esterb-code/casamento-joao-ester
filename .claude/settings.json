@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "$j = $input | ConvertFrom-Json; $f = $j.tool_input.file_path; if ($f -match '\\.(html|js)$') { Set-Location 'C:\\Users\\ester\\OneDrive\\Casório-Site'; git add $f; $changed = git diff --cached --name-only; if ($changed) { $nome = Split-Path $f -Leaf; git commit -m \"Auto-save: $nome\"; git push origin main } }",
+            "statusMessage": "Salvando no GitHub...",
+            "async": true
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git *)"
+    ]
+  }
+}

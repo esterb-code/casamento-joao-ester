@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orçamento Geral · João & Ester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <style>
+    :root{--rosa:#C2516A;--rosa-claro:#F4AABB;--rosa-escuro:#8B2240;--verde:#2C6E3A;--verde-m:#5FA870;--verde-menta:#C8E8CE;--laranja:#E8760A;--laranja-s:#F4A860;--pessego:#FDE8CC;--creme:#FDF5EC;--taupe:#9A7060;--branco:#FDFAF7;--sidebar-w:220px}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;display:flex;min-height:100vh}
+    .sidebar{width:var(--sidebar-w);background:var(--rosa-escuro);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+    .sidebar-logo{padding:24px 20px 20px;border-bottom:.5px solid rgba(194,81,106,.5);margin-bottom:8px}
+    .sidebar-logo .initials{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.15em;color:var(--pessego);margin-bottom:4px}
+    .sidebar-logo .names{font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;line-height:1.2}
+    .sidebar-logo .date{font-size:11px;color:var(--rosa-claro);margin-top:3px;font-weight:300}
+    .nav-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:rgba(244,170,187,.5);padding:8px 20px 4px;text-transform:uppercase}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(253,221,230,.8);cursor:pointer;transition:all .15s;text-decoration:none;border-left:2px solid transparent}
+    .nav-item:hover{background:rgba(194,81,106,.2);color:#fff}
+    .nav-item.active{background:rgba(194,81,106,.25);color:#fff;border-left-color:var(--rosa-claro);font-weight:600}
+    .nav-item i{font-size:16px;opacity:.8}
+    .nav-section{padding:8px 0}
+    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+    .topbar{padding:20px 36px;background:var(--branco);border-bottom:.5px solid #EED8C8;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .topbar-left h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--rosa-escuro)}
+    .topbar-left p{font-size:12px;color:var(--taupe);margin-top:2px}
+    .content{padding:24px 36px}
+    .btn-add{background:var(--rosa);color:white;border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;transition:background .15s}
+    .btn-add:hover{background:var(--rosa-escuro)}
+
+    /* SUMMARY CARDS */
+    .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+    .sum-card{background:var(--branco);border-radius:16px;border:.5px solid #EED8C8;padding:18px 20px}
+    .sum-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--taupe);text-transform:uppercase;margin-bottom:6px}
+    .sum-value{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:var(--rosa-escuro)}
+    .sum-sub{font-size:11px;color:var(--taupe);margin-top:4px}
+    .prog-bar{height:6px;background:#FAE8EC;border-radius:99px;overflow:hidden;margin-top:10px}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--rosa-claro),var(--rosa));border-radius:99px;transition:width .5s}
+
+    /* TABLE */
+    .table-wrap{background:var(--branco);border-radius:16px;border:.5px solid #EED8C8;overflow:hidden}
+    .table-header{display:grid;grid-template-columns:2fr 80px 140px 140px 120px 40px;gap:0;padding:10px 20px;background:#FAE8EC;border-bottom:.5px solid #EED8C8}
+    .th{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--rosa-escuro);text-transform:uppercase;font-weight:600}
+    .table-row{display:grid;grid-template-columns:2fr 80px 140px 140px 120px 40px;gap:0;padding:12px 20px;border-bottom:.5px solid #F5EDE4;align-items:center;transition:background .1s}
+    .table-row:hover{background:var(--creme)}
+    .table-row:last-child{border-bottom:none}
+    .row-nome{font-size:13px;font-weight:600;color:#3E3530}
+    .row-pct{font-size:12px;color:var(--taupe);font-weight:600}
+    .row-valor{font-size:13px;font-weight:600;color:#3E3530}
+    .row-real{font-size:13px;font-weight:600}
+    .row-real.auto{color:var(--verde)}
+    .row-real.manual{color:#185FA5}
+    .row-real.vazio{color:var(--taupe);font-weight:400}
+    .row-bar-wrap{height:4px;background:#FAE8EC;border-radius:99px;overflow:hidden;margin-top:3px}
+    .row-bar-fill{height:100%;border-radius:99px;transition:width .4s}
+    .sync-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;display:inline-flex;align-items:center;gap:3px}
+    .sync-badge.auto{background:var(--verde-menta);color:var(--verde);border:.5px solid var(--verde-m)}
+    .sync-badge.manual{background:#E6F1FB;color:#185FA5;border:.5px solid #378ADD}
+    .table-footer{display:grid;grid-template-columns:2fr 80px 140px 140px 120px 40px;gap:0;padding:12px 20px;background:#FAE8EC;border-top:.5px solid #EED8C8}
+    .footer-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--rosa-escuro);font-weight:600;text-transform:uppercase}
+    .footer-valor{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--rosa-escuro)}
+
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(139,34,64,.3);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--branco);border-radius:20px;border:.5px solid #EED8C8;padding:28px;width:460px;box-shadow:0 20px 60px rgba(139,34,64,.2)}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--rosa-escuro);margin-bottom:20px}
+    .form-group{margin-bottom:14px}
+    .form-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--taupe);text-transform:uppercase;margin-bottom:5px;display:block}
+    .form-input,.form-select{width:100%;border:.5px solid #EED8C8;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;outline:none}
+    .form-input:focus,.form-select:focus{border-color:var(--rosa-claro)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .modal-actions{display:flex;gap:10px;margin-top:20px}
+    .btn-salvar{flex:1;background:var(--rosa);color:white;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif}
+    .btn-salvar:hover{background:var(--rosa-escuro)}
+    .btn-cancelar{padding:11px 20px;background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif}
+    .btn-del{background:none;border:none;cursor:pointer;color:var(--taupe);font-size:15px;opacity:.5;transition:opacity .15s}
+    .btn-del:hover{opacity:1;color:#A32D2D}
+    .hint-sync{font-size:11px;color:var(--taupe);margin-top:6px;line-height:1.5}
+  </style>
+  <script src="supabase.js"></script>
+  <script src="config.js"></script>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="initials">💍 J & E</div>
+      <div class="names" id="sidebar-names">João & Ester</div>
+      <div class="date" id="sidebar-date">13 de junho de 2027</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="index.html" class="nav-item"><i class="ti ti-home"></i> Dashboard</a>
+      <a href="orcamento.html" class="nav-item active"><i class="ti ti-chart-pie"></i> Orçamento</a>
+      <a href="igreja.html" class="nav-item"><i class="ti ti-building-church"></i> Igreja</a>
+      <a href="fornecedores.html" class="nav-item"><i class="ti ti-building-store"></i> Fornecedores</a>
+      <a href="convidados.html" class="nav-item"><i class="ti ti-users"></i> Convidados</a>
+      <a href="cortejo.html" class="nav-item"><i class="ti ti-heart"></i> Cortejo</a>
+      <a href="musicas.html" class="nav-item"><i class="ti ti-music"></i> Músicas</a>
+      <a href="papelaria.html" class="nav-item"><i class="ti ti-file-text"></i> Papelaria</a>
+      <a href="ideias.html" class="nav-item"><i class="ti ti-bulb"></i> Banco de Ideias</a>
+      <a href="reunioes.html" class="nav-item"><i class="ti ti-calendar"></i> Reuniões</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto">
+      <a href="configuracoes.html" class="nav-item"><i class="ti ti-settings"></i> Configurações</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Orçamento Geral</h1>
+        <p>Planejamento financeiro do casamento por categoria</p>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="sincronizarFornecedores()" style="background:#E6F1FB;color:#185FA5;border:.5px solid #378ADD;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;" onmouseover="this.style.background='#378ADD';this.style.color='white'" onmouseout="this.style.background='#E6F1FB';this.style.color='#185FA5'">
+          <i class="ti ti-refresh"></i> Sincronizar Fornecedores
+        </button>
+        <button class="btn-add" onclick="abrirModal()"><i class="ti ti-plus"></i> Nova categoria</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="summary-grid" id="summary-grid"></div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="th">Item</div>
+          <div class="th">%</div>
+          <div class="th">Valor Estimado</div>
+          <div class="th">Valor Real (Pago)</div>
+          <div class="th">Progresso</div>
+          <div class="th"></div>
+        </div>
+        <div id="tabela-body"></div>
+        <div class="table-footer" id="tabela-footer"></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title" id="modal-title">Nova Categoria</div>
+      <div class="form-group">
+        <label class="form-label">Nome da categoria</label>
+        <input class="form-input" id="orc-nome" placeholder="Ex: Fotografia" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor Estimado (R$)</label>
+          <input class="form-input" id="orc-estimado" type="number" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Valor Real manual (R$)</label>
+          <input class="form-input" id="orc-real" type="number" placeholder="Deixe 0 para sincronizar" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Palavra-chave para sincronizar com Fornecedores</label>
+        <input class="form-input" id="orc-keyword" placeholder="Ex: foto, video, filmagem" />
+        <div class="hint-sync">Separe por vírgula. O sistema vai somar o valor pago de todos os fornecedores cujo nome contenha essas palavras.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-salvar" onclick="salvarItem()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_ITEMS = [
+      {nome:'Buffet',             estimado:15000, keyword:'buffet'},
+      {nome:'Salão',              estimado:14200, keyword:'salão,salao,espaço,espaco,recepção'},
+      {nome:'Fotografia e Vídeo', estimado:10000, keyword:'foto,video,vídeo,filmagem'},
+      {nome:'Igreja - Dom Bosco', estimado:7000,  keyword:'igreja'},
+      {nome:'Assessoria/Cerimonial', estimado:4200, keyword:'cerimonial,assessoria'},
+      {nome:'Vestido da noiva',   estimado:3000,  keyword:'vestido'},
+      {nome:'Maquiagem da noiva', estimado:5000,  keyword:'maquiagem,dia de noiva'},
+      {nome:'Decoração',          estimado:10000, keyword:'decoração,decoracao'},
+      {nome:'Banda',              estimado:2000,  keyword:'banda,música,musica,dj'},
+      {nome:'Convites Padrinhos', estimado:2000,  keyword:'convite'},
+      {nome:'Lembracinha',        estimado:1000,  keyword:'lembrança,lembranca,lembracinha'},
+      {nome:'Terno do noivo',     estimado:1000,  keyword:'terno'},
+      {nome:'Margem de reserva',  estimado:5000,  keyword:''},
+    ];
+
+    let itens = JSON.parse(localStorage.getItem('orcamento') || '[]');
+    let editandoId = null;
+
+    function salvar() {
+      localStorage.setItem('orcamento', JSON.stringify(itens));
+      if (typeof db !== 'undefined') db.set('orcamento', itens);
+    }
+
+    function fmt(v) { return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0); }
+
+    function calcularRealDeForns(keywords) {
+      if (!keywords || !keywords.trim()) return { valor: 0, auto: false };
+      const forns = JSON.parse(localStorage.getItem('fornecedores') || '[]');
+      const kws = keywords.toLowerCase().split(',').map(k => k.trim()).filter(Boolean);
+      let total = 0;
+      forns.forEach(f => {
+        const nomeLow = (f.nome || '').toLowerCase();
+        const catLow = (f.categoria || '').toLowerCase();
+        if (kws.some(k => nomeLow.includes(k) || catLow.includes(k))) {
+          total += parseFloat(f.pago) || 0;
+        }
+      });
+      return { valor: total, auto: true };
+    }
+
+    function sincronizarFornecedores() {
+      itens.forEach(item => {
+        if (item.keyword) {
+          const { valor } = calcularRealDeForns(item.keyword);
+          item.realAuto = valor;
+        }
+      });
+      salvar();
+      renderizar();
+      alert('✅ Valores reais sincronizados com os fornecedores!');
+    }
+
+    function abrirModal(id = null) {
+      editandoId = id;
+      const item = id !== null ? itens.find(i => i.id === id) : null;
+      document.getElementById('modal-title').textContent = item ? 'Editar Categoria' : 'Nova Categoria';
+      document.getElementById('orc-nome').value = item ? item.nome : '';
+      document.getElementById('orc-estimado').value = item ? item.estimado : '';
+      document.getElementById('orc-real').value = item ? (item.realManual || 0) : 0;
+      document.getElementById('orc-keyword').value = item ? (item.keyword || '') : '';
+      document.getElementById('modal').classList.add('open');
+    }
+
+    function fecharModal() {
+      document.getElementById('modal').classList.remove('open');
+      editandoId = null;
+    }
+
+    function salvarItem() {
+      const nome = document.getElementById('orc-nome').value.trim();
+      if (!nome) { alert('Informe o nome da categoria.'); return; }
+      const estimado = parseFloat(document.getElementById('orc-estimado').value) || 0;
+      const realManual = parseFloat(document.getElementById('orc-real').value) || 0;
+      const keyword = document.getElementById('orc-keyword').value.trim();
+      const { valor: realAuto } = calcularRealDeForns(keyword);
+
+      if (editandoId !== null) {
+        const item = itens.find(i => i.id === editandoId);
+        if (item) { item.nome = nome; item.estimado = estimado; item.realManual = realManual; item.keyword = keyword; item.realAuto = realAuto; }
+      } else {
+        itens.push({ id: Date.now(), nome, estimado, realManual, keyword, realAuto });
+      }
+      salvar();
+      fecharModal();
+      renderizar();
+    }
+
+    function excluir(id) {
+      if (!confirm('Remover esta categoria?')) return;
+      itens = itens.filter(i => i.id !== id);
+      salvar();
+      renderizar();
+    }
+
+    function renderizar() {
+      const totalEst = itens.reduce((s, i) => s + (i.estimado || 0), 0);
+
+      // Summary
+      const totalReal = itens.reduce((s, i) => {
+        const real = (i.keyword && i.realAuto > 0) ? i.realAuto : (i.realManual || 0);
+        return s + real;
+      }, 0);
+      const saldo = totalEst - totalReal;
+      const pct = totalEst > 0 ? Math.round(totalReal / totalEst * 100) : 0;
+
+      document.getElementById('summary-grid').innerHTML = `
+        <div class="sum-card">
+          <div class="sum-label">Total Estimado</div>
+          <div class="sum-value">${fmt(totalEst)}</div>
+          <div class="sum-sub">orçamento planejado</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-label">Total Pago</div>
+          <div class="sum-value" style="color:var(--verde)">${fmt(totalReal)}</div>
+          <div class="sum-sub">${pct}% do orçamento</div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${Math.min(pct,100)}%"></div></div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-label">Saldo Pendente</div>
+          <div class="sum-value" style="color:var(--laranja)">${fmt(saldo)}</div>
+          <div class="sum-sub">a pagar</div>
+        </div>
+      `;
+
+      // Table body
+      const body = document.getElementById('tabela-body');
+      body.innerHTML = '';
+      itens.forEach(item => {
+        const pctItem = totalEst > 0 ? (item.estimado / totalEst * 100).toFixed(2) : '0.00';
+        const real = (item.keyword && item.realAuto > 0) ? item.realAuto : (item.realManual || 0);
+        const isAuto = item.keyword && item.realAuto > 0;
+        const pctPago = item.estimado > 0 ? Math.min(Math.round(real / item.estimado * 100), 100) : 0;
+        const barColor = pctPago >= 100 ? 'var(--verde)' : pctPago > 50 ? 'var(--laranja)' : 'var(--rosa)';
+
+        const row = document.createElement('div');
+        row.className = 'table-row';
+        row.innerHTML = `
+          <div>
+            <div class="row-nome">${item.nome}</div>
+            ${isAuto ? `<span class="sync-badge auto"><i class="ti ti-refresh" style="font-size:9px;"></i> auto</span>` : (item.realManual > 0 ? `<span class="sync-badge manual">manual</span>` : '')}
+          </div>
+          <div class="row-pct">${pctItem}%</div>
+          <div class="row-valor">${fmt(item.estimado)}</div>
+          <div class="row-real ${real > 0 ? (isAuto ? 'auto' : 'manual') : 'vazio'}">${real > 0 ? fmt(real) : '—'}</div>
+          <div>
+            <div style="font-size:11px;color:var(--taupe);margin-bottom:3px;">${pctPago}%</div>
+            <div class="row-bar-wrap"><div class="row-bar-fill" style="width:${pctPago}%;background:${barColor};"></div></div>
+          </div>
+          <div style="display:flex;gap:4px;">
+            <button onclick="abrirModal(${item.id})" style="background:#FAE8EC;border:.5px solid var(--rosa-claro);border-radius:6px;width:26px;height:26px;cursor:pointer;color:var(--rosa);display:flex;align-items:center;justify-content:center;" title="Editar"><i class="ti ti-pencil" style="font-size:12px;"></i></button>
+            <button class="btn-del" onclick="excluir(${item.id})"><i class="ti ti-trash"></i></button>
+          </div>
+        `;
+        body.appendChild(row);
+      });
+
+      // Footer
+      document.getElementById('tabela-footer').innerHTML = `
+        <div class="footer-label">Total</div>
+        <div class="footer-label">100%</div>
+        <div class="footer-valor">${fmt(totalEst)}</div>
+        <div class="footer-valor" style="color:var(--verde)">${fmt(totalReal)}</div>
+        <div class="footer-label" style="color:var(--laranja)">${pct}% pago</div>
+        <div></div>
+      `;
+    }
+
+    document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
+
+    async function initApp() {
+      if (typeof db !== 'undefined') {
+        const dados = await db.get('orcamento');
+        if (dados !== null) { itens = dados; localStorage.setItem('orcamento', JSON.stringify(dados)); }
+      }
+      if (itens.length === 0) {
+        itens = DEFAULT_ITEMS.map((item, i) => ({
+          id: Date.now() + i,
+          nome: item.nome,
+          estimado: item.estimado,
+          realManual: 0,
+          keyword: item.keyword,
+          realAuto: 0,
+        }));
+        sincronizarFornecedores();
+      } else {
+        renderizar();
+      }
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
