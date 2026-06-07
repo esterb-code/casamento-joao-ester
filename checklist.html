@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
   <style>
-    :root { --rosa:#C2516A;--rosa-claro:#F4AABB;--rosa-escuro:#8B2240;--verde:#2C6E3A;--verde-m:#5FA870;--verde-menta:#C8E8CE;--laranja:#E8760A;--laranja-s:#F4A860;--pessego:#FDE8CC;--creme:#FDF5EC;--taupe:#9A7060;--branco:#FDFAF7;--sidebar-w:220px; }
+    :root { --rosa:#56061D;--rosa-claro:#E2D9CB;--rosa-escuro:#022E4C;--verde:#517493;--verde-m:#8899B4;--verde-menta:#D4DFE8;--laranja:#56061D;--laranja-s:#8B7C72;--pessego:#E2D9CB;--creme:#F7F5F1;--taupe:#4A4A4A;--branco:#FDFAF7;--sidebar-w:220px; }
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;display:flex;min-height:100vh}
     .sidebar{width:var(--sidebar-w);background:var(--rosa-escuro);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
@@ -88,6 +88,31 @@
     .modal-actions{display:flex;gap:10px;margin-top:20px}
     .btn-salvar{flex:1;background:var(--rosa);color:white;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif}
     .btn-cancelar{padding:11px 20px;background:var(--creme);color:var(--taupe);border:.5px solid #EED8C8;border-radius:10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif}
+    /* RESPONSIVE MOBILE MENU */
+    .mobile-menu-btn{display:none;background:none;border:none;color:white;font-size:24px;cursor:pointer;z-index:101;position:fixed;top:12px;left:12px}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;backdrop-filter:blur(2px);opacity:0;transition:opacity .3s ease;pointer-events:none}
+    .sidebar-overlay.open{display:block;opacity:1;pointer-events:auto}
+    @media(max-width:768px){
+      :root{--sidebar-w:0px}
+      body{flex-direction:column}
+      .sidebar{width:min(75vw,300px);position:fixed;top:0;left:0;height:100vh;z-index:100;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);will-change:transform}
+      .sidebar.open{transform:translateX(0)}
+      .main{margin-left:0}
+      .mobile-menu-btn{display:block}
+      .topbar{padding:12px 14px;flex-direction:column;gap:12px}
+      .topbar-left h1{font-size:20px}
+      .topbar-right{width:100%;flex-wrap:wrap;gap:8px}
+      .search-input{width:100%;font-size:13px}
+      .content{padding:16px 12px}
+      .check-category{margin-bottom:16px}
+      .check-list{gap:12px}
+    }
+    @media(max-width:480px){
+      .sidebar{width:100%}
+      .topbar-left h1{font-size:18px}
+      .content{padding:12px 10px}
+      .check-task-item{padding:6px 0}
+    }
   </style>
   <script src="supabase.js"></script>
   <script src="config.js"></script>
@@ -453,6 +478,44 @@
     }
 
     initApp();
+
+    // Mobile Menu Handler
+    function initMobileMenu() {
+      const sidebar = document.querySelector('.sidebar');
+      const body = document.body;
+      
+      if (!document.querySelector('.mobile-menu-btn')) {
+        const menuBtn = document.createElement('button');
+        menuBtn.className = 'mobile-menu-btn';
+        menuBtn.innerHTML = '<i class="ti ti-menu-2"></i>';
+        body.appendChild(menuBtn);
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        body.appendChild(overlay);
+        
+        menuBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          overlay.classList.toggle('open');
+        });
+        
+        overlay.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          overlay.classList.remove('open');
+        });
+      }
+      
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        item.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          const overlay = document.querySelector('.sidebar-overlay');
+          if (overlay) overlay.classList.remove('open');
+        });
+      });
+    }
+
+    initMobileMenu();
 </script>
 </body>
 </html>
