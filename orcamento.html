@@ -42,9 +42,9 @@
 
     /* TABLE */
     .table-wrap{background:var(--branco);border-radius:16px;border:.5px solid #EED8C8;overflow:hidden}
-    .table-header{display:grid;grid-template-columns:2fr 80px 140px 140px 120px 40px;gap:0;padding:10px 20px;background:#FAE8EC;border-bottom:.5px solid #EED8C8}
+    .table-header{display:grid;grid-template-columns:2fr 80px 140px 140px 40px;gap:0;padding:10px 20px;background:#FAE8EC;border-bottom:.5px solid #EED8C8}
     .th{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--rosa-escuro);text-transform:uppercase;font-weight:600}
-    .table-row{display:grid;grid-template-columns:2fr 80px 140px 140px 120px 40px;gap:0;padding:12px 20px;border-bottom:.5px solid #F5EDE4;align-items:center;transition:background .1s}
+    .table-row{display:grid;grid-template-columns:2fr 80px 140px 140px 40px;gap:0;padding:12px 20px;border-bottom:.5px solid #F5EDE4;align-items:center;transition:background .1s}
     .table-row:hover{background:var(--creme)}
     .table-row:last-child{border-bottom:none}
     .row-nome{font-size:13px;font-weight:600;color:#3E3530}
@@ -59,7 +59,7 @@
     .sync-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;display:inline-flex;align-items:center;gap:3px}
     .sync-badge.auto{background:var(--verde-menta);color:var(--verde);border:.5px solid var(--verde-m)}
     .sync-badge.manual{background:#E6F1FB;color:#185FA5;border:.5px solid #378ADD}
-    .table-footer{display:grid;grid-template-columns:2fr 80px 140px 140px 120px 40px;gap:0;padding:12px 20px;background:#FAE8EC;border-top:.5px solid #EED8C8}
+    .table-footer{display:grid;grid-template-columns:2fr 80px 140px 140px 40px;gap:0;padding:12px 20px;background:#FAE8EC;border-top:.5px solid #EED8C8}
     .footer-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--rosa-escuro);font-weight:600;text-transform:uppercase}
     .footer-valor{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--rosa-escuro)}
 
@@ -131,7 +131,6 @@
           <div class="th">%</div>
           <div class="th">Valor Estimado</div>
           <div class="th">Valor Real (Pago)</div>
-          <div class="th">Progresso</div>
           <div class="th"></div>
         </div>
         <div id="tabela-body"></div>
@@ -281,21 +280,10 @@
       const pct = base100 > 0 ? Math.round(totalReal / base100 * 100) : 0;
 
       document.getElementById('summary-grid').innerHTML = `
-        <div class="sum-card">
-          <div class="sum-label">Investimento Total (Dashboard)</div>
+        <div class="sum-card" style="grid-column:1/-1;max-width:320px;">
+          <div class="sum-label">Investimento Total (Previsto)</div>
           <div class="sum-value">${fmt(base100)}</div>
           <div class="sum-sub">${totalInvestimento > 0 ? 'referência de 100%' : 'defina no dashboard'}</div>
-        </div>
-        <div class="sum-card">
-          <div class="sum-label">Total Pago</div>
-          <div class="sum-value" style="color:var(--verde)">${fmt(totalReal)}</div>
-          <div class="sum-sub">${pct}% do investimento total</div>
-          <div class="prog-bar"><div class="prog-fill" style="width:${Math.min(pct,100)}%"></div></div>
-        </div>
-        <div class="sum-card">
-          <div class="sum-label">Saldo Pendente</div>
-          <div class="sum-value" style="color:var(--laranja)">${fmt(saldo)}</div>
-          <div class="sum-sub">a pagar</div>
         </div>
       `;
 
@@ -319,10 +307,6 @@
           <div class="row-pct">${pctItem}%</div>
           <div class="row-valor">${fmt(item.estimado)}</div>
           <div class="row-real ${real > 0 ? (isAuto ? 'auto' : 'manual') : 'vazio'}">${real > 0 ? fmt(real) : '—'}</div>
-          <div>
-            <div style="font-size:11px;color:var(--taupe);margin-bottom:3px;">${pctPago}%</div>
-            <div class="row-bar-wrap"><div class="row-bar-fill" style="width:${pctPago}%;background:${barColor};"></div></div>
-          </div>
           <div style="display:flex;gap:4px;">
             <button onclick="abrirModal(${item.id})" style="background:#FAE8EC;border:.5px solid var(--rosa-claro);border-radius:6px;width:26px;height:26px;cursor:pointer;color:var(--rosa);display:flex;align-items:center;justify-content:center;" title="Editar"><i class="ti ti-pencil" style="font-size:12px;"></i></button>
             <button class="btn-del" onclick="excluir(${item.id})"><i class="ti ti-trash"></i></button>
@@ -332,12 +316,12 @@
       });
 
       // Footer
+      const pctTotalEst = base100 > 0 ? (totalEst / base100 * 100).toFixed(1) : '0.0';
       document.getElementById('tabela-footer').innerHTML = `
         <div class="footer-label">Total</div>
-        <div class="footer-label">100%</div>
+        <div class="footer-label">${pctTotalEst}%</div>
         <div class="footer-valor">${fmt(totalEst)}</div>
         <div class="footer-valor" style="color:var(--verde)">${fmt(totalReal)}</div>
-        <div class="footer-label" style="color:var(--laranja)">${pct}% pago</div>
         <div></div>
       `;
     }
