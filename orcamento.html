@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
   <style>
-    :root{--rosa:#C2516A;--rosa-claro:#F4AABB;--rosa-escuro:#8B2240;--verde:#2C6E3A;--verde-m:#5FA870;--verde-menta:#C8E8CE;--laranja:#E8760A;--laranja-s:#F4A860;--pessego:#FDE8CC;--creme:#FDF5EC;--taupe:#9A7060;--branco:#FDFAF7;--sidebar-w:220px}
+    :root{--rosa:#56061D;--rosa-claro:#E2D9CB;--rosa-escuro:#022E4C;--verde:#517493;--verde-m:#8899B4;--verde-menta:#D4DFE8;--laranja:#56061D;--laranja-s:#8B7C72;--pessego:#E2D9CB;--creme:#F7F5F1;--taupe:#4A4A4A;--branco:#FDFAF7;--sidebar-w:220px}
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Nunito',sans-serif;background:var(--creme);color:#3E3530;display:flex;min-height:100vh}
     .sidebar{width:var(--sidebar-w);background:var(--rosa-escuro);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
@@ -80,13 +80,33 @@
     .btn-del{background:none;border:none;cursor:pointer;color:var(--taupe);font-size:15px;opacity:.5;transition:opacity .15s}
     .btn-del:hover{opacity:1;color:#A32D2D}
     .hint-sync{font-size:11px;color:var(--taupe);margin-top:6px;line-height:1.5}
-    .cell-input{border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:13px;color:#3E3530;width:100%;outline:none;padding:2px 4px;border-radius:6px;transition:background .15s}
-    .cell-input:focus{background:#FAE8EC;color:var(--rosa-escuro)}
-    .cell-input:hover{background:var(--creme)}
-    .btn-salvar-inline{background:var(--verde);color:white;border:none;border-radius:10px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;display:none;align-items:center;gap:6px;font-family:'Nunito',sans-serif;transition:background .15s;animation:pulse .8s infinite alternate}
-    .btn-salvar-inline.visivel{display:flex}
-    .btn-salvar-inline:hover{background:var(--verde-m)}
-    @keyframes pulse{from{box-shadow:0 0 0 0 rgba(44,110,58,.4)}to{box-shadow:0 0 0 6px rgba(44,110,58,0)}}
+    /* RESPONSIVE MOBILE MENU */
+    .mobile-menu-btn{display:none;background:none;border:none;color:white;font-size:24px;cursor:pointer;z-index:101;position:fixed;top:12px;left:12px}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;backdrop-filter:blur(2px);opacity:0;transition:opacity .3s ease;pointer-events:none}
+    .sidebar-overlay.open{display:block;opacity:1;pointer-events:auto}
+    @media(max-width:768px){
+      :root{--sidebar-w:0px}
+      body{flex-direction:column}
+      .sidebar{width:min(75vw,300px);position:fixed;top:0;left:0;height:100vh;z-index:100;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);will-change:transform}
+      .sidebar.open{transform:translateX(0)}
+      .main{margin-left:0}
+      .mobile-menu-btn{display:block}
+      .topbar{padding:12px 14px;flex-direction:column;gap:12px}
+      .topbar-left h1{font-size:20px}
+      .topbar-right{width:100%;flex-wrap:wrap;gap:8px}
+      .search-input{width:100%;font-size:13px}
+      .content{padding:16px 12px}
+      .orcamento-grid{grid-template-columns:1fr}
+      .card-table{font-size:12px}
+      .card-table th{padding:8px 6px;font-size:10px}
+      .card-table td{padding:8px 6px;font-size:10px}
+    }
+    @media(max-width:480px){
+      .sidebar{width:100%}
+      .topbar-left h1{font-size:18px}
+      .content{padding:12px 10px}
+      .card-table{font-size:11px}
+    }
   </style>
   <script src="supabase.js"></script>
   <script src="config.js"></script>
@@ -125,9 +145,6 @@
       <div style="display:flex;gap:10px;">
         <button onclick="sincronizarFornecedores()" style="background:#E6F1FB;color:#185FA5;border:.5px solid #378ADD;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;" onmouseover="this.style.background='#378ADD';this.style.color='white'" onmouseout="this.style.background='#E6F1FB';this.style.color='#185FA5'">
           <i class="ti ti-refresh"></i> Sincronizar Fornecedores
-        </button>
-        <button class="btn-salvar-inline" id="btn-salvar-inline" onclick="salvarAlteracoes()">
-          <i class="ti ti-device-floppy"></i> Salvar alterações
         </button>
         <button class="btn-add" onclick="abrirModal()"><i class="ti ti-plus"></i> Nova categoria</button>
       </div>
@@ -203,49 +220,6 @@
     const ORCAMENTO_VERSAO = '2';
     let itens = JSON.parse(localStorage.getItem('orcamento') || '[]');
     let editandoId = null;
-    let pendente = false;
-
-    function marcarAlterado(id, campo, valor) {
-      const item = itens.find(i => i.id === id);
-      if (!item) return;
-      if (campo === 'estimado' || campo === 'realManual') {
-        item[campo] = parseFloat(valor) || 0;
-      } else {
-        item[campo] = valor;
-      }
-      // Salva imediatamente ao sair do campo
-      salvar();
-      // Atualiza o % da linha sem re-renderizar tudo
-      const dashState = JSON.parse(localStorage.getItem('dash-state') || '{}');
-      const base100 = (dashState.financeiro && dashState.financeiro.total) ? dashState.financeiro.total : itens.reduce((s,i)=>s+(i.estimado||0),0);
-      const pctEl = document.getElementById(`pct-${id}`);
-      if (pctEl && base100 > 0) pctEl.textContent = (item.estimado / base100 * 100).toFixed(2) + '%';
-      // Mostra toast discreto de confirmação
-      mostrarToast();
-    }
-
-    let toastTimer = null;
-    function mostrarToast() {
-      let toast = document.getElementById('toast-salvo');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'toast-salvo';
-        toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--verde);color:white;padding:10px 18px;border-radius:12px;font-size:12px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(44,110,58,.3);display:flex;align-items:center;gap:8px;transition:opacity .3s;';
-        toast.innerHTML = '<i class="ti ti-device-floppy"></i> Salvo automaticamente';
-        document.body.appendChild(toast);
-      }
-      toast.style.opacity = '1';
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2000);
-    }
-
-    function salvarAlteracoes() {
-      salvar();
-      pendente = false;
-      document.getElementById('btn-salvar-inline').classList.remove('visivel');
-      renderizar();
-      mostrarToast();
-    }
 
     function salvar() {
       localStorage.setItem('orcamento', JSON.stringify(itens));
@@ -360,17 +334,14 @@
         row.className = 'table-row';
         row.innerHTML = `
           <div>
-            <input class="cell-input" style="font-weight:600;" value="${item.nome}" onblur="marcarAlterado(${item.id},'nome',this.value)" title="Clique para editar o nome" />
-            ${isAuto ? `<span class="sync-badge auto"><i class="ti ti-refresh" style="font-size:9px;"></i> auto</span>` : ''}
+            <div class="row-nome">${item.nome}</div>
+            ${isAuto ? `<span class="sync-badge auto"><i class="ti ti-refresh" style="font-size:9px;"></i> auto</span>` : (item.realManual > 0 ? `<span class="sync-badge manual">manual</span>` : '')}
           </div>
-          <div class="row-pct" id="pct-${item.id}">${pctItem}%</div>
-          <div>
-            <input class="cell-input" type="number" min="0" value="${item.estimado || ''}" placeholder="—" onblur="marcarAlterado(${item.id},'estimado',this.value)" title="Clique para editar o valor estimado" style="color:var(--rosa-escuro);font-weight:600;" />
-          </div>
-          <div>
-            <input class="cell-input" type="number" min="0" value="${item.realManual || ''}" placeholder="${isAuto ? fmt(real) : '—'}" onblur="marcarAlterado(${item.id},'realManual',this.value)" title="Clique para editar o valor real" style="color:${real>0?(isAuto?'var(--verde)':'#185FA5'):'var(--taupe)'};" ${isAuto ? 'disabled' : ''} />
-          </div>
+          <div class="row-pct">${pctItem}%</div>
+          <div class="row-valor">${fmt(item.estimado)}</div>
+          <div class="row-real ${real > 0 ? (isAuto ? 'auto' : 'manual') : 'vazio'}">${real > 0 ? fmt(real) : '—'}</div>
           <div style="display:flex;gap:4px;">
+            <button onclick="abrirModal(${item.id})" style="background:#FAE8EC;border:.5px solid var(--rosa-claro);border-radius:6px;width:26px;height:26px;cursor:pointer;color:var(--rosa);display:flex;align-items:center;justify-content:center;" title="Editar"><i class="ti ti-pencil" style="font-size:12px;"></i></button>
             <button class="btn-del" onclick="excluir(${item.id})"><i class="ti ti-trash"></i></button>
           </div>
         `;
@@ -413,6 +384,44 @@
     }
 
     initApp();
+
+    // Mobile Menu Handler
+    function initMobileMenu() {
+      const sidebar = document.querySelector('.sidebar');
+      const body = document.body;
+      
+      if (!document.querySelector('.mobile-menu-btn')) {
+        const menuBtn = document.createElement('button');
+        menuBtn.className = 'mobile-menu-btn';
+        menuBtn.innerHTML = '<i class="ti ti-menu-2"></i>';
+        body.appendChild(menuBtn);
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        body.appendChild(overlay);
+        
+        menuBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          overlay.classList.toggle('open');
+        });
+        
+        overlay.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          overlay.classList.remove('open');
+        });
+      }
+      
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        item.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          const overlay = document.querySelector('.sidebar-overlay');
+          if (overlay) overlay.classList.remove('open');
+        });
+      });
+    }
+
+    initMobileMenu();
   </script>
 </body>
 </html>
