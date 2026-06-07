@@ -64,6 +64,10 @@
     .doc-grupo-header:first-child{margin-top:0}
     .doc-aviso{background:#FFF8E6;border:.5px solid #F4A860;border-radius:10px;padding:10px 14px;margin-top:14px;font-size:12px;color:#8B4000;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
     .doc-aviso i{font-size:14px;flex-shrink:0;margin-top:1px}
+    .doc-tabs{display:flex;gap:0;border-bottom:.5px solid #EED8C8;margin-bottom:16px}
+    .doc-tab{padding:10px 18px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--taupe);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;text-transform:uppercase;white-space:nowrap}
+    .doc-tab:hover{color:var(--rosa)}
+    .doc-tab.active{color:var(--rosa-escuro);border-bottom-color:var(--rosa);font-weight:600}
     /* MODAL */
     .modal-overlay{position:fixed;inset:0;background:rgba(139,34,64,.3);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
     .modal-overlay.open{display:flex}
@@ -153,6 +157,7 @@
             <div class="prog-top"><span class="prog-label" id="prog-label-doc">0 de 0 documentos entregues</span><span class="prog-pct" id="prog-pct-doc">0%</span></div>
             <div class="prog-bar"><div class="prog-fill" id="prog-fill-doc" style="width:0%"></div></div>
           </div>
+          <div class="doc-tabs" id="doc-tabs"></div>
           <div id="docs-lista"></div>
           <button class="btn-add-doc" onclick="adicionarDoc()"><i class="ti ti-plus"></i> Adicionar documento</button>
         </div>
@@ -200,16 +205,21 @@
     const STATUS_DOC=['separacao','entregue','cancelado'];
     const STATUS_LABELS={separacao:'Em separação',entregue:'Entregue',cancelado:'Cancelado'};
     const STATUS_CLASSES={separacao:'s-separacao',entregue:'s-entregue',cancelado:'s-cancelado'};
-    const DOCS_VERSAO = '2';
+    const DOCS_VERSAO = '3';
+    const DOC_ABAS = ['Noiva','Noivo','Casal','Testemunhas'];
     const DOCS_DEFAULT = [
-      {id:1, grupo:'Noivo e Noiva (cada um)', nome:'Certidão de Batismo "para fins de Matrimônio" — validade de 6 meses da emissão, assinada pelo pároco', status:'separacao'},
-      {id:2, grupo:'Noivo e Noiva (cada um)', nome:'Cópia do RG', status:'separacao'},
-      {id:3, grupo:'Noivo e Noiva (cada um)', nome:'Cópia de Comprovante de Residência atual', status:'separacao'},
-      {id:4, grupo:'Do Casal (juntos)', nome:'Comprovante do Curso de Noivos — validade de 1 ano da emissão', status:'separacao'},
-      {id:5, grupo:'Do Casal (juntos)', nome:'Cópia da Certidão de Casamento Civil ou protocolo de abertura com data agendada no cartório', status:'separacao'},
-      {id:6, grupo:'Das 2 Testemunhas', nome:'Cópia do RG, endereço completo, profissão e estado civil da 1ª testemunha', status:'separacao'},
-      {id:7, grupo:'Das 2 Testemunhas', nome:'Cópia do RG, endereço completo, profissão e estado civil da 2ª testemunha', status:'separacao'},
+      {id:1,  aba:'Noiva',       nome:'Certidão de Batismo "para fins de Matrimônio" — validade de 6 meses da emissão, assinada pelo pároco', status:'separacao'},
+      {id:2,  aba:'Noiva',       nome:'Cópia do RG', status:'separacao'},
+      {id:3,  aba:'Noiva',       nome:'Cópia de Comprovante de Residência atual', status:'separacao'},
+      {id:4,  aba:'Noivo',       nome:'Certidão de Batismo "para fins de Matrimônio" — validade de 6 meses da emissão, assinada pelo pároco', status:'separacao'},
+      {id:5,  aba:'Noivo',       nome:'Cópia do RG', status:'separacao'},
+      {id:6,  aba:'Noivo',       nome:'Cópia de Comprovante de Residência atual', status:'separacao'},
+      {id:7,  aba:'Casal',       nome:'Comprovante do Curso de Noivos — validade de 1 ano da emissão', status:'separacao'},
+      {id:8,  aba:'Casal',       nome:'Cópia da Certidão de Casamento Civil ou protocolo de abertura com data agendada no cartório', status:'separacao'},
+      {id:9,  aba:'Testemunhas', nome:'Cópia do RG, endereço completo, profissão e estado civil da 1ª testemunha', status:'separacao'},
+      {id:10, aba:'Testemunhas', nome:'Cópia do RG, endereço completo, profissão e estado civil da 2ª testemunha', status:'separacao'},
     ];
+    let abaDocAtiva = 'Noiva';
     let dados=JSON.parse(localStorage.getItem('igreja-dados')||'null');
     let docs = (localStorage.getItem('igreja-docs-versao') === DOCS_VERSAO)
       ? JSON.parse(localStorage.getItem('igreja-docs') || JSON.stringify(DOCS_DEFAULT))
@@ -255,7 +265,7 @@
     function adicionarDoc(){
       const nome=prompt('Nome do documento:');
       if(!nome)return;
-      docs.push({id:Date.now(),nome,grupo:'Outros',status:'separacao'});
+      docs.push({id:Date.now(),nome,aba:abaDocAtiva,status:'separacao'});
       salvarDocs();renderizar()
     }
     function renderizar(){
@@ -279,38 +289,38 @@
           ${dados.docsData?`<div class="horario-row"><div class="horario-icon"><i class="ti ti-file-check"></i></div><div><div class="horario-nome">Entrega de documentação</div><div class="horario-hora">${formatarData(dados.docsData)}${dados.docsHora?' · '+dados.docsHora.replace(':','h'):''}</div></div></div>`:''}
         `
       }
-      // Docs
-      const entregues=docs.filter(d=>d.status==='entregue').length;
-      const total=docs.filter(d=>d.status!=='cancelado').length;
-      const pct=total>0?Math.round(entregues/total*100):0;
-      document.getElementById('prog-label-doc').textContent=`${entregues} de ${total} documentos entregues`;
-      document.getElementById('prog-pct-doc').textContent=pct+'%';
-      document.getElementById('prog-fill-doc').style.width=pct+'%';
-      const lista=document.getElementById('docs-lista');lista.innerHTML='';
-      // Agrupar por grupo
-      const grupos = {};
-      docs.forEach(d => {
-        const g = d.grupo || 'Outros';
-        if (!grupos[g]) grupos[g] = [];
-        grupos[g].push(d);
+      // Docs — Abas
+      const tabsEl = document.getElementById('doc-tabs');
+      tabsEl.innerHTML = '';
+      DOC_ABAS.forEach(aba => {
+        const docsAba = docs.filter(d => d.aba === aba && d.status !== 'cancelado');
+        const entreguesAba = docsAba.filter(d => d.status === 'entregue').length;
+        const tab = document.createElement('div');
+        tab.className = 'doc-tab' + (aba === abaDocAtiva ? ' active' : '');
+        tab.textContent = aba;
+        tab.onclick = () => { abaDocAtiva = aba; renderizar(); };
+        tabsEl.appendChild(tab);
       });
-      const iconeGrupo = {'Noivo e Noiva (cada um)':'ti-heart','Do Casal (juntos)':'ti-users','Das 2 Testemunhas':'ti-user-check'};
-      Object.keys(grupos).forEach(g => {
-        const header = document.createElement('div');
-        header.className = 'doc-grupo-header';
-        header.innerHTML = `<i class="ti ${iconeGrupo[g]||'ti-folder'}" style="font-size:12px;color:var(--rosa);"></i> ${g}`;
-        lista.appendChild(header);
-        grupos[g].forEach(d => {
-          const row=document.createElement('div');row.className='doc-row';
-          row.innerHTML=`<span class="doc-nome">${d.nome}</span><span class="status-badge ${STATUS_CLASSES[d.status]}" onclick="avancarStatusDoc(${d.id})" title="Clique para avançar">${STATUS_LABELS[d.status]}</span>`;
-          lista.appendChild(row);
-        });
+
+      const docsAba = docs.filter(d => (d.aba || 'Noiva') === abaDocAtiva);
+      const entregues = docsAba.filter(d => d.status === 'entregue').length;
+      const total = docsAba.filter(d => d.status !== 'cancelado').length;
+      const pct = total > 0 ? Math.round(entregues / total * 100) : 0;
+      document.getElementById('prog-label-doc').textContent = `${entregues} de ${total} documentos entregues`;
+      document.getElementById('prog-pct-doc').textContent = pct + '%';
+      document.getElementById('prog-fill-doc').style.width = pct + '%';
+
+      const lista = document.getElementById('docs-lista'); lista.innerHTML = '';
+      docsAba.forEach(d => {
+        const row = document.createElement('div'); row.className = 'doc-row';
+        row.innerHTML = `<span class="doc-nome">${d.nome}</span><span class="status-badge ${STATUS_CLASSES[d.status]}" onclick="avancarStatusDoc(${d.id})" title="Clique para avançar">${STATUS_LABELS[d.status]}</span>`;
+        lista.appendChild(row);
       });
-      // Aviso testemunhas
-      if (!lista.querySelector('.doc-aviso')) {
+      // Aviso na aba Testemunhas
+      if (abaDocAtiva === 'Testemunhas') {
         const aviso = document.createElement('div');
         aviso.className = 'doc-aviso';
-        aviso.innerHTML = '<i class="ti ti-alert-triangle"></i><span><strong>Testemunhas:</strong> maiores de 18 anos, presentes na cerimônia e não podem ser os pais dos noivos.</span>';
+        aviso.innerHTML = '<i class="ti ti-alert-triangle"></i><span><strong>Atenção:</strong> maiores de 18 anos, presentes na cerimônia e não podem ser os pais dos noivos.</span>';
         lista.appendChild(aviso);
       }
     }
