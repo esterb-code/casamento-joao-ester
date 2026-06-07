@@ -190,6 +190,7 @@
       {nome:'Outros',                        estimado:0, keyword:''},
     ];
 
+    const ORCAMENTO_VERSAO = '2';
     let itens = JSON.parse(localStorage.getItem('orcamento') || '[]');
     let editandoId = null;
 
@@ -338,7 +339,8 @@
         const dados = await db.get('orcamento');
         if (dados !== null) { itens = dados; localStorage.setItem('orcamento', JSON.stringify(dados)); }
       }
-      if (itens.length === 0) {
+      const versaoSalva = localStorage.getItem('orcamento-versao');
+      if (itens.length === 0 || versaoSalva !== ORCAMENTO_VERSAO) {
         itens = DEFAULT_ITEMS.map((item, i) => ({
           id: Date.now() + i,
           nome: item.nome,
@@ -347,6 +349,7 @@
           keyword: item.keyword,
           realAuto: 0,
         }));
+        localStorage.setItem('orcamento-versao', ORCAMENTO_VERSAO);
         sincronizarFornecedores();
       } else {
         renderizar();
