@@ -233,10 +233,7 @@
         item[campo] = valor;
       }
       salvar();
-      const dashState = JSON.parse(localStorage.getItem('dash-state') || '{}');
-      const base100 = (dashState.financeiro && dashState.financeiro.total) ? dashState.financeiro.total : itens.reduce((s,i)=>s+(i.estimado||0),0);
-      const pctEl = document.getElementById(`pct-${id}`);
-      if (pctEl && base100 > 0) pctEl.textContent = (item.estimado / base100 * 100).toFixed(2) + '%';
+      renderizar();
       mostrarToast();
     }
 
