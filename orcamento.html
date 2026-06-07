@@ -266,26 +266,30 @@
     }
 
     function renderizar() {
+      // 100% = investimento total do dashboard
+      const dashState = JSON.parse(localStorage.getItem('dash-state') || '{}');
+      const totalInvestimento = (dashState.financeiro && dashState.financeiro.total) ? dashState.financeiro.total : 0;
       const totalEst = itens.reduce((s, i) => s + (i.estimado || 0), 0);
+      const base100 = totalInvestimento > 0 ? totalInvestimento : totalEst;
 
       // Summary
       const totalReal = itens.reduce((s, i) => {
         const real = (i.keyword && i.realAuto > 0) ? i.realAuto : (i.realManual || 0);
         return s + real;
       }, 0);
-      const saldo = totalEst - totalReal;
-      const pct = totalEst > 0 ? Math.round(totalReal / totalEst * 100) : 0;
+      const saldo = base100 - totalReal;
+      const pct = base100 > 0 ? Math.round(totalReal / base100 * 100) : 0;
 
       document.getElementById('summary-grid').innerHTML = `
         <div class="sum-card">
-          <div class="sum-label">Total Estimado</div>
-          <div class="sum-value">${fmt(totalEst)}</div>
-          <div class="sum-sub">orçamento planejado</div>
+          <div class="sum-label">Investimento Total (Dashboard)</div>
+          <div class="sum-value">${fmt(base100)}</div>
+          <div class="sum-sub">${totalInvestimento > 0 ? 'referência de 100%' : 'defina no dashboard'}</div>
         </div>
         <div class="sum-card">
           <div class="sum-label">Total Pago</div>
           <div class="sum-value" style="color:var(--verde)">${fmt(totalReal)}</div>
-          <div class="sum-sub">${pct}% do orçamento</div>
+          <div class="sum-sub">${pct}% do investimento total</div>
           <div class="prog-bar"><div class="prog-fill" style="width:${Math.min(pct,100)}%"></div></div>
         </div>
         <div class="sum-card">
@@ -299,7 +303,7 @@
       const body = document.getElementById('tabela-body');
       body.innerHTML = '';
       itens.forEach(item => {
-        const pctItem = totalEst > 0 ? (item.estimado / totalEst * 100).toFixed(2) : '0.00';
+        const pctItem = base100 > 0 ? (item.estimado / base100 * 100).toFixed(2) : '0.00';
         const real = (item.keyword && item.realAuto > 0) ? item.realAuto : (item.realManual || 0);
         const isAuto = item.keyword && item.realAuto > 0;
         const pctPago = item.estimado > 0 ? Math.min(Math.round(real / item.estimado * 100), 100) : 0;
