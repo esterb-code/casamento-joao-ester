@@ -131,7 +131,7 @@
           <div class="th">%</div>
           <div class="th">Valor Estimado</div>
           <div class="th">Valor Real (Pago)</div>
-          <div class="th"></div>
+          <div class="th" style="text-align:center;"><button onclick="abrirModal()" style="background:var(--rosa);color:white;border:none;border-radius:6px;width:24px;height:24px;cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;" title="Nova categoria"><i class="ti ti-plus" style="font-size:13px;"></i></button></div>
         </div>
         <div id="tabela-body"></div>
         <div class="table-footer" id="tabela-footer"></div>
@@ -170,19 +170,24 @@
 
   <script>
     const DEFAULT_ITEMS = [
-      {nome:'Buffet',             estimado:15000, keyword:'buffet'},
-      {nome:'Salão',              estimado:14200, keyword:'salão,salao,espaço,espaco,recepção'},
-      {nome:'Fotografia e Vídeo', estimado:10000, keyword:'foto,video,vídeo,filmagem'},
-      {nome:'Igreja - Dom Bosco', estimado:7000,  keyword:'igreja'},
-      {nome:'Assessoria/Cerimonial', estimado:4200, keyword:'cerimonial,assessoria'},
-      {nome:'Vestido da noiva',   estimado:3000,  keyword:'vestido'},
-      {nome:'Maquiagem da noiva', estimado:5000,  keyword:'maquiagem,dia de noiva'},
-      {nome:'Decoração',          estimado:10000, keyword:'decoração,decoracao'},
-      {nome:'Banda',              estimado:2000,  keyword:'banda,música,musica,dj'},
-      {nome:'Convites Padrinhos', estimado:2000,  keyword:'convite'},
-      {nome:'Lembracinha',        estimado:1000,  keyword:'lembrança,lembranca,lembracinha'},
-      {nome:'Terno do noivo',     estimado:1000,  keyword:'terno'},
-      {nome:'Margem de reserva',  estimado:5000,  keyword:''},
+      {nome:'Assessoria/Cerimonial',        estimado:0, keyword:'cerimonial,assessoria'},
+      {nome:'Igreja',                        estimado:0, keyword:'igreja'},
+      {nome:'Espaço da recepção',           estimado:0, keyword:'salão,salao,espaço,espaco,recepção,green park,casarão,solar'},
+      {nome:'Buffet',                        estimado:0, keyword:'buffet'},
+      {nome:'Fotografia',                    estimado:0, keyword:'foto,fotografia'},
+      {nome:'Filmagem',                      estimado:0, keyword:'film,vídeo,video'},
+      {nome:'Música (DJ/Banda)',             estimado:0, keyword:'música,musica,banda,dj'},
+      {nome:'Decoração (Igreja+recepção)',   estimado:0, keyword:'decoração,decoracao'},
+      {nome:'Vestido da noiva',              estimado:0, keyword:'vestido'},
+      {nome:'Convites (padrinhos+convidados)', estimado:0, keyword:'convite'},
+      {nome:'Papelaria',                     estimado:0, keyword:'papelaria'},
+      {nome:'Bolo e doces',                  estimado:0, keyword:'bolo,doce,bombom'},
+      {nome:'Alianças',                      estimado:0, keyword:'aliança,alianca'},
+      {nome:'Open bar',                      estimado:0, keyword:'bar,drink,bebida'},
+      {nome:'Lembranças',                    estimado:0, keyword:'lembrança,lembranca,lembracinha'},
+      {nome:'Atrações',                      estimado:0, keyword:'atração,atracao,show'},
+      {nome:'Open sorvete',                  estimado:0, keyword:'sorvete'},
+      {nome:'Outros',                        estimado:0, keyword:''},
     ];
 
     let itens = JSON.parse(localStorage.getItem('orcamento') || '[]');
@@ -322,7 +327,7 @@
         <div class="footer-label">${pctTotalEst}%</div>
         <div class="footer-valor">${fmt(totalEst)}</div>
         <div class="footer-valor" style="color:var(--verde)">${fmt(totalReal)}</div>
-        <div></div>
+        <div style="text-align:center;"><button onclick="abrirModal()" style="background:var(--rosa);color:white;border:none;border-radius:6px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Nova categoria"><i class="ti ti-plus" style="font-size:13px;"></i></button></div>
       `;
     }
 
