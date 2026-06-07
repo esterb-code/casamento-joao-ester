@@ -60,6 +60,10 @@
     .s-entregue{background:var(--verde-menta);color:var(--verde);border:.5px solid var(--verde-m)}
     .s-cancelado{background:#F1EFE8;color:#5F5E5A;border:.5px solid #D3D1C7}
     .btn-add-doc{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--rosa);background:none;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:600;margin-top:12px;padding:8px 0}
+    .doc-grupo-header{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--rosa-escuro);text-transform:uppercase;padding:10px 0 6px;margin-top:8px;border-bottom:.5px solid #EED8C8;display:flex;align-items:center;gap:6px}
+    .doc-grupo-header:first-child{margin-top:0}
+    .doc-aviso{background:#FFF8E6;border:.5px solid #F4A860;border-radius:10px;padding:10px 14px;margin-top:14px;font-size:12px;color:#8B4000;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+    .doc-aviso i{font-size:14px;flex-shrink:0;margin-top:1px}
     /* MODAL */
     .modal-overlay{position:fixed;inset:0;background:rgba(139,34,64,.3);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
     .modal-overlay.open{display:flex}
@@ -196,16 +200,24 @@
     const STATUS_DOC=['separacao','entregue','cancelado'];
     const STATUS_LABELS={separacao:'Em separação',entregue:'Entregue',cancelado:'Cancelado'};
     const STATUS_CLASSES={separacao:'s-separacao',entregue:'s-entregue',cancelado:'s-cancelado'};
+    const DOCS_VERSAO = '2';
+    const DOCS_DEFAULT = [
+      {id:1, grupo:'Noivo e Noiva (cada um)', nome:'Certidão de Batismo "para fins de Matrimônio" — validade de 6 meses da emissão, assinada pelo pároco', status:'separacao'},
+      {id:2, grupo:'Noivo e Noiva (cada um)', nome:'Cópia do RG', status:'separacao'},
+      {id:3, grupo:'Noivo e Noiva (cada um)', nome:'Cópia de Comprovante de Residência atual', status:'separacao'},
+      {id:4, grupo:'Do Casal (juntos)', nome:'Comprovante do Curso de Noivos — validade de 1 ano da emissão', status:'separacao'},
+      {id:5, grupo:'Do Casal (juntos)', nome:'Cópia da Certidão de Casamento Civil ou protocolo de abertura com data agendada no cartório', status:'separacao'},
+      {id:6, grupo:'Das 2 Testemunhas', nome:'Cópia do RG, endereço completo, profissão e estado civil da 1ª testemunha', status:'separacao'},
+      {id:7, grupo:'Das 2 Testemunhas', nome:'Cópia do RG, endereço completo, profissão e estado civil da 2ª testemunha', status:'separacao'},
+    ];
     let dados=JSON.parse(localStorage.getItem('igreja-dados')||'null');
-    let docs=JSON.parse(localStorage.getItem('igreja-docs')||JSON.stringify([
-      {id:1,nome:'Certidão de nascimento (noiva)',status:'separacao'},
-      {id:2,nome:'Certidão de nascimento (noivo)',status:'separacao'},
-      {id:3,nome:'Comprovante de batismo (noiva)',status:'separacao'},
-      {id:4,nome:'Comprovante de batismo (noivo)',status:'separacao'},
-      {id:5,nome:'Comprovante de crisma',status:'separacao'},
-      {id:6,nome:'Certificado do curso de noivos',status:'separacao'},
-      {id:7,nome:'Dispensa de proclamas',status:'separacao'},
-    ]));
+    let docs = (localStorage.getItem('igreja-docs-versao') === DOCS_VERSAO)
+      ? JSON.parse(localStorage.getItem('igreja-docs') || JSON.stringify(DOCS_DEFAULT))
+      : DOCS_DEFAULT;
+    if (localStorage.getItem('igreja-docs-versao') !== DOCS_VERSAO) {
+      localStorage.setItem('igreja-docs', JSON.stringify(docs));
+      localStorage.setItem('igreja-docs-versao', DOCS_VERSAO);
+    }
     function salvarDocs(){localStorage.setItem('igreja-docs',JSON.stringify(docs));if(typeof db!=='undefined')db.set('igreja-docs',docs);}
     function abrirModal(){
       if(dados){
@@ -243,7 +255,7 @@
     function adicionarDoc(){
       const nome=prompt('Nome do documento:');
       if(!nome)return;
-      docs.push({id:Date.now(),nome,status:'separacao'});
+      docs.push({id:Date.now(),nome,grupo:'Outros',status:'separacao'});
       salvarDocs();renderizar()
     }
     function renderizar(){
@@ -275,11 +287,32 @@
       document.getElementById('prog-pct-doc').textContent=pct+'%';
       document.getElementById('prog-fill-doc').style.width=pct+'%';
       const lista=document.getElementById('docs-lista');lista.innerHTML='';
-      docs.forEach(d=>{
-        const row=document.createElement('div');row.className='doc-row';
-        row.innerHTML=`<span class="doc-nome">${d.nome}</span><span class="status-badge ${STATUS_CLASSES[d.status]}" onclick="avancarStatusDoc(${d.id})" title="Clique para avançar">${STATUS_LABELS[d.status]}</span>`;
-        lista.appendChild(row)
-      })
+      // Agrupar por grupo
+      const grupos = {};
+      docs.forEach(d => {
+        const g = d.grupo || 'Outros';
+        if (!grupos[g]) grupos[g] = [];
+        grupos[g].push(d);
+      });
+      const iconeGrupo = {'Noivo e Noiva (cada um)':'ti-heart','Do Casal (juntos)':'ti-users','Das 2 Testemunhas':'ti-user-check'};
+      Object.keys(grupos).forEach(g => {
+        const header = document.createElement('div');
+        header.className = 'doc-grupo-header';
+        header.innerHTML = `<i class="ti ${iconeGrupo[g]||'ti-folder'}" style="font-size:12px;color:var(--rosa);"></i> ${g}`;
+        lista.appendChild(header);
+        grupos[g].forEach(d => {
+          const row=document.createElement('div');row.className='doc-row';
+          row.innerHTML=`<span class="doc-nome">${d.nome}</span><span class="status-badge ${STATUS_CLASSES[d.status]}" onclick="avancarStatusDoc(${d.id})" title="Clique para avançar">${STATUS_LABELS[d.status]}</span>`;
+          lista.appendChild(row);
+        });
+      });
+      // Aviso testemunhas
+      if (!lista.querySelector('.doc-aviso')) {
+        const aviso = document.createElement('div');
+        aviso.className = 'doc-aviso';
+        aviso.innerHTML = '<i class="ti ti-alert-triangle"></i><span><strong>Testemunhas:</strong> maiores de 18 anos, presentes na cerimônia e não podem ser os pais dos noivos.</span>';
+        lista.appendChild(aviso);
+      }
     }
     document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)fecharModal()});
 
