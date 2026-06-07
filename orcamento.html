@@ -376,7 +376,7 @@
             <input class="cell-input" type="number" min="0" value="${item.estimado || ''}" placeholder="—" onblur="marcarAlterado(${item.id},'estimado',this.value)" title="Clique para editar" style="color:var(--rosa-escuro);font-weight:600;" />
           </div>
           <div>
-            <input class="cell-input" type="number" min="0" value="${item.realManual || ''}" placeholder="${isAuto ? fmt(real) : '—'}" onblur="marcarAlterado(${item.id},'realManual',this.value)" title="Clique para editar" style="color:${real>0?(isAuto?'var(--verde)':'#185FA5'):'var(--taupe)'};" ${isAuto ? 'disabled' : ''} />
+            <input class="cell-input" type="number" min="0" value="${item.realManual || ''}" placeholder="${isAuto ? fmt(real) : '—'}" onblur="marcarAlterado(${item.id},'realManual',this.value)" title="Clique para editar" style="color:${real>0?(real>item.estimado?'#A32D2D':'#185FA5'):'var(--taupe)'};font-weight:${real>0?'700':'400'};" ${isAuto ? 'disabled' : ''} />
           </div>
           <div style="display:flex;gap:4px;">
             <button class="btn-del" onclick="excluir(${item.id})"><i class="ti ti-trash"></i></button>
