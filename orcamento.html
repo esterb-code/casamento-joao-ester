@@ -255,6 +255,7 @@
 
     function salvar() {
       localStorage.setItem('orcamento', JSON.stringify(itens));
+      localStorage.setItem('orcamento-versao', ORCAMENTO_VERSAO);
       if (typeof db !== 'undefined') db.set('orcamento', itens);
     }
 
@@ -399,7 +400,11 @@
     async function initApp() {
       if (typeof db !== 'undefined') {
         const dados = await db.get('orcamento');
-        if (dados !== null) { itens = dados; localStorage.setItem('orcamento', JSON.stringify(dados)); }
+        if (dados !== null && dados.length > 0) {
+          itens = dados;
+          localStorage.setItem('orcamento', JSON.stringify(dados));
+          localStorage.setItem('orcamento-versao', ORCAMENTO_VERSAO); // Evita reset ao trocar de perfil
+        }
       }
       const versaoSalva = localStorage.getItem('orcamento-versao');
       if (itens.length === 0 || versaoSalva !== ORCAMENTO_VERSAO) {
