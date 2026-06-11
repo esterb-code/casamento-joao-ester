@@ -258,6 +258,7 @@
         <input type="file" id="proposta-input" accept=".pdf,image/*" style="display:none" onchange="lerProposta(event)" />
         <div id="proposta-status" style="font-size:11px;margin-top:8px;min-height:16px;display:flex;align-items:center;gap:6px;"></div>
         <input type="hidden" id="f-proposta-nome" />
+        <input type="hidden" id="f-proposta-data" />
       </div>
 
       <div class="form-group">
@@ -371,7 +372,7 @@
     function abrirModal() { document.getElementById('modal').classList.add('open'); }
     function fecharModal() {
       document.getElementById('modal').classList.remove('open');
-      ['f-nome','f-whatsapp','f-instagram','f-valor','f-pago','f-obs','f-vencimento','f-parcela-desc','f-proposta-nome'].forEach(id => document.getElementById(id).value = '');
+      ['f-nome','f-whatsapp','f-instagram','f-valor','f-pago','f-obs','f-vencimento','f-parcela-desc','f-proposta-nome','f-proposta-data'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('proposta-input').value = '';
       document.getElementById('proposta-status').innerHTML = '';
       const pIcon = document.getElementById('proposta-icon');
@@ -402,6 +403,7 @@
         vencimento: document.getElementById('f-vencimento').value || '',
         parcelaDesc: document.getElementById('f-parcela-desc').value.trim(),
         propostaNome: document.getElementById('f-proposta-nome').value || '',
+        propostaData: document.getElementById('f-proposta-data').value || '',
       };
       fornecedores.push(novo);
       salvar();
@@ -467,6 +469,8 @@
           const pct = f.valor > 0 ? Math.round((f.pago / f.valor) * 100) : 0;
           const card = document.createElement('div');
           card.className = 'vendor-card';
+          card.style.cursor = 'pointer';
+          card.onclick = () => abrirDetalhe(f.id);
           card.innerHTML = `
             <div class="vendor-card-top">
               <div>
@@ -477,8 +481,8 @@
               <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
                 <span class="status-badge ${STATUS_CLASSES[f.status]}">${STATUS_LABELS[f.status]}</span>
                 <div style="display:flex;flex-direction:column;gap:4px;align-items:center;">
-              <button onclick="editarFornecedor(${f.id})" style="background:#FAE8EC;border:.5px solid var(--rosa-claro);border-radius:6px;width:28px;height:28px;cursor:pointer;color:var(--rosa);display:flex;align-items:center;justify-content:center;" title="Editar"><i class="ti ti-pencil" style="font-size:13px;"></i></button>
-              <button onclick="excluirFornecedor(${f.id})" style="background:#FCEBEB;border:.5px solid #E24B4A;border-radius:6px;width:28px;height:28px;cursor:pointer;color:#A32D2D;display:flex;align-items:center;justify-content:center;" title="Remover"><i class="ti ti-trash" style="font-size:13px;"></i></button>
+              <button onclick="event.stopPropagation();editarFornecedor(${f.id})" style="background:#FAE8EC;border:.5px solid var(--rosa-claro);border-radius:6px;width:28px;height:28px;cursor:pointer;color:var(--rosa);display:flex;align-items:center;justify-content:center;" title="Editar"><i class="ti ti-pencil" style="font-size:13px;"></i></button>
+              <button onclick="event.stopPropagation();excluirFornecedor(${f.id})" style="background:#FCEBEB;border:.5px solid #E24B4A;border-radius:6px;width:28px;height:28px;cursor:pointer;color:#A32D2D;display:flex;align-items:center;justify-content:center;" title="Remover"><i class="ti ti-trash" style="font-size:13px;"></i></button>
             </div>
               </div>
             </div>
@@ -554,6 +558,7 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           document.getElementById('f-proposta-nome').value = file.name;
+          document.getElementById('f-proposta-data').value = e.target.result;
           // Mostra miniatura dentro da zona de drop
           drop.style.backgroundImage = `url('${e.target.result}')`;
           drop.style.backgroundSize = 'cover';
@@ -566,10 +571,17 @@
         return;
       }
 
-      // PDF: extrai texto e preenche campos
+      // PDF: extrai texto e preenche campos + salva base64 para preview
       icon.className = 'ti ti-loader-2';
       icon.style.color = 'var(--rosa)';
       status.innerHTML = '<span style="color:var(--taupe);">Lendo proposta...</span>';
+
+      // Salva base64 do PDF para exibir no modal de detalhe
+      const pdfReader = new FileReader();
+      pdfReader.onload = function(e) {
+        document.getElementById('f-proposta-data').value = e.target.result;
+      };
+      pdfReader.readAsDataURL(file);
 
       try {
         const arrayBuffer = await file.arrayBuffer();
@@ -689,6 +701,26 @@
     initApp();
   </script>
 
+  <!-- MODAL DETALHE FORNECEDOR -->
+  <div class="modal-overlay" id="modal-detalhe-forn" style="z-index:200;">
+    <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div>
+          <div id="det-nome" style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--rosa-escuro);font-weight:600;"></div>
+          <span id="det-status" class="status-badge" style="margin-top:4px;display:inline-block;"></span>
+        </div>
+        <button onclick="document.getElementById('modal-detalhe-forn').classList.remove('open')" style="background:none;border:none;cursor:pointer;color:var(--taupe);font-size:20px;padding:4px;"><i class="ti ti-x"></i></button>
+      </div>
+      <!-- Info grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:18px;" id="det-info-grid"></div>
+      <!-- Attachment section -->
+      <div style="border-top:0.5px solid #F5EDE4;padding-top:14px;margin-top:4px;">
+        <div style="font-size:11px;font-weight:600;color:var(--taupe);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Proposta / Anexo</div>
+        <div id="det-anexo"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL EDITAR FORNECEDOR -->
   <div class="modal-overlay" id="modal-editar-forn" style="z-index:250;">
     <div class="modal">
@@ -771,9 +803,84 @@
       f.parcelaDesc = document.getElementById('ef-parcela-desc').value.trim();
       salvar(); document.getElementById('confirm-forn').classList.remove('open'); renderizar();
     }
-    ['modal-editar-forn','confirm-forn'].forEach(id => {
+    ['modal-detalhe-forn','modal-editar-forn','confirm-forn'].forEach(id => {
       document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
     });
+
+    function abrirDetalhe(id) {
+      const f = fornecedores.find(f => f.id === id);
+      if (!f) return;
+
+      // Nome e status
+      document.getElementById('det-nome').textContent = f.nome;
+      const badge = document.getElementById('det-status');
+      badge.textContent = STATUS_LABELS[f.status];
+      badge.className = 'status-badge ' + (STATUS_CLASSES[f.status] || '');
+
+      // Info grid
+      const saldo = (f.valor || 0) - (f.pago || 0);
+      const campos = [
+        { label: 'Categoria', value: f.categoria || '—' },
+        { label: 'WhatsApp', value: f.whatsapp || '—' },
+        { label: 'Instagram', value: f.instagram ? `<a href="${f.instagram.startsWith('http') ? f.instagram : 'https://instagram.com/' + f.instagram.replace('@','')}" target="_blank" style="color:var(--rosa);text-decoration:none;">${f.instagram}</a>` : '—' },
+        { label: 'Valor total', value: formatarMoeda(f.valor || 0) },
+        { label: 'Valor pago', value: formatarMoeda(f.pago || 0) },
+        { label: 'Saldo pendente', value: formatarMoeda(saldo > 0 ? saldo : 0) },
+        { label: 'Próx. vencimento', value: f.vencimento ? f.vencimento.split('-').reverse().join('/') : '—' },
+        { label: 'Parcela', value: f.parcelaDesc || '—' },
+      ];
+      if (f.obs) campos.push({ label: 'Observações', value: f.obs, full: true });
+
+      const grid = document.getElementById('det-info-grid');
+      grid.innerHTML = campos.map(c => `
+        <div style="${c.full ? 'grid-column:1/-1;' : ''}background:var(--creme);border-radius:10px;padding:10px 12px;">
+          <div style="font-size:10px;font-weight:600;color:var(--taupe);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">${c.label}</div>
+          <div style="font-size:13px;color:var(--rosa-escuro);">${c.value}</div>
+        </div>
+      `).join('');
+
+      // Anexo
+      const anexoEl = document.getElementById('det-anexo');
+      if (!f.propostaNome) {
+        anexoEl.innerHTML = '<div style="font-size:12px;color:var(--taupe);padding:10px 0;">Nenhum anexo</div>';
+      } else {
+        const isImg = /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(f.propostaNome);
+        const isPdf = /\.pdf$/i.test(f.propostaNome);
+        if (f.propostaData) {
+          if (isImg) {
+            anexoEl.innerHTML = `<img src="${f.propostaData}" alt="${f.propostaNome}" style="width:100%;border-radius:10px;max-height:320px;object-fit:contain;background:#f9f3ee;" />
+              <div style="font-size:11px;color:var(--taupe);margin-top:6px;text-align:center;">${f.propostaNome}</div>`;
+          } else if (isPdf) {
+            anexoEl.innerHTML = `
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--rosa-escuro);"><i class="ti ti-file-type-pdf" style="font-size:18px;color:var(--rosa);"></i>${f.propostaNome}</div>
+                <button id="btn-abrir-pdf" style="background:var(--rosa);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-external-link"></i> Abrir</button>
+              </div>
+              <embed src="${f.propostaData}" type="application/pdf" style="width:100%;height:360px;border-radius:10px;border:0.5px solid #EED8C8;" />`;
+            // Abre em aba nova via Blob (mais compatível)
+            requestAnimationFrame(() => {
+              const btn = document.getElementById('btn-abrir-pdf');
+              if (btn) btn.onclick = () => {
+                const byteStr = atob(f.propostaData.split(',')[1]);
+                const ab = new ArrayBuffer(byteStr.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteStr.length; i++) ia[i] = byteStr.charCodeAt(i);
+                const blob = new Blob([ab], { type: 'application/pdf' });
+                window.open(URL.createObjectURL(blob), '_blank');
+              };
+            });
+          } else {
+            anexoEl.innerHTML = `<div style="font-size:12px;color:var(--taupe);padding:10px 0;display:flex;align-items:center;gap:8px;"><i class="ti ti-paperclip" style="color:var(--rosa);"></i>${f.propostaNome}</div>`;
+          }
+        } else {
+          // Arquivo salvo antes da atualização (sem dados)
+          const icon = isImg ? 'ti-photo' : (isPdf ? 'ti-file-type-pdf' : 'ti-paperclip');
+          anexoEl.innerHTML = `<div style="font-size:12px;color:var(--taupe);padding:10px 0;display:flex;align-items:center;gap:8px;"><i class="ti ${icon}" style="color:var(--rosa);font-size:16px;"></i>${f.propostaNome} <span style="font-size:10px;opacity:.7;">(salvo antes da atualização — reenvie para visualizar)</span></div>`;
+        }
+      }
+
+      document.getElementById('modal-detalhe-forn').classList.add('open');
+    }
 
     // Mobile Menu Handler
     function initMobileMenu() {
