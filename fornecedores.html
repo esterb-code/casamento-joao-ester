@@ -363,7 +363,22 @@
     let fornecedores = JSON.parse(localStorage.getItem('fornecedores') || '[]');
     let filtroAtivo = 'todos';
 
-    function salvar() { localStorage.setItem('fornecedores', JSON.stringify(fornecedores)); ;if(typeof db!=='undefined')db.set('fornecedores',fornecedores);}
+    function salvar() {
+      // Remove propostaData (base64) antes de salvar no localStorage para economizar espaço
+      const paraLocalStorage = fornecedores.map(f => {
+        const copia = Object.assign({}, f);
+        if (copia.propostaData && copia.propostaData.length > 500) delete copia.propostaData;
+        return copia;
+      });
+      try {
+        localStorage.setItem('fornecedores', JSON.stringify(paraLocalStorage));
+      } catch(e) {
+        // localStorage cheio — limpa dados antigos e tenta novamente
+        localStorage.removeItem('fornecedores');
+        try { localStorage.setItem('fornecedores', JSON.stringify(paraLocalStorage)); } catch(e2) {}
+      }
+      if (typeof db !== 'undefined') db.set('fornecedores', fornecedores);
+    }
 
     function formatarMoeda(v) {
       return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
@@ -405,10 +420,15 @@
         propostaNome: document.getElementById('f-proposta-nome').value || '',
         propostaData: document.getElementById('f-proposta-data').value || '',
       };
-      fornecedores.push(novo);
-      salvar();
-      fecharModal();
-      renderizar();
+      try {
+        fornecedores.push(novo);
+        salvar();
+        fecharModal();
+        renderizar();
+      } catch(e) {
+        alert('Erro ao salvar fornecedor. Tente novamente.');
+        fornecedores.pop();
+      }
     }
 
     function excluirFornecedor(id) {
