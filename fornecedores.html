@@ -512,7 +512,10 @@
               <div class="parcela-bar"><div class="parcela-fill" style="width:${pct}%"></div></div>
               <span class="parcelas-text">${pct}%</span>
             </div>
-            ${f.obs ? `<div style="font-size:11px;color:var(--taupe);margin-top:8px;padding-top:8px;border-top:0.5px solid #F5EDE4;">${f.obs}</div>` : ''}
+            <div class="vendor-estrelas" onclick="event.stopPropagation()" style="margin-top:8px;padding-top:8px;border-top:0.5px solid #F5EDE4;display:flex;gap:2px;">
+              ${[1,2,3,4,5].map(n => `<span onclick="event.stopPropagation();avaliarFornecedor(${f.id},${n})" style="cursor:pointer;font-size:16px;color:${(f.estrelas||0)>=n?'#E8A020':'#DDD4C8'};" title="${n} estrela${n>1?'s':''}">★</span>`).join('')}
+            </div>
+            ${f.obs ? `<div style="font-size:11px;color:var(--taupe);margin-top:8px;">${f.obs}</div>` : ''}
           `;
           grid.appendChild(card);
         });
@@ -823,6 +826,14 @@
       f.parcelaDesc = document.getElementById('ef-parcela-desc').value.trim();
       salvar(); document.getElementById('confirm-forn').classList.remove('open'); renderizar();
     }
+    function avaliarFornecedor(id, estrelas) {
+      const f = fornecedores.find(f => f.id === id);
+      if (!f) return;
+      f.estrelas = (f.estrelas === estrelas) ? 0 : estrelas; // clique duplo remove
+      salvar();
+      renderizar();
+    }
+
     ['modal-detalhe-forn','modal-editar-forn','confirm-forn'].forEach(id => {
       document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
     });
@@ -839,7 +850,9 @@
 
       // Info grid
       const saldo = (f.valor || 0) - (f.pago || 0);
+      const estrelasHtml = [1,2,3,4,5].map(n => `<span style="font-size:20px;color:${(f.estrelas||0)>=n?'#E8A020':'#DDD4C8'};">★</span>`).join('');
       const campos = [
+        { label: 'Avaliação', value: estrelasHtml },
         { label: 'Categoria', value: f.categoria || '—' },
         { label: 'WhatsApp', value: f.whatsapp || '—' },
         { label: 'Instagram', value: f.instagram ? `<a href="${f.instagram.startsWith('http') ? f.instagram : 'https://instagram.com/' + f.instagram.replace('@','')}" target="_blank" style="color:var(--rosa);text-decoration:none;">${f.instagram}</a>` : '—' },
