@@ -690,7 +690,7 @@
       const fmt = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0);
       // Valor pago: soma automática dos fornecedores contratados/pagos
       const fornecedoresFin = JSON.parse(localStorage.getItem('fornecedores') || '[]');
-      const pagoAuto = fornecedoresFin.filter(f => f.status === 'contratado' || f.status === 'pago').reduce((s, f) => s + (f.pago || 0), 0);
+      const pagoAuto = fornecedoresFin.reduce((s, f) => s + (f.pago || 0), 0);
       document.getElementById('val-total').textContent = fmt(fin.total);
       document.getElementById('val-pago').textContent = fmt(pagoAuto);
       document.getElementById('val-pendente').textContent = fmt((fin.total||0) - pagoAuto);
