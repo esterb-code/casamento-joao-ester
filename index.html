@@ -688,10 +688,13 @@
       // Financeiro
       const fin = state.financeiro;
       const fmt = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0);
+      // Valor pago: soma automática dos fornecedores contratados/pagos
+      const fornecedoresFin = JSON.parse(localStorage.getItem('fornecedores') || '[]');
+      const pagoAuto = fornecedoresFin.filter(f => f.status === 'contratado' || f.status === 'pago').reduce((s, f) => s + (f.pago || 0), 0);
       document.getElementById('val-total').textContent = fmt(fin.total);
-      document.getElementById('val-pago').textContent = fmt(fin.pago);
-      document.getElementById('val-pendente').textContent = fmt((fin.total||0) - (fin.pago||0));
-      const pctPago = fin.total > 0 ? Math.round(fin.pago / fin.total * 100) : 0;
+      document.getElementById('val-pago').textContent = fmt(pagoAuto);
+      document.getElementById('val-pendente').textContent = fmt((fin.total||0) - pagoAuto);
+      const pctPago = fin.total > 0 ? Math.round(pagoAuto / fin.total * 100) : 0;
       document.getElementById('sub-pago').textContent = `${pctPago}% quitado`;
 
       // Alertas — calculado automaticamente dos fornecedores
