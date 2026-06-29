@@ -164,9 +164,6 @@
       </div>
     </div>
 
-    <!-- LEGENDA CATEGORIAS -->
-    <div class="legenda" id="legenda-cats"></div>
-
     <!-- TABLE -->
     <div class="table-wrap">
       <table id="tabela-gastos">
@@ -200,28 +197,18 @@
 <!-- MODAL NOVA LINHA -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal-box">
-    <div class="modal-title">Nova Despesa</div>
-    <div class="modal-sub">Preencha as informações básicas. Os valores mensais você edita direto na tabela.</div>
+    <div class="modal-title">Item de inscrição</div>
+    <div class="modal-sub">Os valores mensais você edita direto na tabela.</div>
     <div class="form-group">
-      <label class="form-label">Categoria</label>
-      <select class="form-select" id="m-categoria">
-        <option value="">Selecione a categoria</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Item / Descrição</label>
+      <label class="form-label">Nome do fornecedor</label>
       <input class="form-input" id="m-item" placeholder="Ex: Cerimonialista, Buffet..." />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Fornecedor</label>
-      <input class="form-input" id="m-fornecedor" placeholder="Nome do fornecedor" />
     </div>
     <div class="form-group">
       <label class="form-label">Valor Total (R$)</label>
       <input class="form-input" id="m-valor" type="number" placeholder="0,00" step="0.01" min="0" />
     </div>
     <div class="form-group">
-      <label class="form-label">Obs / Forma de Pagamento</label>
+      <label class="form-label">Observação</label>
       <input class="form-input" id="m-obs" placeholder="Ex: 30% entrada + restante Jul/27" />
     </div>
     <div class="modal-footer">
@@ -266,8 +253,6 @@ let editandoId = null;
 
 async function initApp() {
   AppAuth.verificarPagina();
-  preencherCatSelects();
-  renderLegenda();
   if (typeof db !== 'undefined') {
     const dados = await db.get('custos-totais');
     if (dados && Array.isArray(dados) && dados.length > 0) {
@@ -284,26 +269,7 @@ async function initApp() {
   renderizar();
 }
 
-function preencherCatSelects() {
-  const sel = document.getElementById('m-categoria');
-  CATEGORIAS.forEach(c => {
-    const o = document.createElement('option');
-    o.value = c.nome; o.textContent = c.nome;
-    sel.appendChild(o);
-  });
-}
 
-function renderLegenda() {
-  const el = document.getElementById('legenda-cats');
-  el.innerHTML = CATEGORIAS.map(c =>
-    `<div class="leg-item"><div class="leg-dot" style="background:${c.cor}"></div>${c.nome}</div>`
-  ).join('');
-}
-
-function corCategoria(nome) {
-  const c = CATEGORIAS.find(x => x.nome === nome);
-  return c ? c.cor : '#D5D5D5';
-}
 
 function fmt(v) {
   if (!v && v !== 0) return '';
@@ -320,7 +286,6 @@ function renderizar() {
   const tfoot = document.getElementById('tfoot-gastos');
 
   tbody.innerHTML = linhas.map((l,i) => {
-    const cor = corCategoria(l.categoria);
     const mesCells = MES_KEYS.map((k,mi) => {
       const val = l[k] || '';
       const temVal = val && parseVal(val) > 0;
@@ -336,8 +301,7 @@ function renderizar() {
     return `<tr data-idx="${i}">
       <td>
         <div class="item-cell">
-          <div class="categoria-dot" style="background:${cor}" title="${l.categoria||''}"></div>
-          <input class="item-input" value="${escHtml(l.item||'')}" placeholder="Nome do item"
+          <input class="item-input" value="${escHtml(l.item||'')}" placeholder="Nome do fornecedor"
             onblur="salvarCampo(${i},'item',this.value)"
             onkeydown="if(event.key==='Enter')this.blur()" />
         </div>
@@ -441,9 +405,7 @@ function salvar() {
 
 function abrirModal() {
   AppAuth.verificar(() => {
-    document.getElementById('m-categoria').value = '';
     document.getElementById('m-item').value = '';
-    document.getElementById('m-fornecedor').value = '';
     document.getElementById('m-valor').value = '';
     document.getElementById('m-obs').value = '';
     document.getElementById('modal-overlay').classList.add('open');
@@ -460,9 +422,7 @@ function salvarModal() {
   if (!item) { alert('Informe o nome do item.'); return; }
   const nova = {
     id: Date.now(),
-    categoria: document.getElementById('m-categoria').value,
     item,
-    fornecedor: document.getElementById('m-fornecedor').value.trim(),
     valor: parseVal(document.getElementById('m-valor').value),
     obs: document.getElementById('m-obs').value.trim(),
   };
