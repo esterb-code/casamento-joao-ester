@@ -54,16 +54,16 @@
     td.fixed{padding:10px 12px}
 
     /* EDITABLE CELLS */
-    .cell-input{border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:13px;color:#3E3530;width:100%;outline:none;padding:10px 12px;cursor:pointer}
-    .cell-input:focus{background:#FFF8F5;cursor:text}
-    .cell-input::placeholder{color:#ccc}
+    .cell-input{display:block;font-family:'Nunito',sans-serif;font-size:13px;color:#3E3530;width:100%;padding:10px 12px;cursor:default;user-select:none}
+    .cell-input:hover{background:#FFF8F5}
+    .cell-texto-editando{border:none;background:#FFF8F5;font-family:'Nunito',sans-serif;font-size:13px;color:#3E3530;width:100%;outline:none;padding:10px 12px;cursor:text;display:block}
 
-    /* ITEM / CATEGORIA column */
+    /* ITEM column */
     .item-cell{display:flex;align-items:center;gap:8px;padding:0 12px}
     .categoria-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-    .item-input{border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:#3E3530;flex:1;outline:none;padding:10px 0;cursor:pointer;min-width:140px}
-    .item-input:focus{background:transparent;cursor:text}
-    .item-input::placeholder{color:#ccc;font-weight:400}
+    .item-input{display:block;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:#3E3530;flex:1;padding:10px 0;cursor:default;user-select:none;min-width:140px}
+    .item-input:hover{background:#FFF8F5}
+    .item-input-editando{border:none;background:#FFF8F5;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:#3E3530;flex:1;outline:none;padding:10px 0;cursor:text;min-width:140px}
 
     /* CATEGORIA SELECT */
     .cat-select{border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:11px;color:var(--taupe);outline:none;cursor:pointer;padding:4px 0;width:100%;max-width:140px}
@@ -255,12 +255,17 @@ async function initApp() {
   AppAuth.verificarPagina();
   if (typeof db !== 'undefined') {
     const dados = await db.get('custos-totais');
-    if (dados && Array.isArray(dados) && dados.length > 0) {
+    if (dados !== null && Array.isArray(dados)) {
+      // Supabase é a fonte de verdade — sobrescreve local
       linhas = dados;
       localStorage.setItem('custos-totais', JSON.stringify(dados));
     } else {
+      // Chave ainda não existe no Supabase: lê local e sobe imediatamente
       const local = localStorage.getItem('custos-totais');
-      if (local) linhas = JSON.parse(local);
+      if (local) {
+        linhas = JSON.parse(local);
+        db.set('custos-totais', linhas);
+      }
     }
   } else {
     const local = localStorage.getItem('custos-totais');
@@ -301,21 +306,12 @@ function renderizar() {
     return `<tr data-idx="${i}">
       <td>
         <div class="item-cell">
-          <input class="item-input" value="${escHtml(l.item||'')}" placeholder="Nome do fornecedor"
-            onblur="salvarCampo(${i},'item',this.value)"
-            onkeydown="if(event.key==='Enter')this.blur()" />
+          <span class="cell-texto item-input" ondblclick="ativarEdicao(this,${i},'item')">${escHtml(l.item||'') || '<span style="color:#ccc">Duplo clique para editar</span>'}</span>
         </div>
       </td>
-      <td><input class="cell-input" value="${escHtml(l.fornecedor||'')}" placeholder="Fornecedor"
-        onblur="salvarCampo(${i},'fornecedor',this.value)"
-        onkeydown="if(event.key==='Enter')this.blur()" /></td>
-      <td><input class="cell-input" value="${l.valor ? fmt(parseVal(l.valor)) : ''}" placeholder="R$ 0,00"
-        onfocus="this.value=this.value.replace('R$ ','').replace(/\\./g,'').replace(',','.')"
-        onblur="salvarValor(${i},this.value)"
-        onkeydown="if(event.key==='Enter')this.blur()" /></td>
-      <td><input class="cell-input" value="${escHtml(l.obs||'')}" placeholder="Obs / forma pgto"
-        onblur="salvarCampo(${i},'obs',this.value)"
-        onkeydown="if(event.key==='Enter')this.blur()" /></td>
+      <td><span class="cell-texto cell-input" ondblclick="ativarEdicao(this,${i},'fornecedor')">${escHtml(l.fornecedor||'') || '<span style="color:#ccc">—</span>'}</span></td>
+      <td><span class="cell-texto cell-input" ondblclick="ativarEdicaoValor(this,${i})">${l.valor ? fmt(parseVal(l.valor)) : '<span style="color:#ccc">—</span>'}</span></td>
+      <td><span class="cell-texto cell-input" ondblclick="ativarEdicao(this,${i},'obs')">${escHtml(l.obs||'') || '<span style="color:#ccc">—</span>'}</span></td>
       ${mesCells}
       <td><button class="del-btn" onclick="deletarLinha(${i})" title="Remover"><i class="ti ti-trash"></i></button></td>
     </tr>`;
@@ -431,6 +427,41 @@ function salvarModal() {
   salvar();
   renderizar();
   fecharModal();
+}
+
+function ativarEdicao(span, idx, campo) {
+  const isItem = span.classList.contains('item-input');
+  const valorAtual = linhas[idx][campo] || '';
+  const input = document.createElement('input');
+  input.value = valorAtual;
+  input.className = isItem ? 'item-input-editando' : 'cell-texto-editando';
+  input.onblur = function() {
+    linhas[idx][campo] = this.value;
+    salvar();
+    renderizar();
+  };
+  input.onkeydown = function(e) { if (e.key === 'Enter') this.blur(); if (e.key === 'Escape') { renderizar(); } };
+  span.replaceWith(input);
+  input.focus();
+  input.select();
+}
+
+function ativarEdicaoValor(span, idx) {
+  const valorAtual = linhas[idx].valor || '';
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.value = valorAtual ? parseVal(fmt(valorAtual)) : '';
+  input.className = 'cell-texto-editando';
+  input.placeholder = '0,00';
+  input.onblur = function() {
+    linhas[idx].valor = parseVal(this.value);
+    salvar();
+    renderizar();
+  };
+  input.onkeydown = function(e) { if (e.key === 'Enter') this.blur(); if (e.key === 'Escape') { renderizar(); } };
+  span.replaceWith(input);
+  input.focus();
+  input.select();
 }
 
 function escHtml(str) {
