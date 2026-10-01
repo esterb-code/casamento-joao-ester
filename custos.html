@@ -135,6 +135,8 @@
       <p>Cronograma de pagamentos mês a mês</p>
     </div>
     <div class="topbar-right">
+      <span id="sync-status" style="font-size:11px;color:#aaa;display:flex;align-items:center;gap:5px;"></span>
+      <button class="btn-sec" id="btn-sync" onclick="sincronizarAgora()" title="Forçar sincronização com a nuvem" style="display:none"><i class="ti ti-cloud-upload"></i> Sincronizar</button>
       <button class="btn-sec" onclick="abrirModal()"><i class="ti ti-plus"></i> Nova linha</button>
     </div>
   </div>
@@ -251,20 +253,53 @@ const CATEGORIAS = [
 let linhas = [];
 let editandoId = null;
 
+function setSyncStatus(msg, cor) {
+  const el = document.getElementById('sync-status');
+  if (el) { el.textContent = msg; el.style.color = cor || '#aaa'; }
+}
+
+async function sincronizarAgora() {
+  if (typeof db === 'undefined') return;
+  setSyncStatus('Sincronizando...', '#EE5802');
+  document.getElementById('btn-sync').disabled = true;
+  const ok = await db.set('custos-totais', linhas);
+  if (ok) {
+    setSyncStatus('✓ Sincronizado', '#629E46');
+    document.getElementById('btn-sync').style.display = 'none';
+    setTimeout(() => setSyncStatus(''), 3000);
+  } else {
+    setSyncStatus('✗ Erro ao sincronizar', '#c0392b');
+    document.getElementById('btn-sync').disabled = false;
+  }
+}
+
 async function initApp() {
   AppAuth.verificarPagina();
   if (typeof db !== 'undefined') {
+    setSyncStatus('Carregando...', '#aaa');
     const dados = await db.get('custos-totais');
-    if (dados !== null && Array.isArray(dados)) {
-      // Supabase é a fonte de verdade — sobrescreve local
+    if (dados !== null && Array.isArray(dados) && dados.length > 0) {
+      // Supabase tem dados — é a fonte de verdade
       linhas = dados;
       localStorage.setItem('custos-totais', JSON.stringify(dados));
+      setSyncStatus('✓ Nuvem sincronizada', '#629E46');
+      setTimeout(() => setSyncStatus(''), 3000);
     } else {
-      // Chave ainda não existe no Supabase: lê local e sobe imediatamente
+      // Supabase vazio: lê localStorage
       const local = localStorage.getItem('custos-totais');
       if (local) {
         linhas = JSON.parse(local);
-        db.set('custos-totais', linhas);
+        // Sobe imediatamente para Supabase
+        const ok = await db.set('custos-totais', linhas);
+        if (ok) {
+          setSyncStatus('✓ Dados enviados para a nuvem', '#629E46');
+          setTimeout(() => setSyncStatus(''), 3000);
+        } else {
+          setSyncStatus('⚠ Dados locais — nuvem indisponível', '#EE5802');
+          document.getElementById('btn-sync').style.display = 'flex';
+        }
+      } else {
+        setSyncStatus('');
       }
     }
   } else {
