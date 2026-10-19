@@ -39,10 +39,14 @@ const db = {
         headers: Object.assign({}, this._headers(), { 'Prefer': 'resolution=merge-duplicates' }),
         body: JSON.stringify({ key, value, updated_at: new Date().toISOString() })
       });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      if (!res.ok) {
+        const body = await res.text().catch(() => '');
+        console.error('Supabase SET erro', res.status, body);
+        throw new Error('HTTP ' + res.status + ' ' + body);
+      }
       return true;
     } catch (e) {
-      console.warn('Supabase SET offline, salvo apenas localmente:', key);
+      console.warn('Supabase SET falhou:', e.message);
       return false;
     }
   },
