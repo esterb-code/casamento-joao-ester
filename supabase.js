@@ -47,6 +47,19 @@ const db = {
     }
   },
 
+  async getUpdatedAt(key) {
+    try {
+      const res = await fetch(
+        SUPABASE_URL + '/rest/v1/site_data?key=eq.' + encodeURIComponent(key) + '&select=updated_at',
+        { headers: this._headers() }
+      );
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) return data[0].updated_at;
+      return null;
+    } catch(e) { return null; }
+  },
+
   async getMany(keys) {
     try {
       const param = keys.map(k => '"' + k + '"').join(',');

@@ -137,7 +137,7 @@
     </div>
     <div class="topbar-right">
       <span id="sync-status" style="font-size:11px;color:#aaa;display:flex;align-items:center;gap:5px;"></span>
-      <button class="btn-sec" id="btn-sync" onclick="sincronizarAgora()" title="Forçar sincronização com a nuvem" style="display:none"><i class="ti ti-cloud-upload"></i> Sincronizar</button>
+      <button class="btn-sec" id="btn-sync" onclick="sincronizarAgora()" title="Forçar sincronização com a nuvem"><i class="ti ti-cloud-upload"></i> Sincronizar</button>
       <button class="btn-sec" onclick="abrirModal()"><i class="ti ti-plus"></i> Nova linha</button>
     </div>
   </div>
@@ -253,6 +253,7 @@ const CATEGORIAS = [
 
 let linhas = [];
 let editandoId = null;
+let ultimaAtualizacao = null;
 
 function setSyncStatus(msg, cor) {
   const el = document.getElementById('sync-status');
@@ -265,13 +266,13 @@ async function sincronizarAgora() {
   document.getElementById('btn-sync').disabled = true;
   const ok = await db.set('custos-totais', linhas);
   if (ok) {
-    setSyncStatus('✓ Sincronizado', '#629E46');
-    document.getElementById('btn-sync').style.display = 'none';
+    ultimaAtualizacao = await db.getUpdatedAt('custos-totais');
+    setSyncStatus('✓ Sincronizado com a nuvem', '#629E46');
     setTimeout(() => setSyncStatus(''), 3000);
   } else {
-    setSyncStatus('✗ Erro ao sincronizar', '#c0392b');
-    document.getElementById('btn-sync').disabled = false;
+    setSyncStatus('✗ Erro ao sincronizar — tente novamente', '#c0392b');
   }
+  document.getElementById('btn-sync').disabled = false;
 }
 
 async function initApp() {
@@ -283,6 +284,7 @@ async function initApp() {
       // Supabase tem dados — é a fonte de verdade
       linhas = dados;
       localStorage.setItem('custos-totais', JSON.stringify(dados));
+      ultimaAtualizacao = await db.getUpdatedAt('custos-totais');
       setSyncStatus('✓ Nuvem sincronizada', '#629E46');
       setTimeout(() => setSyncStatus(''), 3000);
     } else {
@@ -428,7 +430,17 @@ function deletarLinha(idx) {
 
 function salvar() {
   try { localStorage.setItem('custos-totais', JSON.stringify(linhas)); } catch(e) {}
-  if (typeof db !== 'undefined') db.set('custos-totais', linhas);
+  if (typeof db !== 'undefined') {
+    db.set('custos-totais', linhas).then(ok => {
+      if (ok) {
+        ultimaAtualizacao = null; // será atualizado no próximo poll sem causar re-render
+        setSyncStatus('✓ Salvo', '#629E46');
+        setTimeout(() => setSyncStatus(''), 2000);
+      } else {
+        setSyncStatus('⚠ Nuvem indisponível — clique em Sincronizar', '#EE5802');
+      }
+    });
+  }
 }
 
 function abrirModal() {
@@ -507,7 +519,23 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') fecharModal();
 });
 
-initApp();
+async function iniciarPolling() {
+  if (typeof db === 'undefined') return;
+  setInterval(async () => {
+    const ts = await db.getUpdatedAt('custos-totais');
+    if (!ts || ts === ultimaAtualizacao) return;
+    ultimaAtualizacao = ts;
+    const dados = await db.get('custos-totais');
+    if (!dados || !Array.isArray(dados)) return;
+    if (JSON.stringify(dados) === JSON.stringify(linhas)) return;
+    linhas = dados;
+    renderizar();
+    setSyncStatus('✓ Atualizado de outro dispositivo', '#629E46');
+    setTimeout(() => setSyncStatus(''), 3000);
+  }, 30000); // verifica a cada 30 segundos
+}
+
+initApp().then(iniciarPolling);
 </script>
 </body>
 </html>
