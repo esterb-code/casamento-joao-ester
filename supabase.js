@@ -1,31 +1,19 @@
-// Supabase — João & Ester
-const SUPABASE_URL = 'https://vnbkjumpibcirrayfswo.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZuYmtqdW1waWJjaXJyYXlmc3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4Mzg0OTQsImV4cCI6MjA5NTQxNDQ5NH0._RvaITN--mXRSxWErPKWkQoWrikGZxrm6IBF-QRWKjU';
+// Firebase Realtime Database — João & Ester
+const FIREBASE_URL = 'https://casamento-joao-ester-default-rtdb.firebaseio.com';
 
 const db = {
-  _headers() {
-    return {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json'
-    };
-  },
-
   async get(key, fallback = null) {
     try {
-      const res = await fetch(
-        SUPABASE_URL + '/rest/v1/site_data?key=eq.' + encodeURIComponent(key) + '&select=value',
-        { headers: this._headers() }
-      );
+      const res = await fetch(`${FIREBASE_URL}/${key}.json`);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        localStorage.setItem(key, JSON.stringify(data[0].value));
-        return data[0].value;
+      if (data !== null) {
+        localStorage.setItem(key, JSON.stringify(data));
+        return data;
       }
       return fallback;
     } catch (e) {
-      console.warn('Supabase GET offline, usando localStorage:', key);
+      console.warn('Firebase GET falhou, usando localStorage:', key);
       const v = localStorage.getItem(key);
       return v ? JSON.parse(v) : fallback;
     }
@@ -34,67 +22,39 @@ const db = {
   async set(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
     try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/site_data', {
-        method: 'POST',
-        headers: Object.assign({}, this._headers(), { 'Prefer': 'resolution=merge-duplicates' }),
-        body: JSON.stringify({ key, value, updated_at: new Date().toISOString() })
+      const res = await fetch(`${FIREBASE_URL}/${key}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(value)
       });
-      if (!res.ok) {
-        const body = await res.text().catch(() => '');
-        console.error('Supabase SET erro', res.status, body);
-        throw new Error('HTTP ' + res.status + ' ' + body);
-      }
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      // salva timestamp separado para o polling detectar mudanças
+      await fetch(`${FIREBASE_URL}/${key}_updated_at.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(new Date().toISOString())
+      });
       return true;
     } catch (e) {
-      console.warn('Supabase SET falhou:', e.message);
+      console.warn('Firebase SET falhou:', e.message);
       return false;
     }
   },
 
   async getUpdatedAt(key) {
     try {
-      const res = await fetch(
-        SUPABASE_URL + '/rest/v1/site_data?key=eq.' + encodeURIComponent(key) + '&select=updated_at',
-        { headers: this._headers() }
-      );
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const res = await fetch(`${FIREBASE_URL}/${key}_updated_at.json`);
+      if (!res.ok) throw new Error();
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data[0].updated_at;
-      return null;
-    } catch(e) { return null; }
+      return data || null;
+    } catch (e) { return null; }
   },
 
   async getMany(keys) {
-    try {
-      const param = keys.map(k => '"' + k + '"').join(',');
-      const res = await fetch(
-        SUPABASE_URL + '/rest/v1/site_data?key=in.(' + param + ')&select=key,value',
-        { headers: this._headers() }
-      );
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      const result = {};
-      if (Array.isArray(data)) {
-        data.forEach(r => {
-          result[r.key] = r.value;
-          localStorage.setItem(r.key, JSON.stringify(r.value));
-        });
-      }
-      keys.forEach(k => {
-        if (!(k in result)) {
-          const v = localStorage.getItem(k);
-          result[k] = v ? JSON.parse(v) : null;
-        }
-      });
-      return result;
-    } catch (e) {
-      console.warn('Supabase GETMANY offline, usando localStorage');
-      const result = {};
-      keys.forEach(k => {
-        const v = localStorage.getItem(k);
-        result[k] = v ? JSON.parse(v) : null;
-      });
-      return result;
-    }
+    const result = {};
+    await Promise.all(keys.map(async k => {
+      result[k] = await this.get(k, null);
+    }));
+    return result;
   }
 };
