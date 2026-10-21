@@ -364,20 +364,25 @@
       renderizar();
     }
 
+    function listaFiltrada() {
+      let lista = [...convidados];
+      if (filtroAtivo !== 'todos') lista = lista.filter(g => g.status === filtroAtivo);
+      if (filtroFamilia !== 'todos') lista = lista.filter(g => g.familia === filtroFamilia);
+      return lista;
+    }
+
     function selecionarTodos(checked) {
       if (checked) {
-        let lista = [...convidados];
-        if (filtroAtivo !== 'todos') lista = lista.filter(g => g.status === filtroAtivo);
-        lista.forEach(g => selecionados.add(g.id));
+        listaFiltrada().forEach(g => selecionados.add(g.id));
       } else {
-        selecionados.clear();
+        listaFiltrada().forEach(g => selecionados.delete(g.id));
       }
       atualizarBarraSelecao();
       renderizar();
     }
 
     function limparSelecao() {
-      selecionados.clear();
+      listaFiltrada().forEach(g => selecionados.delete(g.id));
       atualizarBarraSelecao();
       renderizar();
     }
@@ -544,10 +549,10 @@
 
       // Mostrar "selecionar todos" quando há convidados
       document.getElementById('sel-todos-wrap').style.display = lista.length > 0 ? 'flex' : 'none';
-      // Atualiza estado do checkbox "todos"
+      // Atualiza estado do checkbox "todos" com base nos itens do filtro atual
       const chkTodos = document.getElementById('chk-todos');
-      if (lista.length > 0 && selecionados.size === lista.length) chkTodos.checked = true;
-      else chkTodos.checked = false;
+      const todosMarcados = lista.length > 0 && lista.every(g => selecionados.has(g.id));
+      chkTodos.checked = todosMarcados;
     }
 
     document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
