@@ -301,7 +301,6 @@
           <div class="card-header">
             <span class="card-title">Resumo Financeiro</span>
             <div class="card-header-right">
-              <button class="edit-btn" onclick="abrirModal('financeiro')"><i class="ti ti-pencil"></i> Editar</button>
               <div class="privacy-toggle" onclick="togglePrivacy()">
                 <i class="ti ti-eye" id="privacy-icon"></i>
                 <span id="privacy-text">Ocultar</span>
@@ -682,16 +681,17 @@
       document.getElementById('sidebar-date').textContent = `${d} de ${meses[parseInt(m)-1].toLowerCase().substring(0,3)} de ${y}`;
       document.getElementById('cd-date-text').textContent = `${d}/${m}/${y} · ${horaFmt}`;
 
-      // Financeiro
-      const fin = state.financeiro;
+      // Financeiro — calculado automaticamente de Custos Totais
       const fmt = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0);
-      // Valor pago: soma automática dos fornecedores contratados/pagos
-      const fornecedoresFin = JSON.parse(localStorage.getItem('fornecedores') || '[]');
-      const pagoAuto = fornecedoresFin.reduce((s, f) => s + (f.pago || 0), 0);
-      document.getElementById('val-total').textContent = fmt(fin.total);
-      document.getElementById('val-pago').textContent = fmt(pagoAuto);
-      document.getElementById('val-pendente').textContent = fmt((fin.total||0) - pagoAuto);
-      const pctPago = fin.total > 0 ? Math.round(pagoAuto / fin.total * 100) : 0;
+      const custos = JSON.parse(localStorage.getItem('custos-totais') || '[]');
+      const MES_KEYS_FIN = ['jul26','ago26','set26','out26','nov26','dez26','jan27','fev27','mar27','abr27','mai27'];
+      const finTotal = custos.reduce((s, l) => s + (parseFloat(l.valor) || 0), 0);
+      const finPago  = custos.reduce((s, l) => s + MES_KEYS_FIN.reduce((ms, k) => ms + (parseFloat(l[k]) || 0), 0), 0);
+      const finPendente = finTotal - finPago;
+      document.getElementById('val-total').textContent = fmt(finTotal);
+      document.getElementById('val-pago').textContent = fmt(finPago);
+      document.getElementById('val-pendente').textContent = fmt(finPendente);
+      const pctPago = finTotal > 0 ? Math.round(finPago / finTotal * 100) : 0;
       document.getElementById('sub-pago').textContent = `${pctPago}% quitado`;
 
       // Alertas — calculado automaticamente dos fornecedores
