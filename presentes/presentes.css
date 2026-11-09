@@ -11,7 +11,7 @@ img{display:block;max-width:100%}
 
 /* ---------- Topo ---------- */
 .hero{position:relative;text-align:center;padding:56px 20px 44px;color:var(--papel);
-  background:linear-gradient(rgba(47,74,44,.86),rgba(30,48,28,.92)),url('floral.webp') center/cover}
+  background:linear-gradient(rgba(40,8,26,.55),rgba(20,8,14,.78)),url('estampa.jpg') center/cover}
 .hero .pre{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.32em;text-transform:uppercase;opacity:.85}
 .hero h1{font-family:'Pinyon Script',cursive;font-weight:400;font-size:clamp(54px,13vw,92px);line-height:1.05;margin:10px 0 6px;color:var(--creme)}
 .hero .data{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.24em;text-transform:uppercase}
@@ -69,7 +69,7 @@ input:focus,textarea:focus{outline:2px solid var(--rosa);outline-offset:0}
 textarea{resize:vertical;min-height:84px;font-family:ui-monospace,Consolas,monospace;font-size:14px}
 .erro-msg{color:#a32222;font-size:15px;margin-top:10px;display:none}
 
-.barra{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--floresta);color:var(--papel);padding:14px 20px}
+.barra{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#5F1729;color:var(--papel);padding:14px 20px}
 .barra b{font-family:'Pinyon Script',cursive;font-weight:400;font-size:30px;color:var(--creme)}
 .barra .lado{display:flex;gap:8px;flex-wrap:wrap}
 .barra .btn.vazado{color:var(--papel);outline-color:rgba(242,240,234,.6)}
