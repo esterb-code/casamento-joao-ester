@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administrador | Lista de Presentes</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="presentes.css">
+</head>
+<body>
+
+<!-- Login -->
+<section id="tela-login" class="login">
+  <h1>João &amp; Ester</h1>
+  <p>Área do administrador</p>
+  <form id="form-login" autocomplete="off">
+    <label for="l-user">Login</label>
+    <input type="text" id="l-user" autocapitalize="off" autocomplete="username">
+    <label for="l-pass">Senha</label>
+    <input type="password" id="l-pass" autocomplete="current-password">
+    <div class="erro-msg" id="l-erro">Login ou senha incorretos.</div>
+    <button class="btn" type="submit" style="width:100%;margin-top:22px">Entrar</button>
+  </form>
+</section>
+
+<!-- Painel -->
+<section id="tela-admin" class="hide">
+  <div class="barra">
+    <b>Presentes</b>
+    <div class="lado">
+      <a class="btn peq vazado" href="./" target="_blank">Ver como convidado</a>
+      <button class="btn peq vazado" id="sair" type="button">Sair</button>
+    </div>
+  </div>
+
+  <div class="painel">
+    <!-- Formulário -->
+    <div class="cartao">
+      <h2 id="f-titulo">Novo presente</h2>
+      <form id="form" autocomplete="off">
+        <label>Imagem</label>
+        <div class="previa" id="previa"><span>Toque para escolher uma imagem</span></div>
+        <input type="file" id="arq" accept="image/*" class="hide">
+
+        <label for="f-tit">Título</label>
+        <input type="text" id="f-tit" required maxlength="120" placeholder="Ex.: Geladeira">
+
+        <label for="f-preco">Preço (R$)</label>
+        <input type="number" id="f-preco" required min="0" step="0.01" inputmode="decimal" placeholder="0,00">
+
+        <label for="f-link">Link da loja</label>
+        <input type="text" id="f-link" inputmode="url" autocapitalize="off" placeholder="https://...">
+
+        <label for="f-pix">Código Pix (copia e cola)</label>
+        <textarea id="f-pix" placeholder="Cole aqui o código Pix"></textarea>
+
+        <div class="linha2">
+          <button class="btn" type="submit" id="f-salvar">Salvar presente</button>
+          <button class="btn vazado hide" type="button" id="f-cancelar">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Lista -->
+    <div class="cartao">
+      <h2>Presentes cadastrados (<span id="qtd">0</span>)</h2>
+      <div class="lista" id="lista"></div>
+      <p class="vazio" id="vazio">Nenhum presente ainda. Cadastre o primeiro ao lado.</p>
+    </div>
+  </div>
+</section>
+
+<script src="../supabase.js"></script>
+<script src="shared.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const USER = 'Joter', PASS = 'Joter2027', SESS = 'presentes-admin';
+let lista = [];
+let editId = null;     // id em edição (null = novo)
+let imagem = '';       // dataURL da imagem atual
+
+/* ---------- Login ---------- */
+function entra() {
+  $('tela-login').classList.add('hide');
+  $('tela-admin').classList.remove('hide');
+  carrega();
+}
+$('form-login').onsubmit = e => {
+  e.preventDefault();
+  if ($('l-user').value.trim() === USER && $('l-pass').value === PASS) {
+    try { sessionStorage.setItem(SESS, '1'); } catch (_) {}
+    entra();
+  } else {
+    $('l-erro').style.display = 'block';
+    $('l-pass').value = '';
+  }
+};
+$('sair').onclick = () => { try { sessionStorage.removeItem(SESS); } catch (_) {} location.reload(); };
+try { if (sessionStorage.getItem(SESS) === '1') entra(); } catch (_) {}
+
+/* ---------- Dados ---------- */
+async function carrega() { lista = await Presentes.listar(); desenha(); }
+
+async function grava(msg) {
+  const ok = await Presentes.salvar(lista);
+  toast(ok ? msg : 'Salvo só neste aparelho: sem conexão com o servidor. Tente de novo.', !ok);
+}
+
+/* ---------- Imagem (reduz para não pesar) ---------- */
+$('previa').onclick = () => $('arq').click();
+$('arq').onchange = e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const fr = new FileReader();
+  fr.onload = () => {
+    const im = new Image();
+    im.onload = () => {
+      const max = 640, k = Math.min(1, max / Math.max(im.width, im.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      imagem = c.toDataURL('image/jpeg', 0.75);
+      mostraPrevia();
+    };
+    im.onerror = () => toast('Não consegui ler essa imagem.', true);
+    im.src = fr.result;
+  };
+  fr.readAsDataURL(f);
+};
+function mostraPrevia() {
+  const p = $('previa');
+  p.style.backgroundImage = imagem ? `url("${imagem}")` : '';
+  p.classList.toggle('tem', !!imagem);
+}
+
+/* ---------- Formulário ---------- */
+function limpa() {
+  editId = null; imagem = '';
+  $('form').reset(); $('arq').value = '';
+  mostraPrevia();
+  $('f-titulo').textContent = 'Novo presente';
+  $('f-salvar').textContent = 'Salvar presente';
+  $('f-cancelar').classList.add('hide');
+}
+$('f-cancelar').onclick = limpa;
+
+$('form').onsubmit = async e => {
+  e.preventDefault();
+  const dados = {
+    titulo: $('f-tit').value.trim(),
+    preco: parseFloat($('f-preco').value) || 0,
+    link: normalizaLink($('f-link').value),
+    pix: $('f-pix').value.trim(),
+    imagem
+  };
+  if (!dados.titulo) return;
+  if (editId) {
+    lista = lista.map(p => p.id === editId ? { ...p, ...dados } : p);
+  } else {
+    lista.push({ id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), ...dados });
+  }
+  const msg = editId ? 'Presente atualizado!' : 'Presente cadastrado!';
+  limpa(); desenha();
+  await grava(msg);
+};
+
+/* ---------- Lista ---------- */
+function desenha() {
+  const el = $('lista');
+  el.innerHTML = '';
+  $('qtd').textContent = lista.length;
+  $('vazio').style.display = lista.length ? 'none' : 'block';
+  lista.forEach((p, i) => {
+    const r = document.createElement('div'); r.className = 'row';
+    const m = document.createElement('div'); m.className = 'mini';
+    if (p.imagem) m.style.backgroundImage = `url("${p.imagem}")`;
+    const info = document.createElement('div');
+    const t = document.createElement('div'); t.className = 't'; t.textContent = p.titulo;
+    const pr = document.createElement('div'); pr.className = 'p'; pr.textContent = brl(p.preco);
+    const tg = document.createElement('div'); tg.className = 'tags';
+    tg.textContent = [p.link ? 'link' : '', p.pix ? 'pix' : ''].filter(Boolean).join(' · ') || 'sem link nem pix';
+    info.append(t, pr, tg);
+    const bt = document.createElement('div'); bt.className = 'bt';
+    const mk = (txt, cls, fn, off) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn peq ' + cls; b.textContent = txt;
+      if (off) { b.disabled = true; b.style.opacity = '.35'; b.style.cursor = 'default'; }
+      else b.onclick = fn;
+      bt.appendChild(b);
+    };
+    mk('↑', 'vazado', () => move(i, -1), i === 0);
+    mk('↓', 'vazado', () => move(i, 1), i === lista.length - 1);
+    mk('Editar', '', () => edita(p));
+    mk('Duplicar', 'vazado', () => duplica(p));
+    mk('Excluir', 'perigo', () => exclui(p));
+    r.append(m, info, bt);
+    el.appendChild(r);
+  });
+}
+
+async function move(i, d) {
+  const j = i + d;
+  if (j < 0 || j >= lista.length) return;
+  [lista[i], lista[j]] = [lista[j], lista[i]];
+  desenha();
+  await grava('Ordem atualizada!');
+}
+function edita(p) {
+  editId = p.id; imagem = p.imagem || '';
+  $('f-tit').value = p.titulo; $('f-preco').value = p.preco;
+  $('f-link').value = p.link || ''; $('f-pix').value = p.pix || '';
+  mostraPrevia();
+  $('f-titulo').textContent = 'Editando presente';
+  $('f-salvar').textContent = 'Salvar alterações';
+  $('f-cancelar').classList.remove('hide');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+async function duplica(p) {
+  const i = lista.findIndex(x => x.id === p.id);
+  lista.splice(i + 1, 0, { ...p, id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), titulo: p.titulo + ' (cópia)' });
+  desenha();
+  await grava('Presente duplicado! Edite a cópia.');
+}
+async function exclui(p) {
+  if (!confirm(`Excluir "${p.titulo}"? Não dá para desfazer.`)) return;
+  lista = lista.filter(x => x.id !== p.id);
+  if (editId === p.id) limpa();
+  desenha();
+  await grava('Presente excluído.');
+}
+</script>
+</body>
+</html>

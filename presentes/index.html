@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lista de Presentes | João & Ester</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="presentes.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="pre">Lista de presentes</div>
+  <h1 id="nomes">João &amp; Ester</h1>
+  <div class="data" id="data"></div>
+  <div class="fio"></div>
+  <p class="sub">Escolha um presente, toque nele e depois é só pagar por Pix ou ir direto à loja. Obrigado pelo carinho!</p>
+</header>
+
+<main class="wrap">
+  <div class="grade" id="grade"></div>
+  <p class="vazio" id="vazio" style="display:none">Os presentes estão sendo preparados. Volte em breve 💚</p>
+</main>
+
+<div class="rodape">com carinho, João &amp; Ester</div>
+
+<div class="fundo" id="fundo">
+  <div class="caixa" role="dialog" aria-modal="true" aria-labelledby="m-tit">
+    <button class="fechar" id="fechar" aria-label="Fechar">&times;</button>
+    <div class="foto" id="m-foto"></div>
+    <div class="conteudo">
+      <h2 id="m-tit"></h2>
+      <div class="preco" id="m-preco"></div>
+      <div class="acoes">
+        <button class="btn rosa" id="b-pix">Copiar código Pix</button>
+        <a class="btn" id="b-loja" target="_blank" rel="noopener noreferrer">Acessar link da loja</a>
+      </div>
+      <div class="pixbox" id="pixbox"></div>
+      <p class="dica" id="dica"></p>
+    </div>
+  </div>
+</div>
+
+<script src="../supabase.js"></script>
+<script src="shared.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let lista = [];
+
+function desenha() {
+  const g = $('grade');
+  g.innerHTML = '';
+  $('vazio').style.display = lista.length ? 'none' : 'block';
+  lista.forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'item';
+    b.type = 'button';
+    const foto = document.createElement('div');
+    foto.className = 'foto';
+    if (p.imagem) foto.style.backgroundImage = `url("${p.imagem}")`;
+    const corpo = document.createElement('div');
+    corpo.className = 'corpo';
+    const t = document.createElement('div'); t.className = 'tit'; t.textContent = p.titulo;
+    const pr = document.createElement('div'); pr.className = 'preco'; pr.textContent = brl(p.preco);
+    corpo.append(t, pr);
+    b.append(foto, corpo);
+    b.onclick = () => abre(p);
+    g.appendChild(b);
+  });
+}
+
+function abre(p) {
+  $('m-foto').style.backgroundImage = p.imagem ? `url("${p.imagem}")` : '';
+  $('m-tit').textContent = p.titulo;
+  $('m-preco').textContent = brl(p.preco);
+  const pix = (p.pix || '').trim();
+  const link = normalizaLink(p.link);
+  const bp = $('b-pix'), bl = $('b-loja');
+  bp.style.display = pix ? 'block' : 'none';
+  bl.style.display = link ? 'block' : 'none';
+  if (link) bl.href = link;
+  $('pixbox').style.display = 'none';
+  $('dica').textContent = (!pix && !link) ? 'Em breve as opções de pagamento estarão disponíveis.' : '';
+  bp.onclick = async () => {
+    const ok = await copiar(pix);
+    const box = $('pixbox');
+    box.textContent = pix; box.style.display = 'block';
+    toast(ok ? 'Código Pix copiado! Agora é só colar no app do seu banco.' : 'Não consegui copiar. Selecione o código abaixo.', !ok);
+  };
+  $('fundo').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+
+function fecha() { $('fundo').classList.remove('on'); document.body.style.overflow = ''; }
+$('fechar').onclick = fecha;
+$('fundo').onclick = e => { if (e.target.id === 'fundo') fecha(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fecha(); });
+
+(async () => {
+  const [ev, l] = await Promise.all([carregarEvento(), Presentes.listar()]);
+  $('nomes').textContent = ev.nomes;
+  $('data').textContent = dataExtenso(ev.data);
+  lista = l;
+  desenha();
+})();
+</script>
+</body>
+</html>
