@@ -39,6 +39,11 @@
       </div>
       <div class="pixbox" id="pixbox"></div>
       <p class="dica" id="dica"></p>
+      <div class="ja" id="ja">
+        <p>Já fez o presente? Avise aqui para ninguém repetir. 💚</p>
+        <input type="text" id="j-nome" maxlength="60" placeholder="Seu nome (para agradecermos)">
+        <button class="btn vazado" id="b-ja" type="button">Já presenteei</button>
+      </div>
     </div>
   </div>
 </div>
@@ -48,6 +53,7 @@
 <script>
 const $ = id => document.getElementById(id);
 let lista = [];
+let comprados = {};
 
 function desenha() {
   const g = $('grade');
@@ -55,18 +61,24 @@ function desenha() {
   $('vazio').style.display = lista.length ? 'none' : 'block';
   lista.forEach(p => {
     const b = document.createElement('button');
-    b.className = 'item';
+    const dado = !!comprados[p.id];
+    b.className = 'item' + (dado ? ' dado' : '');
     b.type = 'button';
     const foto = document.createElement('div');
     foto.className = 'foto';
     if (p.imagem) foto.style.backgroundImage = `url("${p.imagem}")`;
+    if (dado) {
+      const sl = document.createElement('span'); sl.className = 'selo'; sl.textContent = 'Já presenteado';
+      foto.appendChild(sl);
+      b.setAttribute('aria-disabled', 'true');
+    }
     const corpo = document.createElement('div');
     corpo.className = 'corpo';
     const t = document.createElement('div'); t.className = 'tit'; t.textContent = p.titulo;
     const pr = document.createElement('div'); pr.className = 'preco'; pr.textContent = brl(p.preco);
     corpo.append(t, pr);
     b.append(foto, corpo);
-    b.onclick = () => abre(p);
+    b.onclick = () => { if (dado) toast('Esse presente já foi escolhido por alguém. Escolha outro! 💚'); else abre(p); };
     g.appendChild(b);
   });
 }
@@ -89,8 +101,22 @@ function abre(p) {
     box.textContent = pix; box.style.display = 'block';
     toast(ok ? 'Código Pix copiado! Agora é só colar no app do seu banco.' : 'Não consegui copiar. Selecione o código abaixo.', !ok);
   };
+  $('j-nome').value = '';
+  $('b-ja').onclick = async () => {
+    if (!confirm('Confirmar que você já fez este presente? Ele sairá da lista para os outros convidados.')) return;
+    const ok = await Presentes.marcar(p.id, $('j-nome').value);
+    if (ok) {
+      comprados[p.id] = { nome: $('j-nome').value.trim() };
+      fecha(); desenha();
+      toast('Obrigado pelo carinho! 💚');
+    } else toast('Não consegui registrar agora. Tente de novo.', true);
+  };
   $('fundo').classList.add('on');
   document.body.style.overflow = 'hidden';
+  // confere de novo: alguém pode ter presenteado enquanto a página estava aberta
+  Presentes.comprados().then(c => {
+    if (c && c[p.id]) { comprados = c; fecha(); desenha(); toast('Esse presente acabou de ser escolhido por outra pessoa. Escolha outro! 💚'); }
+  });
 }
 
 function fecha() { $('fundo').classList.remove('on'); document.body.style.overflow = ''; }
@@ -99,7 +125,8 @@ $('fundo').onclick = e => { if (e.target.id === 'fundo') fecha(); };
 document.addEventListener('keydown', e => { if (e.key === 'Escape') fecha(); });
 
 (async () => {
-  const [ev, l] = await Promise.all([carregarEvento(), Presentes.listar()]);
+  const [ev, l, c] = await Promise.all([carregarEvento(), Presentes.listar(), Presentes.comprados()]);
+  comprados = c || {};
   $('nomes').textContent = ev.nomes;
   $('data').textContent = dataExtenso(ev.data);
   lista = l;

@@ -97,3 +97,17 @@ textarea{resize:vertical;min-height:84px;font-family:ui-monospace,Consolas,monos
 input[type=range]{width:100%;accent-color:var(--peonia)}
 .dica2{font-size:15px;font-style:italic;color:#5b4743;margin-top:6px}
 .dica2 a{color:var(--peonia)}
+
+/* presente já dado */
+.item.dado{cursor:default;opacity:.62}
+.item.dado:hover{transform:none;box-shadow:none}
+.item.dado .foto{filter:grayscale(1);position:relative}
+.item .selo{position:absolute;left:10px;top:10px;background:var(--floresta);color:var(--papel);font-family:'Cinzel',serif;
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;padding:6px 10px;border-radius:20px}
+.item .foto{position:relative}
+.item.dado .preco{text-decoration:line-through}
+.ja{margin-top:20px;padding-top:16px;border-top:1px solid var(--linha)}
+.ja p{font-style:italic;font-size:16px;color:#5b4743;margin-bottom:8px;line-height:1.35}
+.ja input{margin-bottom:10px}
+.tag-dado{display:inline-block;background:var(--floresta);color:var(--papel);font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;padding:3px 8px;border-radius:20px;margin-top:4px}

@@ -84,6 +84,7 @@ const $ = id => document.getElementById(id);
 const USER = 'Joter', PASS = 'Joter2027', SESS = 'presentes-admin';
 let lista = [];
 let editId = null;     // id em edição (null = novo)
+let comprados = {};
 let imagem = '';       // dataURL da imagem atual
 
 /* ---------- Login ---------- */
@@ -106,7 +107,7 @@ $('sair').onclick = () => { try { sessionStorage.removeItem(SESS); } catch (_) {
 try { if (sessionStorage.getItem(SESS) === '1') entra(); } catch (_) {}
 
 /* ---------- Dados ---------- */
-async function carrega() { lista = await Presentes.listar(); desenha(); }
+async function carrega() { [lista, comprados] = await Promise.all([Presentes.listar(), Presentes.comprados()]); comprados = comprados || {}; desenha(); }
 
 async function grava(msg) {
   const ok = await Presentes.salvar(lista);
@@ -222,6 +223,12 @@ function desenha() {
     const tg = document.createElement('div'); tg.className = 'tags';
     tg.textContent = [p.link ? 'link' : '', p.pix ? 'pix' : ''].filter(Boolean).join(' · ') || 'sem link nem pix';
     info.append(t, pr, tg);
+    const dado = comprados[p.id];
+    if (dado) {
+      const d = document.createElement('div'); d.className = 'tag-dado';
+      d.textContent = 'Presenteado' + (dado.nome ? ' por ' + dado.nome : '');
+      info.appendChild(d);
+    }
     const bt = document.createElement('div'); bt.className = 'bt';
     const mk = (txt, cls, fn, off) => {
       const b = document.createElement('button');
@@ -233,6 +240,7 @@ function desenha() {
     mk('↑', 'vazado', () => move(i, -1), i === 0);
     mk('↓', 'vazado', () => move(i, 1), i === lista.length - 1);
     mk('Editar', '', () => edita(p));
+    mk(dado ? 'Reativar' : 'Marcar presenteado', 'vazado', () => alterna(p, !!dado));
     mk('Duplicar', 'vazado', () => duplica(p));
     mk('Excluir', 'perigo', () => exclui(p));
     r.append(m, info, bt);
@@ -257,6 +265,11 @@ function edita(p) {
   $('f-cancelar').classList.remove('hide');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+async function alterna(p, jaDado) {
+  const ok = jaDado ? await Presentes.liberar(p.id) : await Presentes.marcar(p.id, '');
+  if (ok) { if (jaDado) delete comprados[p.id]; else comprados[p.id] = { nome: '' }; desenha(); }
+  toast(ok ? (jaDado ? 'Presente voltou para a lista.' : 'Presente marcado como presenteado.') : 'Não consegui salvar. Tente de novo.', !ok);
+}
 async function duplica(p) {
   const i = lista.findIndex(x => x.id === p.id);
   lista.splice(i + 1, 0, { ...p, id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), titulo: p.titulo + ' (cópia)' });
@@ -266,6 +279,7 @@ async function duplica(p) {
 async function exclui(p) {
   if (!confirm(`Excluir "${p.titulo}"? Não dá para desfazer.`)) return;
   lista = lista.filter(x => x.id !== p.id);
+  Presentes.liberar(p.id); delete comprados[p.id];
   if (editId === p.id) limpa();
   desenha();
   await grava('Presente excluído.');

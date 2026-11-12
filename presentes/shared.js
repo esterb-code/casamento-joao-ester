@@ -9,6 +9,30 @@ const Presentes = {
   },
   async salvar(lista) {
     return db.set(CHAVE, lista);
+  },
+  // Presentes já dados ficam em um nó separado (um registro por id), para o convidado
+  // marcar sem sobrescrever a lista inteira que a administradora edita.
+  async comprados() {
+    try {
+      const r = await fetch(`${FIREBASE_URL}/presentes_comprados.json`, { cache: 'no-store' });
+      if (!r.ok) throw new Error();
+      return (await r.json()) || {};
+    } catch (e) { return null; }   // null = não consegui consultar
+  },
+  async marcar(id, nome) {
+    try {
+      const r = await fetch(`${FIREBASE_URL}/presentes_comprados/${encodeURIComponent(id)}.json`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome: (nome || '').trim().slice(0, 60), em: new Date().toISOString() })
+      });
+      return r.ok;
+    } catch (e) { return false; }
+  },
+  async liberar(id) {
+    try {
+      const r = await fetch(`${FIREBASE_URL}/presentes_comprados/${encodeURIComponent(id)}.json`, { method: 'DELETE' });
+      return r.ok;
+    } catch (e) { return false; }
   }
 };
 
