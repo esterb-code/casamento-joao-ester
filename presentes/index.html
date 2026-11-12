@@ -54,12 +54,13 @@
 const $ = id => document.getElementById(id);
 let lista = [];
 let comprados = {};
+let ordemAuto = true;
 
 function desenha() {
   const g = $('grade');
   g.innerHTML = '';
   $('vazio').style.display = lista.length ? 'none' : 'block';
-  lista.forEach(p => {
+  (ordemAuto ? porPreco(lista) : lista).forEach(p => {
     const b = document.createElement('button');
     const dado = !!comprados[p.id];
     b.className = 'item' + (dado ? ' dado' : '');
@@ -125,7 +126,8 @@ $('fundo').onclick = e => { if (e.target.id === 'fundo') fecha(); };
 document.addEventListener('keydown', e => { if (e.key === 'Escape') fecha(); });
 
 (async () => {
-  const [ev, l, c] = await Promise.all([carregarEvento(), Presentes.listar(), Presentes.comprados()]);
+  const [ev, l, c, cfg] = await Promise.all([carregarEvento(), Presentes.listar(), Presentes.comprados(), Presentes.config()]);
+  ordemAuto = cfg.ordemAuto;
   comprados = c || {};
   $('nomes').textContent = ev.nomes;
   $('data').textContent = dataExtenso(ev.data);

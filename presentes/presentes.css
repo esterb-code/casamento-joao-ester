@@ -111,3 +111,7 @@ input[type=range]{width:100%;accent-color:var(--peonia)}
 .ja input{margin-bottom:10px}
 .tag-dado{display:inline-block;background:var(--floresta);color:var(--papel);font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;
   text-transform:uppercase;padding:3px 8px;border-radius:20px;margin-top:4px}
+
+.chave{display:flex;gap:10px;align-items:flex-start;text-transform:none;letter-spacing:0;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--noite);margin:12px 0 0;cursor:pointer}
+.chave input{width:20px;height:20px;margin-top:3px;accent-color:var(--peonia);flex:none}
+.sep{border:0;border-top:1px solid var(--linha);margin:18px 0 4px}

@@ -70,6 +70,11 @@
 
     <!-- Lista -->
     <div class="cartao">
+      <h2>Configurações do site</h2>
+      <label class="chave"><input type="checkbox" id="c-auto" checked>
+        <span>Ordenar automaticamente do mais caro para o mais barato</span></label>
+      <p class="dica2" id="c-dica"></p>
+      <hr class="sep">
       <h2>Presentes cadastrados (<span id="qtd">0</span>)</h2>
       <div class="lista" id="lista"></div>
       <p class="vazio" id="vazio">Nenhum presente ainda. Cadastre o primeiro ao lado.</p>
@@ -85,6 +90,7 @@ const USER = 'Joter', PASS = 'Joter2027', SESS = 'presentes-admin';
 let lista = [];
 let editId = null;     // id em edição (null = novo)
 let comprados = {};
+let ordemAuto = true;
 let imagem = '';       // dataURL da imagem atual
 
 /* ---------- Login ---------- */
@@ -107,7 +113,19 @@ $('sair').onclick = () => { try { sessionStorage.removeItem(SESS); } catch (_) {
 try { if (sessionStorage.getItem(SESS) === '1') entra(); } catch (_) {}
 
 /* ---------- Dados ---------- */
-async function carrega() { [lista, comprados] = await Promise.all([Presentes.listar(), Presentes.comprados()]); comprados = comprados || {}; desenha(); }
+async function carrega() {
+  let cfg;
+  [lista, comprados, cfg] = await Promise.all([Presentes.listar(), Presentes.comprados(), Presentes.config()]);
+  comprados = comprados || {}; ordemAuto = cfg.ordemAuto;
+  $('c-auto').checked = ordemAuto;
+  desenha();
+}
+$('c-auto').onchange = async e => {
+  ordemAuto = e.target.checked;
+  desenha();
+  const ok = await Presentes.salvarConfig({ ordemAuto });
+  toast(ok ? (ordemAuto ? 'Ordem automática ligada.' : 'Ordem manual: use as setas para organizar.') : 'Não consegui salvar a configuração.', !ok);
+};
 
 async function grava(msg) {
   const ok = await Presentes.salvar(lista);
@@ -213,7 +231,9 @@ function desenha() {
   el.innerHTML = '';
   $('qtd').textContent = lista.length;
   $('vazio').style.display = lista.length ? 'none' : 'block';
-  lista.forEach((p, i) => {
+  $('c-dica').textContent = ordemAuto ? 'Os convidados veem do mais caro para o mais barato. As setas ↑ ↓ ficam desativadas.' : 'Os convidados veem na ordem desta lista. Use as setas ↑ ↓ para organizar.';
+  const exibida = ordemAuto ? porPreco(lista) : lista;
+  exibida.forEach((p, i) => {
     const r = document.createElement('div'); r.className = 'row';
     const m = document.createElement('div'); m.className = 'mini';
     if (p.imagem) m.style.backgroundImage = `url("${p.imagem}")`;
@@ -237,8 +257,8 @@ function desenha() {
       else b.onclick = fn;
       bt.appendChild(b);
     };
-    mk('↑', 'vazado', () => move(i, -1), i === 0);
-    mk('↓', 'vazado', () => move(i, 1), i === lista.length - 1);
+    mk('↑', 'vazado', () => move(i, -1), ordemAuto || i === 0);
+    mk('↓', 'vazado', () => move(i, 1), ordemAuto || i === lista.length - 1);
     mk('Editar', '', () => edita(p));
     mk(dado ? 'Reativar' : 'Marcar presenteado', 'vazado', () => alterna(p, !!dado));
     mk('Duplicar', 'vazado', () => duplica(p));

@@ -12,6 +12,22 @@ const Presentes = {
   },
   // Presentes já dados ficam em um nó separado (um registro por id), para o convidado
   // marcar sem sobrescrever a lista inteira que a administradora edita.
+  // Configurações do site (padrão: ordem automática, do mais caro ao mais barato)
+  async config() {
+    try {
+      const r = await fetch(`${FIREBASE_URL}/presentes_config.json`, { cache: 'no-store' });
+      const v = r.ok ? await r.json() : null;
+      return { ordemAuto: !(v && v.ordemAuto === false) };
+    } catch (e) { return { ordemAuto: true }; }
+  },
+  async salvarConfig(cfg) {
+    try {
+      const r = await fetch(`${FIREBASE_URL}/presentes_config.json`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cfg)
+      });
+      return r.ok;
+    } catch (e) { return false; }
+  },
   async comprados() {
     try {
       const r = await fetch(`${FIREBASE_URL}/presentes_comprados.json`, { cache: 'no-store' });
@@ -83,3 +99,6 @@ function dataExtenso(s) {
   const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
   return `${d} de ${meses[parseInt(m, 10) - 1]} de ${y}`;
 }
+
+// Do mais caro para o mais barato (empate mantém a ordem cadastrada)
+const porPreco = lista => lista.map((p, i) => [p, i]).sort((a, b) => (Number(b[0].preco) || 0) - (Number(a[0].preco) || 0) || a[1] - b[1]).map(x => x[0]);
