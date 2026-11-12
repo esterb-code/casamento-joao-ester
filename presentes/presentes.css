@@ -90,3 +90,10 @@ textarea{resize:vertical;min-height:84px;font-family:ui-monospace,Consolas,monos
 .row .tags{font-size:13px;color:#5b4743;font-style:italic}
 .row .bt{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
 .hide{display:none!important}
+.previa canvas{display:none;width:100%;height:100%;touch-action:none;cursor:grab;border-radius:3px}
+.previa canvas:active{cursor:grabbing}
+.previa.tem{border-style:solid;cursor:default}
+.previa.tem canvas{display:block}
+input[type=range]{width:100%;accent-color:var(--peonia)}
+.dica2{font-size:15px;font-style:italic;color:#5b4743;margin-top:6px}
+.dica2 a{color:var(--peonia)}

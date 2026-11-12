@@ -41,7 +41,12 @@
       <h2 id="f-titulo">Novo presente</h2>
       <form id="form" autocomplete="off">
         <label>Imagem</label>
-        <div class="previa" id="previa"><span>Toque para escolher uma imagem</span></div>
+        <div class="previa" id="previa"><canvas id="cv" width="640" height="480"></canvas><span>Toque para escolher uma imagem</span></div>
+        <div id="ajuste" class="hide">
+          <label for="zoom">Zoom</label>
+          <input type="range" id="zoom" min="1" max="3" step="0.01" value="1">
+          <p class="dica2">Arraste a imagem para posicionar. <a href="#" id="trocar">Trocar imagem</a></p>
+        </div>
         <input type="file" id="arq" accept="image/*" class="hide">
 
         <label for="f-tit">Título</label>
@@ -108,36 +113,70 @@ async function grava(msg) {
   toast(ok ? msg : 'Salvo só neste aparelho: sem conexão com o servidor. Tente de novo.', !ok);
 }
 
-/* ---------- Imagem (reduz para não pesar) ---------- */
-$('previa').onclick = () => $('arq').click();
+/* ---------- Imagem: posicionar e dar zoom (recorte 4:3) ---------- */
+const cv = $('cv'), cx2 = cv.getContext('2d');
+let src = null, zoom = 1, cx = 0, cy = 0;   // cx,cy = ponto da imagem no centro do recorte
+const W = 640, H = 480;
+const escala = () => Math.max(W / src.width, H / src.height) * zoom;
+
+function clampPos() {
+  const s = escala();
+  cx = Math.min(Math.max(cx, W / 2 / s), src.width - W / 2 / s);
+  cy = Math.min(Math.max(cy, H / 2 / s), src.height - H / 2 / s);
+}
+function redesenha() {
+  if (!src) return;
+  clampPos();
+  const s = escala();
+  cx2.fillStyle = '#fff'; cx2.fillRect(0, 0, W, H);
+  cx2.drawImage(src, cx - W / 2 / s, cy - H / 2 / s, W / s, H / s, 0, 0, W, H);
+}
+function carregaSrc(url) {
+  const im = new Image();
+  im.onload = () => {
+    src = im; zoom = 1; $('zoom').value = 1;
+    cx = im.width / 2; cy = im.height / 2;
+    mostraPrevia(); redesenha();
+  };
+  im.onerror = () => toast('Não consegui ler essa imagem.', true);
+  im.src = url;
+}
+$('previa').onclick = () => { if (!src) $('arq').click(); };
+$('trocar').onclick = e => { e.preventDefault(); $('arq').click(); };
 $('arq').onchange = e => {
   const f = e.target.files[0];
   if (!f) return;
   const fr = new FileReader();
-  fr.onload = () => {
-    const im = new Image();
-    im.onload = () => {
-      const max = 640, k = Math.min(1, max / Math.max(im.width, im.height));
-      const c = document.createElement('canvas');
-      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
-      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
-      imagem = c.toDataURL('image/jpeg', 0.75);
-      mostraPrevia();
-    };
-    im.onerror = () => toast('Não consegui ler essa imagem.', true);
-    im.src = fr.result;
-  };
+  fr.onload = () => carregaSrc(fr.result);
   fr.readAsDataURL(f);
+  e.target.value = '';
 };
+$('zoom').oninput = e => { zoom = parseFloat(e.target.value); redesenha(); };
+cv.addEventListener('wheel', e => {
+  if (!src) return;
+  e.preventDefault();
+  zoom = Math.min(3, Math.max(1, zoom - e.deltaY * 0.002));
+  $('zoom').value = zoom; redesenha();
+}, { passive: false });
+let arrasta = null;
+cv.addEventListener('pointerdown', e => { if (!src) return; arrasta = { x: e.clientX, y: e.clientY }; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e => {
+  if (!arrasta) return;
+  const k = W / cv.getBoundingClientRect().width / escala();   // pixels da tela → pixels da imagem
+  cx -= (e.clientX - arrasta.x) * k; cy -= (e.clientY - arrasta.y) * k;
+  arrasta = { x: e.clientX, y: e.clientY };
+  redesenha();
+});
+['pointerup', 'pointercancel'].forEach(t => cv.addEventListener(t, () => { arrasta = null; }));
+
 function mostraPrevia() {
-  const p = $('previa');
-  p.style.backgroundImage = imagem ? `url("${imagem}")` : '';
-  p.classList.toggle('tem', !!imagem);
+  $('previa').classList.toggle('tem', !!src);
+  $('ajuste').classList.toggle('hide', !src);
 }
 
 /* ---------- Formulário ---------- */
 function limpa() {
-  editId = null; imagem = '';
+  editId = null; imagem = ''; src = null;
   $('form').reset(); $('arq').value = '';
   mostraPrevia();
   $('f-titulo').textContent = 'Novo presente';
@@ -148,6 +187,7 @@ $('f-cancelar').onclick = limpa;
 
 $('form').onsubmit = async e => {
   e.preventDefault();
+  if (src) { redesenha(); imagem = cv.toDataURL('image/jpeg', 0.78); }
   const dados = {
     titulo: $('f-tit').value.trim(),
     preco: parseFloat($('f-preco').value) || 0,
@@ -208,10 +248,10 @@ async function move(i, d) {
   await grava('Ordem atualizada!');
 }
 function edita(p) {
-  editId = p.id; imagem = p.imagem || '';
+  editId = p.id; imagem = p.imagem || ''; src = null;
   $('f-tit').value = p.titulo; $('f-preco').value = p.preco;
   $('f-link').value = p.link || ''; $('f-pix').value = p.pix || '';
-  mostraPrevia();
+  if (imagem) carregaSrc(imagem); else mostraPrevia();
   $('f-titulo').textContent = 'Editando presente';
   $('f-salvar').textContent = 'Salvar alterações';
   $('f-cancelar').classList.remove('hide');
