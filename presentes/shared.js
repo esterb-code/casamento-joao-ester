@@ -2,8 +2,23 @@
 const CHAVE = 'presentes';
 
 const Presentes = {
-  async listar() {
-    const v = await db.get(CHAVE, []);
+  // estrito=true: falha de conexão dá erro (a página dos convidados tenta de novo e avisa)
+  async listar(estrito) {
+    let v;
+    if (estrito) {
+      let ultimo;
+      for (let i = 0; i < 3; i++) {
+        try {
+          const r = await fetch(`${FIREBASE_URL}/${CHAVE}.json`, { cache: 'no-store' });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          v = (await r.json()) || [];
+          ultimo = null; break;
+        } catch (e) { ultimo = e; await new Promise(r => setTimeout(r, 800 * (i + 1))); }
+      }
+      if (ultimo) throw ultimo;
+    } else {
+      v = await db.get(CHAVE, []);
+    }
     const arr = Array.isArray(v) ? v : Object.values(v || {});
     return arr.filter(Boolean);
   },

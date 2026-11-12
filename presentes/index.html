@@ -22,6 +22,8 @@
 <main class="wrap">
   <div class="grade" id="grade"></div>
   <p class="vazio" id="vazio" style="display:none">Os presentes estão sendo preparados. Volte em breve 💚</p>
+  <div class="vazio" id="falha" style="display:none">Não consegui carregar os presentes. Verifique sua internet.<br><br>
+    <button class="btn" type="button" onclick="iniciar()" style="display:inline-block">Tentar de novo</button></div>
 </main>
 
 <div class="rodape">com carinho, João &amp; Ester</div>
@@ -125,15 +127,23 @@ $('fechar').onclick = fecha;
 $('fundo').onclick = e => { if (e.target.id === 'fundo') fecha(); };
 document.addEventListener('keydown', e => { if (e.key === 'Escape') fecha(); });
 
-(async () => {
-  const [ev, l, c, cfg] = await Promise.all([carregarEvento(), Presentes.listar(), Presentes.comprados(), Presentes.config()]);
-  ordemAuto = cfg.ordemAuto;
-  comprados = c || {};
-  $('nomes').textContent = ev.nomes;
-  $('data').textContent = dataExtenso(ev.data);
-  lista = l;
-  desenha();
-})();
+async function iniciar() {
+  $('falha').style.display = 'none';
+  try {
+    const [ev, l, c, cfg] = await Promise.all([carregarEvento(), Presentes.listar(true), Presentes.comprados(), Presentes.config()]);
+    ordemAuto = cfg.ordemAuto;
+    comprados = c || {};
+    $('nomes').textContent = ev.nomes;
+    $('data').textContent = dataExtenso(ev.data);
+    lista = l;
+    desenha();
+  } catch (e) {
+    $('vazio').style.display = 'none';
+    $('falha').style.display = 'block';
+  }
+}
+iniciar();
+
 </script>
 </body>
 </html>
