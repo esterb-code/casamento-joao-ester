@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convite João & Ester | Suíte de papelaria</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+:root{
+  --peonia:#8A1650; --framboesa:#B3205F; --rosa:#D9779F; --pessego:#F0B58F;
+  --creme:#EFDFC6; --folha:#3F6B3A; --floresta:#2F4A2C; --laranja:#D9622B;
+  --noite:#0E1A14; --papel:#F2F0EA; --branco:#FBF9F4; --mesa:#CDB1AC;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--mesa);font-family:'Cormorant Garamond',serif;color:var(--noite);padding:24px 12px 48px}
+.topo{text-align:center;margin-bottom:10px}
+.topo h1{font-family:'Cinzel',serif;font-weight:400;font-size:18px;letter-spacing:.2em;color:var(--floresta)}
+.topo p{font-size:15px;font-style:italic;color:#5b4743;margin-top:4px}
+.btns{text-align:center;margin:14px 0 10px}
+button{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;background:var(--floresta);color:var(--papel);border:0;padding:9px 16px;margin:0 4px;cursor:pointer}
+button.off{background:transparent;color:var(--floresta);outline:1px solid var(--floresta)}
+
+.wrap{width:100%;overflow:hidden;display:flex;justify-content:center}
+.stage{width:1000px;height:780px;position:relative;transform-origin:top center;flex:none}
+.peca{position:absolute}
+.sombra{filter:drop-shadow(0 10px 14px rgba(40,20,18,.32))}
+
+/* Cartão */
+.card{left:318px;top:150px;width:340px;height:500px;background:var(--branco);box-shadow:0 0 0 5px var(--floresta),0 14px 22px rgba(40,20,18,.35);transform:rotate(-1.2deg)}
+.txt{position:absolute;left:0;right:0;top:0;height:68%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px}
+.mono{font-family:'Pinyon Script',cursive;font-size:34px;color:var(--floresta);line-height:1;margin-bottom:12px}
+.mono i{display:block;width:26px;height:1px;background:var(--floresta);margin:6px auto 0;opacity:.6}
+.caps{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--floresta);line-height:2}
+.nomes{font-family:'Pinyon Script',cursive;font-size:46px;color:var(--peonia);line-height:1.05;margin:6px 0 4px;white-space:nowrap}
+.data{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--noite);line-height:1.9;margin-top:10px}
+.local{font-style:italic;font-size:14px;color:var(--noite);margin-top:2px}
+.fun{font-style:italic;font-size:12px;color:var(--folha);margin-top:12px;max-width:230px;line-height:1.45}
+.card .capa{position:absolute;left:0;bottom:0;width:100%;height:100%;pointer-events:none;transition:opacity .3s}
+.sem-capa .capa{opacity:0}
+
+/* Envelope */
+.env{left:20px;top:20px;width:560px;height:400px;transform:rotate(-2deg)}
+/* RSVP oval */
+.rsvp{left:690px;top:320px;width:280px;height:380px;border-radius:50%;background:var(--branco);transform:rotate(3deg);
+ box-shadow:0 0 0 4px var(--folha),0 14px 22px rgba(40,20,18,.35);
+ background-image:repeating-linear-gradient(90deg,transparent 0 6px,rgba(47,74,44,.07) 6px 7px);
+ display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 40px}
+.rsvp .tit{font-family:'Pinyon Script',cursive;font-size:30px;color:var(--peonia);line-height:1}
+.rsvp .qr{width:54px;height:54px;margin:12px 0 8px;border:1px solid var(--floresta);background:
+ conic-gradient(var(--noite) 25%,transparent 0 50%,var(--noite) 0 75%,transparent 0) 0 0/10px 10px;opacity:.85}
+.rsvp .caps{font-size:7.5px}
+/* Cartão de detalhe (cardápio / presentes) */
+.mini{left:700px;top:60px;width:230px;height:150px;background:var(--creme);transform:rotate(4deg);box-shadow:0 10px 16px rgba(40,20,18,.3);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;text-align:center}
+.mini .caps{font-size:7.5px;color:var(--peonia)}
+.mini .tit{font-family:'Pinyon Script',cursive;font-size:24px;color:var(--floresta);line-height:1}
+
+.nota{max-width:760px;margin:10px auto 0;background:var(--papel);padding:18px 22px;border-left:4px solid var(--peonia);font-size:16px;line-height:1.6}
+.nota b{font-family:'Cinzel',serif;font-weight:500;font-size:12px;letter-spacing:.14em;color:var(--peonia)}
+</style>
+</head>
+<body>
+<div class="topo">
+  <h1>JOÃO &amp; ESTER · SUÍTE DE PAPELARIA</h1>
+  <p>Impressão em papel de algodão · capa vazada, flor em linha e monograma em relevo</p>
+</div>
+<div class="btns">
+  <button id="b1">Ver cartão sem a capa</button>
+</div>
+
+<div class="wrap" id="wrap">
+<div class="stage" id="stage">
+
+  <!-- Envelope aberto: forro listrado + monograma em relevo -->
+  <svg class="peca env sombra" viewBox="0 0 560 400" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="listra" width="8" height="8" patternUnits="userSpaceOnUse">
+        <rect width="8" height="8" fill="#F7F4EC"/><rect x="0" width="1.2" height="8" fill="#2F4A2C" opacity=".35"/>
+      </pattern>
+      <filter id="relevo" x="-20%" y="-20%" width="140%" height="140%">
+        <feOffset in="SourceAlpha" dx="-1.2" dy="-1.2" result="a"/><feFlood flood-color="#fff" flood-opacity=".95"/><feComposite in2="a" operator="in" result="luz"/>
+        <feOffset in="SourceAlpha" dx="1.4" dy="1.4" result="b"/><feFlood flood-color="#6b6558" flood-opacity=".55"/><feComposite in2="b" operator="in" result="sombra"/>
+        <feMerge><feMergeNode in="luz"/><feMergeNode in="sombra"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <!-- corpo -->
+    <rect x="0" y="150" width="560" height="250" fill="#F4F1E8"/>
+    <polygon points="0,400 280,250 560,400" fill="#EDE9DD"/>
+    <polygon points="0,150 280,330 560,150" fill="#F7F4EC" stroke="#E2DDCF"/>
+    <!-- aba aberta com forro -->
+    <polygon points="0,150 280,-10 560,150" fill="url(#listra)" stroke="#D9D3C2"/>
+    <polygon points="0,150 280,-10 560,150" fill="none" stroke="#fff" stroke-width="3" opacity=".6"/>
+    <!-- monograma em relevo -->
+    <text x="280" y="108" text-anchor="middle" font-family="Pinyon Script" font-size="78" fill="#F4F1E8" filter="url(#relevo)">J&amp;E</text>
+    <!-- fios finos -->
+    <line x1="240" y1="122" x2="320" y2="122" stroke="#2F4A2C" stroke-width=".8" opacity=".5"/>
+  </svg>
+
+  <!-- Mini cartão -->
+  <div class="peca mini">
+    <div class="caps">Cardápio &amp; Presentes</div>
+    <div class="tit">no site</div>
+    <div class="caps" style="color:var(--floresta)">casorio-site</div>
+  </div>
+
+  <!-- Cartão do convite -->
+  <div class="peca card" id="card">
+    <div class="txt">
+      <div class="mono">J&amp;E<i></i></div>
+      <div class="caps">Com a alegria de quem<br>encontrou seu par,</div>
+      <div class="nomes">João &amp; Ester</div>
+      <div class="caps">convidam você para celebrar<br>o casamento deles</div>
+      <div class="data">Domingo · 27 de junho de 2027<br>às 15h</div>
+      <div class="local">Santuário Dom Bosco</div>
+      <div class="fun">Prometemos muito amor, boa comida e uma festa à altura do roteiro.</div>
+    </div>
+
+    <!-- Capa vazada: verde com flor em linha -->
+    <svg class="capa" viewBox="0 0 340 500" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <g id="petalaA"><path d="M0,0 C-30,-8 -46,-46 -22,-68 C-12,-78 -4,-74 0,-80 C4,-74 12,-78 22,-68 C46,-46 30,-8 0,0Z"/><path d="M0,-8 C-10,-26 -12,-46 -6,-64 M0,-8 C10,-26 12,-46 6,-64" fill="none"/></g>
+        <g id="folha1"><path d="M0,0 C22,-26 24,-68 0,-104 C-24,-68 -22,-26 0,0Z"/><path d="M0,-4 L0,-96" fill="none"/><path d="M0,-30 L12,-44 M0,-48 L-13,-62 M0,-64 L11,-78 M0,-38 L-11,-52" fill="none"/></g>
+      </defs>
+      <!-- painel verde com borda irregular -->
+      <path d="M0,500 L0,350 C46,346 96,372 140,414 C184,456 250,486 340,490 L340,500Z" fill="#2F4A2C"/>
+      <g id="flor" stroke="#142216" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round">
+        <g id="folhas"></g>
+        <g id="peonia"></g>
+        <g id="botoes"></g>
+      </g>
+    </svg>
+  </div>
+
+  <!-- RSVP oval -->
+  <div class="peca rsvp">
+    <div class="caps">Responda até</div>
+    <div class="tit">20 de abril de 2027</div>
+    <div class="qr"></div>
+    <div class="caps">Confirme sua presença<br>pelo site ou QR code</div>
+  </div>
+
+</div>
+</div>
+
+<p class="nota">
+<b>PARA OPINAR</b><br>
+1. A capa verde vazada com a flor em linha está no ponto de elegância que você queria?<br>
+2. O monograma J&amp;E em relevo (tom sobre tom) no forro do envelope funciona?<br>
+3. O RSVP oval combina ou prefere formato de coração/pétala?<br>
+4. O verso da capa ou o forro poderia levar o padrão ilustrado (vinho, carro, cartas)?<br>
+5. Os nomes em peônia estão no destaque certo, e a frase divertida fica ou vai para o verso?
+</p>
+
+<script>
+// Peônia em linha: anéis de pétalas girados
+(function(){
+  var seed=7;function r(){seed=(seed*9301+49297)%233280;return seed/233280;}
+  var cx=96,cy=438;
+  // folhas pontiagudas saindo por trás, uma delas invadindo o cartão branco
+  var fo='',lv=[[-75,1.15,'#4F7D46'],[-20,1.3,'#5E8E52'],[35,1.05,'#4F7D46'],[80,1.0,'#3F6B3A'],[125,1.1,'#3F6B3A'],[200,1.0,'#3F6B3A']];
+  lv.forEach(function(l){fo+='<g transform="translate('+cx+' '+cy+') rotate('+l[0]+') translate(0 -26) scale('+l[1]+')" fill="'+l[2]+'"><use href="#folha1"/></g>';});
+  document.getElementById('folhas').innerHTML=fo;
+  // peônia: anéis com pétalas irregulares (tamanho e ângulo variados)
+  var h='',an=[{n:10,s:1.0,o:0,c:'#8FB27B'},{n:9,s:.82,o:17,c:'#7FA66F'},{n:8,s:.62,o:6,c:'#6E9760'},{n:7,s:.42,o:28,c:'#5E8652'},{n:5,s:.24,o:10,c:'#4C7A43'}];
+  an.forEach(function(a){
+    for(var k=0;k<a.n;k++){
+      var ang=a.o+k*360/a.n+(r()-.5)*14,sc=a.s*(0.86+r()*.28),sx=0.85+r()*.35;
+      h+='<g transform="translate('+cx+' '+cy+') rotate('+ang+') scale('+(sc*sx*1.05)+' '+(sc*1.05)+')" fill="'+a.c+'"><use href="#petalaA"/></g>';
+    }
+  });
+  document.getElementById('peonia').innerHTML=h;
+  // botões de flor
+  document.getElementById('botoes').innerHTML=
+   '<g transform="translate(246 454) rotate(18)"><circle r="12" fill="#5E8E52"/><path d="M-12,0 C-6,-16 6,-16 12,0 C6,-6 -6,-6 -12,0Z" fill="#7FA66F"/><path d="M0,12 L-6,44" fill="none"/></g>'+
+   '<g transform="translate(300 468) rotate(-14) scale(.8)"><circle r="12" fill="#4F7D46"/><path d="M-12,0 C-6,-16 6,-16 12,0 C6,-6 -6,-6 -12,0Z" fill="#6E9760"/></g>';
+})();
+
+// Alternar capa
+var card=document.getElementById('card'),b=document.getElementById('b1');
+b.onclick=function(){card.classList.toggle('sem-capa');var s=card.classList.contains('sem-capa');b.textContent=s?'Ver com a capa vazada':'Ver cartão sem a capa';};
+
+// Ajuste de escala em telas menores
+function fit(){var w=document.getElementById('wrap').clientWidth,s=Math.min(1,w/1000),st=document.getElementById('stage');
+  st.style.transform='scale('+s+')';document.getElementById('wrap').style.height=(780*s)+'px';}
+window.addEventListener('resize',fit);fit();
+</script>
+</body>
+</html>

@@ -1,11 +1,11 @@
-// config.js — Configuração global compartilhada entre todas as abas
+﻿// config.js — Configuração global compartilhada entre todas as abas
 // João & Ester · casamento-joao-ester.vercel.app
 
 const AppConfig = {
   // Valores padrão
   defaults: {
     nomes: 'João & Ester',
-    data: '2027-06-13',
+    data: '2027-06-27',
     hora: '16:00',
     cidade: 'Brasília, DF',
   },

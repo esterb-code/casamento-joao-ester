@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convite João & Ester | Duas peças</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+:root{
+  --peonia:#8A1650; --vinho:#5F1729; --rosa:#D9779F; --creme:#EFDFC6;
+  --folha:#3F6B3A; --floresta:#2F4A2C; --noite:#0E1A14; --papel:#F2F0EA; --branco:#FBF9F4; --mesa:#CDB1AC;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--mesa);font-family:'Cormorant Garamond',serif;color:var(--noite);padding:24px 12px 48px}
+.topo{text-align:center;margin-bottom:18px}
+.topo h1{font-family:'Cinzel',serif;font-weight:400;font-size:18px;letter-spacing:.2em;color:var(--floresta)}
+.topo p{font-size:15px;font-style:italic;color:#5b4743;margin-top:4px}
+.wrap{width:100%;overflow:hidden;display:flex;justify-content:center}
+.stage{width:960px;height:660px;position:relative;transform-origin:top center;flex:none}
+.peca{position:absolute}
+
+/* ---------- Convite recortado (peça 1) ---------- */
+.conv{left:40px;top:30px;width:420px;height:600px;transform:rotate(-1.5deg);filter:drop-shadow(0 14px 18px rgba(40,20,18,.4))}
+.conv svg{position:absolute;inset:0;width:100%;height:100%}
+.conv .txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 62px;color:var(--creme)}
+.bencao{font-family:'Pinyon Script',cursive;font-size:20px;line-height:1.15;color:var(--creme)}
+.pais{display:flex;gap:18px;margin:14px 0 8px;font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;line-height:1.9;color:#E8CFC4}
+.pais div{flex:1}
+.nomes{font-family:'Pinyon Script',cursive;font-size:56px;line-height:1.05;color:#fff;margin:8px 0 6px;white-space:nowrap}
+.caps{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;line-height:1.9}
+.vers{font-style:italic;font-size:14px;line-height:1.4;color:var(--creme);margin:14px 0 2px;max-width:250px}
+.vers small{display:block;font-style:normal;font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.2em;margin-top:4px;opacity:.85}
+.data{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.2em;text-transform:uppercase;line-height:1.9;color:#fff;margin-top:10px}
+.hora{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;line-height:1.9;margin-top:4px}
+.fio{width:30px;height:1px;background:var(--creme);opacity:.55;margin:10px auto}
+
+/* ---------- Cartão de detalhes (peça 2) ---------- */
+.det{left:530px;top:60px;width:390px;height:560px;background:var(--branco);transform:rotate(2deg);
+  box-shadow:0 14px 22px rgba(40,20,18,.35);overflow:hidden}
+.det:before{content:"";position:absolute;inset:14px;border:1px solid rgba(47,74,44,.55);pointer-events:none;z-index:2}
+.det:after{content:"";position:absolute;inset:19px;border:.5px solid rgba(47,74,44,.3);pointer-events:none;z-index:2}
+.det .in{position:absolute;inset:0;padding:48px 44px 0;display:flex;flex-direction:column;align-items:center;text-align:center;z-index:1}
+.det h2{font-family:'Pinyon Script',cursive;font-weight:400;font-size:44px;color:var(--peonia);line-height:1}
+.bloco{margin-top:17px}
+.bloco .rot{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--floresta);font-weight:500}
+.bloco .nome{font-size:19px;color:var(--noite);margin-top:3px;line-height:1.1}
+.bloco .end{font-size:13.5px;font-style:italic;color:#4a3f3c;line-height:1.35;margin-top:2px}
+.bloco .hr{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.18em;color:var(--peonia);margin-top:3px}
+.flor{position:absolute;left:14px;right:14px;bottom:14px;height:92px;z-index:1;
+  background:url(floral.webp) center 40%/cover;
+  -webkit-mask:radial-gradient(60px 26px at 50% 100%,#000 98%,transparent 100%),linear-gradient(#000,#000);
+  clip-path:path("M0,34 C60,6 110,6 168,26 C190,34 200,34 222,26 C280,6 330,6 362,34 L362,92 L0,92Z")}
+
+/* marcadores do que falta */
+.ph{background:rgba(255,214,70,.85);color:#3a2a00;padding:0 3px;border-radius:2px;font-style:normal}
+.conv .ph{background:rgba(255,214,70,.9)}
+
+.nota{max-width:760px;margin:14px auto 0;background:var(--papel);padding:18px 22px;border-left:4px solid var(--peonia);font-size:16px;line-height:1.6}
+.nota b{font-family:'Cinzel',serif;font-weight:500;font-size:12px;letter-spacing:.14em;color:var(--peonia)}
+</style>
+</head>
+<body>
+<div class="topo">
+  <h1>JOÃO &amp; ESTER · CONVITE EM DUAS PEÇAS</h1>
+  <p>Convite com corte especial + cartão de detalhes · primeira versão de layout</p>
+</div>
+
+<div class="wrap" id="wrap">
+<div class="stage" id="stage">
+
+  <!-- Peça 2: detalhes -->
+  <div class="peca det">
+    <div class="in">
+      <h2>Detalhes</h2>
+
+      <div class="bloco">
+        <div class="rot">Cerimônia</div>
+        <div class="nome">Santuário Dom Bosco</div>
+        <div class="end">Quadra 702 Sul Bloco B, SHCS</div>
+        <div class="hr">14H30</div>
+      </div>
+
+      <div class="bloco">
+        <div class="rot">Recepção</div>
+        <div class="nome">Sítio Geranium</div>
+        <div class="end">Núcleo Rural Taguatinga<br>Chácara 29</div>
+        <div class="hr"><span class="ph">HORÁRIO</span></div>
+      </div>
+
+      <div class="bloco">
+        <div class="rot">Código de vestimenta</div>
+        <div class="nome"><span class="ph">a definir</span></div>
+      </div>
+
+      <div class="bloco">
+        <div class="rot">Confirme sua presença</div>
+        <div class="end">até <span class="ph">20 de abril de 2027</span><br>pelo site ou QR code</div>
+      </div>
+    </div>
+    <div class="flor"></div>
+  </div>
+
+  <!-- Peça 1: convite com corte especial -->
+  <div class="peca conv">
+    <svg viewBox="0 0 420 600" xmlns="http://www.w3.org/2000/svg">
+      <path id="forma" fill="#5F1729" d="M40,18 H165 C185,18 195,3 210,3 C225,3 235,18 255,18 H380 C392,18 402,22 402,40 V230 C402,255 417,270 417,300 C417,330 402,345 402,370 V560 C402,578 392,582 380,582 H255 C235,582 225,597 210,597 C195,597 185,582 165,582 H40 C28,582 18,578 18,560 V370 C18,345 3,330 3,300 C3,270 18,255 18,230 V40 C18,22 28,18 40,18Z"/>
+      <use href="#forma" fill="none" stroke="#EFDFC6" stroke-width="1" opacity=".55" transform="translate(210 300) scale(.93) translate(-210 -300)"/>
+      <use href="#forma" fill="none" stroke="#EFDFC6" stroke-width=".6" opacity=".35" transform="translate(210 300) scale(.9) translate(-210 -300)"/>
+    </svg>
+    <div class="txt">
+      <div class="bencao">Com a bênção de Deus<br>e de nossos pais</div>
+      <div class="pais">
+        <div><span class="ph">Pai do João</span><br><span class="ph">Mãe do João</span></div>
+        <div><span class="ph">Pai da Ester</span><br><span class="ph">Mãe da Ester</span></div>
+      </div>
+      <div class="nomes">João &amp; Ester</div>
+      <div class="caps">têm a alegria de convidar você<br>para celebrar o seu casamento</div>
+      <div class="vers"><span class="ph">“O amor tudo suporta, tudo crê, tudo espera, tudo tolera.”</span><small><span class="ph">1 CORÍNTIOS 13:7</span></small></div>
+      <div class="fio"></div>
+      <div class="data">Domingo<br>27 de junho de 2027</div>
+      <div class="hora">às 14h30 · Santuário Dom Bosco</div>
+      <div class="hora" style="margin-top:0;opacity:.85">Brasília · DF</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<p class="nota">
+<b>PARA OPINAR</b><br>
+1. A forma recortada do convite (vinho, com ondas nas laterais) é o corte que você imaginou?<br>
+2. Vinho no convite e papel claro nos detalhes: combina ou prefere inverter?<br>
+3. A faixa de flores na base do cartão de detalhes funciona ou prefere só o texto?<br>
+4. Os trechos em amarelo são o que ainda falta confirmar: nomes dos pais, versículo, horário da recepção, traje e prazo do RSVP.
+</p>
+
+<script>
+function fit(){var w=document.getElementById('wrap').clientWidth,s=Math.min(1,w/960),st=document.getElementById('stage');
+  st.style.transform='scale('+s+')';document.getElementById('wrap').style.height=(660*s)+'px';}
+window.addEventListener('resize',fit);fit();
+</script>
+</body>
+</html>
