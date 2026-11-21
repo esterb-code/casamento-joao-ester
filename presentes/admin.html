@@ -94,6 +94,7 @@ let lista = [];
 let editId = null;     // id em edição (null = novo)
 let comprados = {};
 let ordemAuto = true;
+let versao = null;
 let imagem = '';       // dataURL da imagem atual
 
 /* ---------- Login ---------- */
@@ -118,6 +119,7 @@ try { if (sessionStorage.getItem(SESS) === '1') entra(); } catch (_) {}
 /* ---------- Dados ---------- */
 async function carrega() {
   let cfg;
+  versao = await db.getUpdatedAt(CHAVE);
   [lista, comprados, cfg] = await Promise.all([Presentes.listar(), Presentes.comprados(), Presentes.config()]);
   comprados = comprados || {}; ordemAuto = cfg.ordemAuto;
   $('c-auto').checked = ordemAuto;
@@ -130,10 +132,20 @@ $('c-auto').onchange = async e => {
   toast(ok ? (ordemAuto ? 'Ordem intercalada ligada.' : 'Ordem manual: use as setas para organizar.') : 'Não consegui salvar a configuração.', !ok);
 };
 
+// Evita sobrescrever alterações feitas em outro lugar (outra aba, outro aparelho ou ajustes diretos):
+// se a lista no servidor mudou desde que esta tela a carregou, recarrega em vez de gravar por cima.
 async function grava(msg) {
+  const atual = await db.getUpdatedAt(CHAVE);
+  if (atual !== versao) {
+    await carrega();
+    toast('A lista foi alterada em outro lugar. Atualizei a tela: repita a alteração.', true);
+    return;
+  }
   const ok = await Presentes.salvar(lista);
-  toast(ok ? msg : 'Salvo só neste aparelho: sem conexão com o servidor. Tente de novo.', !ok);
+  if (ok) versao = await db.getUpdatedAt(CHAVE);
+  toast(ok ? msg : 'Não consegui salvar no servidor. Tente de novo.', !ok);
 }
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !$('tela-admin').classList.contains('hide') && !editId) carrega(); });
 
 /* ---------- Imagem: posicionar e dar zoom (recorte 4:3) ---------- */
 const cv = $('cv'), cx2 = cv.getContext('2d');
