@@ -50,11 +50,11 @@ const Presentes = {
       return (await r.json()) || {};
     } catch (e) { return null; }   // null = não consegui consultar
   },
-  async marcar(id, nome) {
+  async marcar(id, nome, recado) {
     try {
       const r = await fetch(`${FIREBASE_URL}/presentes_comprados/${encodeURIComponent(id)}.json`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome: (nome || '').trim().slice(0, 60), em: new Date().toISOString() })
+        body: JSON.stringify({ nome: (nome || '').trim().slice(0, 60), recado: (recado || '').trim().slice(0, 500), em: new Date().toISOString() })
       });
       return r.ok;
     } catch (e) { return false; }

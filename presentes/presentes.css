@@ -115,3 +115,10 @@ input[type=range]{width:100%;accent-color:var(--peonia)}
 .chave{display:flex;gap:10px;align-items:flex-start;text-transform:none;letter-spacing:0;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--noite);margin:12px 0 0;cursor:pointer}
 .chave input{width:20px;height:20px;margin-top:3px;accent-color:var(--peonia);flex:none}
 .sep{border:0;border-top:1px solid var(--linha);margin:18px 0 4px}
+
+.ja textarea{font-family:'Cormorant Garamond',serif;font-size:17px;min-height:70px;margin-bottom:10px}
+.recados summary{font-family:'Cinzel',serif;font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--peonia);cursor:pointer;padding:4px 0}
+.recado{background:var(--papel);border-left:3px solid var(--peonia);border-radius:4px;padding:10px 12px}
+.recado .quem{font-weight:500;font-size:18px}
+.recado .pres{font-size:14px;font-style:italic;color:#5b4743;margin-top:1px}
+.recado .msg{margin-top:8px;font-size:17px;line-height:1.4;white-space:pre-wrap;word-break:break-word}

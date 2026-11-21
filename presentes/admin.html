@@ -72,6 +72,12 @@
         <span>Intercalar automaticamente: um caro, um barato, um caro, um barato…</span></label>
       <p class="dica2" id="c-dica"></p>
       <hr class="sep">
+      <details class="recados" id="recados">
+        <summary>Recados dos convidados (<span id="n-recados">0</span>)</summary>
+        <div class="lista" id="lista-recados"></div>
+        <button class="btn peq vazado" type="button" id="atualiza-recados" style="margin-top:10px">Atualizar recados</button>
+      </details>
+      <hr class="sep">
       <h2>Presentes cadastrados (<span id="qtd">0</span>)</h2>
       <div class="lista" id="lista"></div>
       <p class="vazio" id="vazio">Nenhum presente ainda. Cadastre o primeiro ao lado.</p>
@@ -229,6 +235,7 @@ function desenha() {
   $('qtd').textContent = lista.length;
   $('vazio').style.display = lista.length ? 'none' : 'block';
   $('c-dica').textContent = ordemAuto ? 'Os convidados veem um presente caro, um barato, um caro, um barato… As setas ↑ ↓ ficam desativadas.' : 'Os convidados veem na ordem desta lista. Use as setas ↑ ↓ para organizar.';
+  desenhaRecados();
   const exibida = ordemAuto ? intercala(lista) : lista;
   exibida.forEach((p, i) => {
     const r = document.createElement('div'); r.className = 'row';
@@ -264,6 +271,34 @@ function desenha() {
     el.appendChild(r);
   });
 }
+
+function desenhaRecados() {
+  const el = $('lista-recados');
+  el.innerHTML = '';
+  const itens = Object.entries(comprados)
+    .map(([id, c]) => ({ id, ...c, presente: (lista.find(p => p.id === id) || {}).titulo || '(presente excluído)' }))
+    .filter(c => c.nome || c.recado)
+    .sort((a, b) => (b.em || '').localeCompare(a.em || ''));
+  $('n-recados').textContent = itens.length;
+  if (!itens.length) {
+    const v = document.createElement('p'); v.className = 'dica2';
+    v.textContent = 'Ainda não há recados. Quando alguém marcar "Já presenteei", o nome e o recado aparecem aqui.';
+    el.appendChild(v); return;
+  }
+  itens.forEach(c => {
+    const d = document.createElement('div'); d.className = 'recado';
+    const q = document.createElement('div'); q.className = 'quem';
+    q.textContent = (c.nome || 'Anônimo') + (c.em ? ' · ' + new Date(c.em).toLocaleDateString('pt-BR') : '');
+    const g = document.createElement('div'); g.className = 'pres'; g.textContent = 'Presente: ' + c.presente;
+    d.append(q, g);
+    if (c.recado) { const m = document.createElement('div'); m.className = 'msg'; m.textContent = c.recado; d.appendChild(m); }
+    el.appendChild(d);
+  });
+}
+$('atualiza-recados').onclick = async () => {
+  const c = await Presentes.comprados();
+  if (c) { comprados = c; desenha(); toast('Recados atualizados.'); } else toast('Não consegui atualizar agora.', true);
+};
 
 async function move(i, d) {
   const j = i + d;

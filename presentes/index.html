@@ -42,6 +42,7 @@
       <div class="ja" id="ja">
         <p>Já fez o presente? Avise aqui para ninguém repetir. 💚</p>
         <input type="text" id="j-nome" maxlength="60" placeholder="Seu nome (para agradecermos)">
+        <textarea id="j-recado" maxlength="500" placeholder="Deixe um recadinho para os noivos (opcional)"></textarea>
         <button class="btn vazado" id="b-ja" type="button">Já presenteei</button>
       </div>
     </div>
@@ -93,10 +94,10 @@ function abre(p) {
   bl.style.display = link ? 'block' : 'none';
   if (link) bl.href = link;
   $('dica').textContent = link ? '' : 'Em breve o link de pagamento estará disponível.';
-  $('j-nome').value = '';
+  $('j-nome').value = ''; $('j-recado').value = '';
   $('b-ja').onclick = async () => {
     if (!confirm('Confirmar que você já fez este presente? Ele sairá da lista para os outros convidados.')) return;
-    const ok = await Presentes.marcar(p.id, $('j-nome').value);
+    const ok = await Presentes.marcar(p.id, $('j-nome').value, $('j-recado').value);
     if (ok) {
       comprados[p.id] = { nome: $('j-nome').value.trim() };
       fecha(); desenha();
