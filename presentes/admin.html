@@ -55,11 +55,8 @@
         <label for="f-preco">Preço (R$)</label>
         <input type="number" id="f-preco" required min="0" step="0.01" inputmode="decimal" placeholder="0,00">
 
-        <label for="f-link">Link da loja</label>
+        <label for="f-link">Link de pagamento</label>
         <input type="text" id="f-link" inputmode="url" autocapitalize="off" placeholder="https://...">
-
-        <label for="f-pix">Código Pix (copia e cola)</label>
-        <textarea id="f-pix" placeholder="Cole aqui o código Pix"></textarea>
 
         <div class="linha2">
           <button class="btn" type="submit" id="f-salvar">Salvar presente</button>
@@ -72,7 +69,7 @@
     <div class="cartao">
       <h2>Configurações do site</h2>
       <label class="chave"><input type="checkbox" id="c-auto" checked>
-        <span>Ordenar automaticamente do mais caro para o mais barato</span></label>
+        <span>Intercalar automaticamente: um caro, um barato, um caro, um barato…</span></label>
       <p class="dica2" id="c-dica"></p>
       <hr class="sep">
       <h2>Presentes cadastrados (<span id="qtd">0</span>)</h2>
@@ -124,7 +121,7 @@ $('c-auto').onchange = async e => {
   ordemAuto = e.target.checked;
   desenha();
   const ok = await Presentes.salvarConfig({ ordemAuto });
-  toast(ok ? (ordemAuto ? 'Ordem automática ligada.' : 'Ordem manual: use as setas para organizar.') : 'Não consegui salvar a configuração.', !ok);
+  toast(ok ? (ordemAuto ? 'Ordem intercalada ligada.' : 'Ordem manual: use as setas para organizar.') : 'Não consegui salvar a configuração.', !ok);
 };
 
 async function grava(msg) {
@@ -210,8 +207,8 @@ $('form').onsubmit = async e => {
   const dados = {
     titulo: $('f-tit').value.trim(),
     preco: parseFloat($('f-preco').value) || 0,
-    link: normalizaLink($('f-link').value),
-    pix: $('f-pix').value.trim(),
+    pagamento: normalizaLink($('f-link').value),
+    link: undefined, pix: undefined,   // campos antigos, não são mais usados
     imagem
   };
   if (!dados.titulo) return;
@@ -231,8 +228,8 @@ function desenha() {
   el.innerHTML = '';
   $('qtd').textContent = lista.length;
   $('vazio').style.display = lista.length ? 'none' : 'block';
-  $('c-dica').textContent = ordemAuto ? 'Os convidados veem do mais caro para o mais barato. As setas ↑ ↓ ficam desativadas.' : 'Os convidados veem na ordem desta lista. Use as setas ↑ ↓ para organizar.';
-  const exibida = ordemAuto ? porPreco(lista) : lista;
+  $('c-dica').textContent = ordemAuto ? 'Os convidados veem um presente caro, um barato, um caro, um barato… As setas ↑ ↓ ficam desativadas.' : 'Os convidados veem na ordem desta lista. Use as setas ↑ ↓ para organizar.';
+  const exibida = ordemAuto ? intercala(lista) : lista;
   exibida.forEach((p, i) => {
     const r = document.createElement('div'); r.className = 'row';
     const m = document.createElement('div'); m.className = 'mini';
@@ -241,7 +238,7 @@ function desenha() {
     const t = document.createElement('div'); t.className = 't'; t.textContent = p.titulo;
     const pr = document.createElement('div'); pr.className = 'p'; pr.textContent = brl(p.preco);
     const tg = document.createElement('div'); tg.className = 'tags';
-    tg.textContent = [p.link ? 'link' : '', p.pix ? 'pix' : ''].filter(Boolean).join(' · ') || 'sem link nem pix';
+    tg.textContent = linkPagamento(p) ? 'com link de pagamento' : 'sem link de pagamento';
     info.append(t, pr, tg);
     const dado = comprados[p.id];
     if (dado) {
@@ -278,7 +275,7 @@ async function move(i, d) {
 function edita(p) {
   editId = p.id; imagem = p.imagem || ''; src = null;
   $('f-tit').value = p.titulo; $('f-preco').value = p.preco;
-  $('f-link').value = p.link || ''; $('f-pix').value = p.pix || '';
+  $('f-link').value = p.pagamento || p.link || '';
   if (imagem) carregaSrc(imagem); else mostraPrevia();
   $('f-titulo').textContent = 'Editando presente';
   $('f-salvar').textContent = 'Salvar alterações';

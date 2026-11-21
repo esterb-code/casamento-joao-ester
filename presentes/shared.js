@@ -117,3 +117,18 @@ function dataExtenso(s) {
 
 // Do mais caro para o mais barato (empate mantém a ordem cadastrada)
 const porPreco = lista => lista.map((p, i) => [p, i]).sort((a, b) => (Number(b[0].preco) || 0) - (Number(a[0].preco) || 0) || a[1] - b[1]).map(x => x[0]);
+
+// Link de pagamento do presente (presentes antigos usavam "link")
+const linkPagamento = p => normalizaLink(p.pagamento || p.link);
+
+// Intercala: um caro, um barato, um caro, um barato... (do topo e do fim da lista ordenada por preço)
+function intercala(lista) {
+  const ord = porPreco(lista);
+  const r = [];
+  let i = 0, j = ord.length - 1;
+  while (i <= j) {
+    r.push(ord[i++]);
+    if (i <= j) r.push(ord[j--]);
+  }
+  return r;
+}
